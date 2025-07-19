@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Future Eraser - The Tomorrow That Will Never Be</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Dancing+Script&family=Courier+Prime&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Playfair Display', serif;
+            background: linear-gradient(180deg, #87CEEB 0%, #000000 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 10s ease;
+        }
+        
+        body.dark {
+            background: #000000;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            opacity: 0;
+            animation: fadeIn 2s forwards;
+        }
+        
+        .header h1 {
+            font-size: 3em;
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 10px;
+            font-family: 'Dancing Script', cursive;
+            transition: all 3s ease;
+        }
+        
+        .header h1.dying {
+            color: #333;
+            text-decoration: line-through;
+            transform: scale(0.8);
+            opacity: 0.5;
+        }
+        
+        .subtitle {
+            color: #FFF;
+            font-size: 1.2em;
+            font-style: italic;
+        }
+        
+        .timeline {
+            position: relative;
+            padding: 50px 0;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, #FFD700 0%, #000 100%);
+            transform: translateX(-50%);
+            transition: background 5s ease;
+        }
+        
+        .timeline.ending::before {
+            background: #000;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 50px;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: slideIn 1s forwards;
+        }
+        
+        .timeline-item:nth-child(even) {
+            text-align: right;
+        }
+        
+        .timeline-content {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            max-width: 400px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .timeline-content.erasing {
+            animation: disintegrate 2s forwards;
+        }
+        
+        .timeline-content h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #FFD700;
+            transition: all 1s ease;
+        }
+        
+        .timeline-content.erasing h3 {
+            text-decoration: line-through;
+            color: #666;
+            opacity: 0.5;
+        }
+        
+        .timeline-content p {
+            color: #333;
+            line-height: 1.6;
+            transition: all 1s ease;
+        }
+        
+        .timeline-content.erasing p {
+            text-decoration: line-through;
+            opacity: 0.3;
+        }
+        
+        .date {
+            font-weight: bold;
+            color: #87CEEB;
+            margin-bottom: 5px;
+            font-family: 'Courier Prime', monospace;
+        }
+        
+        .photo-frame {
+            width: 150px;
+            height: 150px;
+            background: #FFF;
+            border: 5px solid #D4AF37;
+            margin: 20px auto;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+        
+        .photo-frame.shattered {
+            animation: shatter 1.5s forwards;
+        }
+        
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: sepia(0.3);
+        }
+        
+        .add-future {
+            text-align: center;
+            margin: 50px 0;
+        }
+        
+        .add-future input {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border: 2px solid #FFD700;
+            border-radius: 5px;
+            margin-right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .add-future button {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            background: #FFD700;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Playfair Display', serif;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .add-future button:hover {
+            background: #FFA500;
+            transform: scale(1.05);
+        }
+        
+        .clock {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 2em;
+            color: #FFF;
+            font-family: 'Courier Prime', monospace;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+        
+        .clock.stopped {
+            animation: pulse 1s infinite;
+            color: #FF0000;
+        }
+        
+        .message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3em;
+            color: #FF0000;
+            text-align: center;
+            display: none;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.8);
+            font-weight: bold;
+            z-index: 1000;
+        }
+        
+        .message.show {
+            display: block;
+            animation: flash 3s ease-in-out;
+        }
+        
+        .calculator {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 10px;
+            margin: 50px auto;
+            max-width: 600px;
+            text-align: center;
+            display: none;
+            color: #FFF;
+        }
+        
+        .calculator.show {
+            display: block;
+            animation: fadeIn 2s forwards;
+        }
+        
+        .calculator h3 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #FF0000;
+        }
+        
+        .years-alone {
+            font-size: 4em;
+            color: #FFD700;
+            font-weight: bold;
+            margin: 20px 0;
+            font-family: 'Courier Prime', monospace;
+        }
+        
+        .blueprint {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 800"><rect width="1000" height="800" fill="%230033CC" opacity="0.1"/><path d="M100 400 L900 400 M500 100 L500 700 M100 100 L900 100 L900 700 L100 700 Z" stroke="%23FFF" stroke-width="2" opacity="0.3"/><text x="500" y="50" text-anchor="middle" fill="%23FFF" opacity="0.5" font-size="24">DREAM HOME</text></svg>') no-repeat center;
+            background-size: cover;
+            opacity: 0.1;
+            z-index: -1;
+            transition: opacity 3s ease;
+        }
+        
+        .blueprint.crumbling {
+            animation: crumble 5s forwards;
+        }
+        
+        .infinity-calendar {
+            background: #000;
+            padding: 50px;
+            text-align: center;
+            display: none;
+            min-height: 100vh;
+        }
+        
+        .infinity-calendar.show {
+            display: block;
+        }
+        
+        .infinity-calendar h2 {
+            color: #FFF;
+            font-size: 3em;
+            margin-bottom: 30px;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .calendar-day {
+            background: #111;
+            padding: 20px;
+            border: 1px solid #333;
+            color: #444;
+            font-size: 1.2em;
+            opacity: 0;
+            animation: fadeIn 0.1s forwards;
+        }
+        
+        .epitaph {
+            text-align: center;
+            padding: 100px 20px;
+            display: none;
+        }
+        
+        .epitaph.show {
+            display: block;
+            animation: fadeIn 3s forwards;
+        }
+        
+        .epitaph h2 {
+            font-size: 3em;
+            color: #FFF;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.8);
+        }
+        
+        .epitaph p {
+            font-size: 1.5em;
+            color: #AAA;
+            font-style: italic;
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes disintegrate {
+            0% { transform: scale(1) rotate(0deg); opacity: 1; }
+            50% { transform: scale(1.1) rotate(5deg); opacity: 0.7; }
+            100% { transform: scale(0) rotate(15deg); opacity: 0; }
+        }
+        
+        @keyframes shatter {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(10deg); }
+            100% { transform: scale(0) rotate(45deg); opacity: 0; }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        @keyframes flash {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+        
+        @keyframes crumble {
+            0% { transform: scale(1); opacity: 0.1; }
+            50% { transform: scale(1.1) rotate(2deg); opacity: 0.2; }
+            100% { transform: scale(0.8) rotate(-5deg); opacity: 0; }
+        }
+        
+        .try-save {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 20px 40px;
+            background: #28A745;
+            color: #FFF;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2em;
+            cursor: pointer;
+            display: none;
+            transition: all 0.3s ease;
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .try-save.show {
+            display: block;
+            animation: fadeIn 1s forwards;
+        }
+        
+        .try-save:hover {
+            transform: translateX(-50%) scale(1.1);
+        }
+        
+        .try-save.slipping {
+            animation: slipAway 2s forwards;
+        }
+        
+        @keyframes slipAway {
+            0% { transform: translateX(-50%) scale(1); opacity: 1; }
+            50% { transform: translateX(200%) scale(0.8); opacity: 0.5; }
+            100% { transform: translateX(500%) scale(0); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="blueprint"></div>
+    
+    <div class="container" id="mainContainer">
+        <div class="header">
+            <h1 id="mainTitle">Our Beautiful Future Together</h1>
+            <p class="subtitle">Delete the tomorrow you planned together</p>
+        </div>
+        
+        <div class="timeline" id="timeline">
+            <div class="timeline-item" style="animation-delay: 0.5s">
+                <div class="timeline-content" onclick="eraseThis(this)">
+                    <div class="date">June 2024</div>
+                    <h3>Our Wedding Day</h3>
+                    <p>The day we say "I do" surrounded by family and friends</p>
+                    <div class="photo-frame">
+                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect fill='%23F0E68C' width='200' height='200'/><circle cx='100' cy='80' r='30' fill='%23FFB6C1'/><path d='M70 120 Q100 150 130 120' fill='%23FFF'/></svg>" alt="Wedding">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-item" style="animation-delay: 1s">
+                <div class="timeline-content" onclick="eraseThis(this)">
+                    <div class="date">December 2024</div>
+                    <h3>Our First Home</h3>
+                    <p>Moving into the house we've been dreaming about</p>
+                    <div class="photo-frame">
+                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect fill='%2387CEEB' width='200' height='200'/><polygon points='100,50 150,100 150,150 50,150 50,100' fill='%23D2691E'/><polygon points='100,50 50,100 150,100' fill='%238B4513'/></svg>" alt="House">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-item" style="animation-delay: 1.5s">
+                <div class="timeline-content" onclick="eraseThis(this)">
+                    <div class="date">Summer 2025</div>
+                    <h3>Paris Honeymoon</h3>
+                    <p>Finally taking that trip we've been planning for years</p>
+                    <div class="photo-frame">
+                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect fill='%23FFB6C1' width='200' height='200'/><polygon points='100,40 80,160 120,160' fill='%23696969'/><circle cx='100' cy='40' r='10' fill='%23FFD700'/></svg>" alt="Paris">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-item" style="animation-delay: 2s">
+                <div class="timeline-content" onclick="eraseThis(this)">
+                    <div class="date">2026</div>
+                    <h3>First Child</h3>
+                    <p>Welcoming little Emma or James into our family</p>
+                    <div class="photo-frame">
+                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect fill='%23E6E6FA' width='200' height='200'/><circle cx='100' cy='100' r='40' fill='%23FFE4B5'/><circle cx='90' cy='90' r='5' fill='%23000'/><circle cx='110' cy='90' r='5' fill='%23000'/><path d='M90 110 Q100 120 110 110' stroke='%23000' fill='none'/></svg>" alt="Baby">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-item" style="animation-delay: 2.5s">
+                <div class="timeline-content" onclick="eraseThis(this)">
+                    <div class="date">2030</div>
+                    <h3>Family Complete</h3>
+                    <p>Our family of four, just as we always imagined</p>
+                    <div class="photo-frame">
+                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect fill='%2398FB98' width='200' height='200'/><circle cx='70' cy='80' r='20' fill='%23FFE4B5'/><circle cx='130' cy='80' r='20' fill='%23FFE4B5'/><circle cx='70' cy='130' r='15' fill='%23FFE4B5'/><circle cx='130' cy='130' r='15' fill='%23FFE4B5'/></svg>" alt="Family">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="timeline-item" style="animation-delay: 3s">
+                <div class="timeline-content" onclick="eraseThis(this)">
+                    <div class="date">2050</div>
+                    <h3>Growing Old Together</h3>
+                    <p>Still holding hands after all these years</p>
+                    <div class="photo-frame">
+                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect fill='%23F0E68C' width='200' height='200'/><circle cx='80' cy='100' r='30' fill='%23FFE4B5'/><circle cx='120' cy='100' r='30' fill='%23FFE4B5'/><path d='M80 100 L120 100' stroke='%23D2691E' stroke-width='3'/></svg>" alt="Old Couple">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="add-future">
+            <input type="text" id="futureInput" placeholder="Add your specific dream...">
+            <button onclick="addFuture()">Add Future to Erase</button>
+        </div>
+        
+        <button class="try-save" onclick="trySave()">Try to Save This Future</button>
+    </div>
+    
+    <div class="calculator">
+        <h3>Years You'll Now Spend Alone</h3>
+        <div class="years-alone" id="yearsAlone">0</div>
+        <p>Based on average life expectancy</p>
+    </div>
+    
+    <div class="infinity-calendar" id="infinityCalendar">
+        <h2>Your Empty Calendar Stretching Into Infinity</h2>
+        <div class="calendar-grid" id="calendarGrid"></div>
+    </div>
+    
+    <div class="epitaph">
+        <h2>Here Lies The Life We Would Have Lived</h2>
+        <p>2024 - Never</p>
+    </div>
+    
+    <div class="clock" id="clock">12:00:00</div>
+    
+    <div class="message" id="message"></div>
+    
+    <audio id="tickSound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBCuBzvLZiTYJG2m98OScTgwOUajm7blmFgU0kNXyzn0vBSh+zPLaizsIGGq68u6fXQ0PVq/k8L5tIAQlg8zzz4k2Chhov+3mnEwKDlOm6O+3YRsGN5DU8stxKAUuhM/yz4U0ChZqvu3mmEgKDlKk6ey5XhkFOJLW8slvJAUwhtDyzIY1ChVovO3mn0wKDVKl6e62XhoGOpPY8sdtIgU1h9L1wX4hBDGJ1PLMhTMKFGu+7OaVRwoOUqPq8LtrGwc1kdby0ncqBSl+zPDfkz8LF2+/8OScSAwOUqPt8LVmGAU3lNT1w3kpBChzv+/jl0ILDWK68OaNQwwUXLHz5Y9FDAxYqOnyx2wdBDOV0erJeisFJn3L896GNwUYb73y5plKDQ1PoujtxGsfBTuY0O3OgzELGGO86+qhVQ0KTZ7g8MBuHgUyisvvyHkiBDSX0ObLfS8GHm7A7OWcSA0KVZ/i8bJlFwU9lM7tyHkiBDSX0ObLfS8GHm7A7OWcSA0KVZ/i8bJlFwU9lM7tyHkiBDSX0ObLfS8GHm7A7OWcSA0KVZ/i8bJlFwU9lM7tyHkiBDSX0ObLfS8GHm7A7OWcSA0KVZ/i8bJlFwU9lM7tyHkiBDSX0ObLfS8GHm7A7OWcSA0KVZ/i8bJlFwU9lM7tyHkiBDSX0ObLfS8GHm7A7OWcSA0KVZ/i8bJlFwU9lM7tyHkiBDSX0ObLfS8GHm7A7OWcSA0KVZ/i8bJlFwU9lM7tyHkiBDSX0ObLfS8GHm7A7OWcSA0KVZ/i8bJlFwU9lM7tyHkiBDSX0ObLfS8GHm7A7OWcSA0KVZ/i8bJlFwU9lM7tyHkiBDSX0ObLfS8GHm7A7OWcSA0KVZ/i8bJlFwU9lM7tyHkiBDSX0ObLfS8GHm7A7OWcSA0KVZ/i8bJlFwU9lM7tyHkiBDSX0ObLfS8GHm7A7OWcSA0KVZ/i8bJlFwU9lM7tyHkiBDSX0ObLfS8GHnkiBDSX0ObLfS8GHm7A7OWcSA0KVZ/i8bJlFwU9lM7tyHkiBDSX0ObLfS8GHm7A7OWcSA0KVZ/i8bJlFwU9lM7tyHkiBDSX0ObLfS8GHm7A7OWcSA0KVZ/i8bJlFwU9lM7tyHkiBDSX0ObLfS8GHm7A7OWcSA==" type="audio/wav">
+    </audio>
+    
+    <script>
+        let erasedCount = 0;
+        let totalItems = 6;
+        let clockInterval;
+        let saveTries = 0;
+        
+        // Clock functionality
+        function updateClock() {
+            const now = new Date();
+            const time = now.toLocaleTimeString();
+            document.getElementById('clock').textContent = time;
+        }
+        
+        clockInterval = setInterval(updateClock, 1000);
+        
+        // Erase timeline item
+        function eraseThis(element) {
+            if (element.classList.contains('erasing')) return;
+            
+            element.classList.add('erasing');
+            const photoFrame = element.querySelector('.photo-frame');
+            if (photoFrame) {
+                photoFrame.classList.add('shattered');
+            }
+            
+            // Play tick sound
+            const tickSound = document.getElementById('tickSound');
+            tickSound.play().catch(() => {});
+            
+            erasedCount++;
+            
+            // Update future text
+            const h3 = element.querySelector('h3');
+            const p = element.querySelector('p');
+            
+            setTimeout(() => {
+                if (h3.textContent === 'Our Wedding Day') {
+                    h3.textContent = 'Perpetual Solitude';
+                    p.textContent = 'The day that will never come';
+                } else if (h3.textContent === 'Paris Honeymoon') {
+                    h3.textContent = 'MY Trip to Nowhere';
+                    p.textContent = 'Traveling alone through empty dreams';
+                }
+            }, 500);
+            
+            // Check progress
+            if (erasedCount >= totalItems / 2) {
+                document.body.classList.add('dark');
+                document.querySelector('.blueprint').classList.add('crumbling');
+                document.getElementById('mainTitle').classList.add('dying');
+                
+                // Show save button
+                document.querySelector('.try-save').classList.add('show');
+            }
+            
+            if (erasedCount >= totalItems) {
+                setTimeout(() => {
+                    stopClock();
+                    showMessage('TOMORROW DIED TODAY');
+                    setTimeout(() => {
+                        showMessage('THE FUTURE YOU KNEW NO LONGER EXISTS');
+                        setTimeout(() => {
+                            showCalculator();
+                        }, 3000);
+                    }, 3000);
+                }, 1000);
+            }
+            
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 2000);
+        }
+        
+        // Add custom future
+        function addFuture() {
+            const input = document.getElementById('futureInput');
+            const futureText = input.value.trim();
+            
+            if (!futureText) return;
+            
+            const timeline = document.getElementById('timeline');
+            const newItem = document.createElement('div');
+            newItem.className = 'timeline-item';
+            newItem.style.opacity = '0';
+            
+            const erasedVersion = futureText.replace(/our/gi, 'MY')
+                                          .replace(/we/gi, 'I')
+                                          .replace(/us/gi, 'ME');
+            
+            newItem.innerHTML = `
+                <div class="timeline-content" onclick="eraseThis(this)">
+                    <div class="date">Someday</div>
+                    <h3>${futureText}</h3>
+                    <p>A dream that will become "${erasedVersion}"</p>
+                    <div class="photo-frame">
+                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect fill='%23DDD' width='200' height='200'/><text x='100' y='100' text-anchor='middle' font-size='60' fill='%23999'>?</text></svg>" alt="Unknown">
+                    </div>
+                </div>
+            `;
+            
+            timeline.appendChild(newItem);
+            totalItems++;
+            
+            setTimeout(() => {
+                newItem.style.opacity = '1';
+                newItem.style.animation = 'slideIn 1s forwards';
+            }, 100);
+            
+            input.value = '';
+        }
+        
+        // Try to save (but fail)
+        function trySave() {
+            saveTries++;
+            const button = document.querySelector('.try-save');
+            button.classList.add('slipping');
+            
+            setTimeout(() => {
+                button.classList.remove('slipping');
+                button.style.left = Math.random() * 80 + '%';
+                button.style.bottom = Math.random() * 200 + 50 + 'px';
+                
+                if (saveTries >= 3) {
+                    button.style.display = 'none';
+                    showMessage('YOU CAN\'T SAVE WHAT\'S ALREADY GONE');
+                }
+            }, 2000);
+        }
+        
+        // Stop clock
+        function stopClock() {
+            clearInterval(clockInterval);
+            document.getElementById('clock').classList.add('stopped');
+        }
+        
+        // Show message
+        function showMessage(text) {
+            const message = document.getElementById('message');
+            message.textContent = text;
+            message.classList.add('show');
+            
+            setTimeout(() => {
+                message.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Show life calculator
+        function showCalculator() {
+            const calculator = document.querySelector('.calculator');
+            calculator.classList.add('show');
+            
+            const currentAge = 30; // Assumed age
+            const lifeExpectancy = 80;
+            const yearsAlone = lifeExpectancy - currentAge;
+            
+            let counter = 0;
+            const interval = setInterval(() => {
+                counter++;
+                document.getElementById('yearsAlone').textContent = counter;
+                
+                if (counter >= yearsAlone) {
+                    clearInterval(interval);
+                    setTimeout(showInfinityCalendar, 2000);
+                }
+            }, 50);
+        }
+        
+        // Show infinity calendar
+        function showInfinityCalendar() {
+            document.getElementById('mainContainer').style.display = 'none';
+            document.querySelector('.calculator').style.display = 'none';
+            
+            const calendar = document.getElementById('infinityCalendar');
+            calendar.classList.add('show');
+            
+            const grid = document.getElementById('calendarGrid');
+            
+            // Generate empty calendar days
+            for (let i = 0; i < 365; i++) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day';
+                day.textContent = '∅';
+                day.style.animationDelay = (i * 10) + 'ms';
+                grid.appendChild(day);
+            }
+            
+            setTimeout(() => {
+                calendar.style.display = 'none';
+                document.querySelector('.epitaph').classList.add('show');
+            }, 10000);
+        }
+        
+        // Initialize
+        updateClock();
+        
+        // Add enter key support for input
+        document.getElementById('futureInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addFuture();
+            }
+        });
+    </script>
+</body>
+</html>

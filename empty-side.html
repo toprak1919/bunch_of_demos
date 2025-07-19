@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empty Side Syndrome</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            overflow: hidden;
+            background: #0a0a0a;
+            color: #fff;
+            position: relative;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            position: relative;
+        }
+
+        .side {
+            width: 50%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .your-side {
+            background: linear-gradient(135deg, #2a1810 0%, #1a0f08 100%);
+            border-right: 2px solid #111;
+        }
+
+        .their-side {
+            background: linear-gradient(135deg, #0a0a0a 0%, #050505 100%);
+            position: relative;
+        }
+
+        .bed-container {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 300px;
+            perspective: 800px;
+        }
+
+        .bed {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(15deg);
+        }
+
+        .mattress {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #f5f5f5;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .your-side .mattress {
+            background: linear-gradient(90deg, #faf5f0 0%, #f0e6dc 100%);
+        }
+
+        .their-side .mattress {
+            background: linear-gradient(90deg, #d0d0d0 0%, #a0a0a0 100%);
+            filter: brightness(0.3);
+        }
+
+        .pillow {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 80px;
+            background: #fff;
+            border-radius: 40px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .your-side .pillow {
+            background: #fff;
+            animation: breathe 4s ease-in-out infinite;
+        }
+
+        .their-side .pillow {
+            background: #e0e0e0;
+            box-shadow: inset 0 -10px 20px rgba(0,0,0,0.5);
+        }
+
+        .head-indent {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40%;
+            height: 60%;
+            background: radial-gradient(ellipse, rgba(0,0,0,0.3) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.02); }
+        }
+
+        .heat-map {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .your-side .heat-map {
+            background: radial-gradient(circle at 50% 40%, rgba(255,100,0,0.4) 0%, transparent 60%);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .their-side .heat-map {
+            background: radial-gradient(circle at 50% 40%, rgba(0,100,255,0.3) 0%, transparent 60%);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 0.8; }
+        }
+
+        .daily-items {
+            position: absolute;
+            bottom: 20%;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            padding: 0 50px;
+        }
+
+        .item {
+            text-align: center;
+            opacity: 0;
+            animation: fadeIn 2s forwards;
+        }
+
+        .item:nth-child(2) { animation-delay: 0.5s; }
+        .item:nth-child(3) { animation-delay: 1s; }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .coffee-cup {
+            width: 60px;
+            height: 70px;
+            background: #8B4513;
+            border-radius: 0 0 30px 30px;
+            position: relative;
+            margin: 0 auto 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .coffee-cup::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px;
+            height: 20px;
+            background: #6B3410;
+            border-radius: 50%;
+        }
+
+        .coffee-cup::after {
+            content: '';
+            position: absolute;
+            right: -15px;
+            top: 10px;
+            width: 20px;
+            height: 30px;
+            border: 5px solid #8B4513;
+            border-left: none;
+            border-radius: 0 15px 15px 0;
+        }
+
+        .their-side .coffee-cup {
+            opacity: 0.3;
+            filter: grayscale(100%);
+            position: relative;
+        }
+
+        .their-side .coffee-cup::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent 30%, rgba(100,100,100,0.5) 100%);
+            border-radius: inherit;
+        }
+
+        .dust {
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            opacity: 0;
+            animation: gatherDust 10s forwards;
+        }
+
+        @keyframes gatherDust {
+            to {
+                opacity: 1;
+                box-shadow: 0 0 20px rgba(150,150,150,0.3);
+                filter: blur(0.5px);
+            }
+        }
+
+        .their-side .coffee-cup .dust {
+            display: block;
+        }
+
+        .toothbrush {
+            width: 10px;
+            height: 80px;
+            background: #4169E1;
+            margin: 0 auto 10px;
+            border-radius: 5px 5px 0 0;
+            position: relative;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+        }
+
+        .toothbrush::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: -5px;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 3px;
+        }
+
+        .their-side .toothbrush {
+            opacity: 0.2;
+            filter: grayscale(100%);
+            animation: fadeGhost 5s infinite;
+        }
+
+        @keyframes fadeGhost {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.1; }
+        }
+
+        .plate {
+            width: 80px;
+            height: 80px;
+            background: #fff;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .plate::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 50%;
+        }
+
+        .their-side .plate {
+            animation: fadePlate 8s forwards;
+        }
+
+        @keyframes fadePlate {
+            to {
+                opacity: 0.1;
+                transform: scale(0.8);
+            }
+        }
+
+        .message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            text-align: center;
+            letter-spacing: 3px;
+            opacity: 0;
+            animation: messageAppear 5s forwards;
+            animation-delay: 3s;
+            text-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        .their-side .message {
+            color: #666;
+        }
+
+        @keyframes messageAppear {
+            to { opacity: 0.8; }
+        }
+
+        .clock {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 150px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        .clock-face {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .hand {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform-origin: bottom center;
+            background: #333;
+        }
+
+        .hour-hand {
+            width: 4px;
+            height: 40px;
+            transform: translate(-50%, -100%) rotate(30deg);
+        }
+
+        .minute-hand {
+            width: 3px;
+            height: 55px;
+            transform: translate(-50%, -100%) rotate(180deg);
+        }
+
+        .your-side .hour-hand {
+            animation: rotateHour 43200s linear infinite;
+        }
+
+        .your-side .minute-hand {
+            animation: rotateMinute 3600s linear infinite;
+        }
+
+        @keyframes rotateHour {
+            to { transform: translate(-50%, -100%) rotate(390deg); }
+        }
+
+        @keyframes rotateMinute {
+            to { transform: translate(-50%, -100%) rotate(540deg); }
+        }
+
+        .their-side .clock {
+            filter: grayscale(100%) brightness(0.5);
+        }
+
+        .center-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background: #333;
+            border-radius: 50%;
+        }
+
+        .shadows {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 0;
+            background: linear-gradient(to top, #000 0%, transparent 100%);
+            animation: creepingShadows 15s forwards;
+            animation-delay: 5s;
+        }
+
+        @keyframes creepingShadows {
+            to { height: 60%; }
+        }
+
+        .warning {
+            position: absolute;
+            bottom: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            letter-spacing: 2px;
+            color: #666;
+            opacity: 0;
+            animation: warningPulse 3s ease-in-out infinite;
+            animation-delay: 10s;
+            text-align: center;
+            width: 80%;
+        }
+
+        @keyframes warningPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        .echo-text {
+            position: absolute;
+            font-size: 18px;
+            color: #444;
+            opacity: 0;
+            animation: echo 4s ease-out forwards;
+        }
+
+        @keyframes echo {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1.2);
+            }
+        }
+
+        .their-side .item-label {
+            opacity: 0.3;
+            animation: fadeText 10s forwards;
+        }
+
+        @keyframes fadeText {
+            to {
+                opacity: 0.05;
+                letter-spacing: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="side your-side">
+            <div class="heat-map"></div>
+            <div class="clock">
+                <div class="clock-face">
+                    <div class="hand hour-hand"></div>
+                    <div class="hand minute-hand"></div>
+                    <div class="center-dot"></div>
+                </div>
+            </div>
+            <div class="bed-container">
+                <div class="bed">
+                    <div class="mattress"></div>
+                    <div class="pillow"></div>
+                </div>
+            </div>
+            <div class="daily-items">
+                <div class="item">
+                    <div class="coffee-cup"></div>
+                    <div class="item-label">Morning Coffee</div>
+                </div>
+                <div class="item">
+                    <div class="toothbrush"></div>
+                    <div class="item-label">Daily Routine</div>
+                </div>
+                <div class="item">
+                    <div class="plate"></div>
+                    <div class="item-label">Dinner</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="side their-side">
+            <div class="heat-map"></div>
+            <div class="clock">
+                <div class="clock-face">
+                    <div class="hand hour-hand"></div>
+                    <div class="hand minute-hand"></div>
+                    <div class="center-dot"></div>
+                </div>
+            </div>
+            <div class="bed-container">
+                <div class="bed">
+                    <div class="mattress"></div>
+                    <div class="pillow">
+                        <div class="head-indent"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="daily-items">
+                <div class="item">
+                    <div class="coffee-cup">
+                        <div class="dust"></div>
+                    </div>
+                    <div class="item-label">Morning Coffee</div>
+                </div>
+                <div class="item">
+                    <div class="toothbrush"></div>
+                    <div class="item-label">Daily Routine</div>
+                </div>
+                <div class="item">
+                    <div class="plate"></div>
+                    <div class="item-label">Dinner</div>
+                </div>
+            </div>
+            <div class="message">THIS SIDE WILL ALWAYS BE EMPTY</div>
+            <div class="shadows"></div>
+            <div class="warning">SLEEPING DIAGONALLY DOESN'T FILL THE VOID</div>
+        </div>
+    </div>
+
+    <script>
+        // Create echo effects on their side
+        function createEcho() {
+            const theirSide = document.querySelector('.their-side');
+            const phrases = ['where are you?', 'come back', 'I miss you', 'empty', 'alone'];
+            
+            setInterval(() => {
+                const echo = document.createElement('div');
+                echo.className = 'echo-text';
+                echo.textContent = phrases[Math.floor(Math.random() * phrases.length)];
+                echo.style.left = Math.random() * 80 + 10 + '%';
+                echo.style.top = Math.random() * 80 + 10 + '%';
+                theirSide.appendChild(echo);
+                
+                setTimeout(() => echo.remove(), 4000);
+            }, 3000);
+        }
+
+        // Simulate temperature difference with cursor movement
+        document.addEventListener('mousemove', (e) => {
+            const width = window.innerWidth;
+            const x = e.clientX;
+            const yourSide = document.querySelector('.your-side .heat-map');
+            const theirSide = document.querySelector('.their-side .heat-map');
+            
+            if (x < width / 2) {
+                yourSide.style.opacity = '0.8';
+                theirSide.style.opacity = '0.3';
+            } else {
+                yourSide.style.opacity = '0.6';
+                theirSide.style.opacity = '0.5';
+            }
+        });
+
+        // Add subtle animations to emphasize emptiness
+        setTimeout(() => {
+            createEcho();
+        }, 2000);
+
+        // Gradually darken their side over time
+        let darkness = 0;
+        setInterval(() => {
+            if (darkness < 0.7) {
+                darkness += 0.01;
+                document.querySelector('.their-side').style.filter = `brightness(${1 - darkness})`;
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

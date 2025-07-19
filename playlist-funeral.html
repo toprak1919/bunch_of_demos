@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playlist Funeral - Where Songs Go to Die</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Nosifer&family=UnifrakturMaguntia&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            color: #999;
+            font-family: Arial, sans-serif;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        /* Background transformation */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600"><rect fill="%23000"/><circle cx="500" cy="300" r="200" fill="%23111" opacity="0.5"/></svg>') center/cover;
+            animation: venueToGraveyard 20s infinite;
+        }
+        
+        @keyframes venueToGraveyard {
+            0%, 100% {
+                filter: blur(0px) brightness(0.3);
+                background-position: center;
+            }
+            50% {
+                filter: blur(2px) brightness(0.1);
+                background-position: center bottom;
+            }
+        }
+        
+        /* Tombstone particles */
+        .tombstone-particle {
+            position: fixed;
+            width: 4px;
+            height: 6px;
+            background: #333;
+            animation: float-up 10s linear infinite;
+        }
+        
+        @keyframes float-up {
+            from {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.5;
+            }
+            90% {
+                opacity: 0.5;
+            }
+            to {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 2px solid #222;
+        }
+        
+        .playlist-title {
+            font-family: 'UnifrakturMaguntia', cursive;
+            font-size: 3em;
+            color: #666;
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+            animation: decay 5s infinite;
+        }
+        
+        @keyframes decay {
+            0%, 100% {
+                filter: blur(0px);
+                opacity: 1;
+            }
+            50% {
+                filter: blur(1px);
+                opacity: 0.7;
+            }
+        }
+        
+        .playlist-status {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #555;
+        }
+        
+        .playlist-status .orphaned {
+            color: #800;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        .duration-info {
+            margin-top: 20px;
+            font-style: italic;
+            color: #444;
+            font-size: 0.9em;
+        }
+        
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 30px 0;
+            justify-content: center;
+        }
+        
+        .btn {
+            background: #222;
+            border: 1px solid #444;
+            color: #888;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:hover {
+            background: #111;
+            color: #666;
+            transform: scale(0.95);
+        }
+        
+        .btn-play {
+            font-size: 1.5em;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-bury {
+            background: #200;
+            border-color: #400;
+            color: #800;
+        }
+        
+        .btn-bury:hover {
+            background: #300;
+            box-shadow: 0 0 20px rgba(128, 0, 0, 0.5);
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: #111;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: #800;
+            width: 0%;
+            transition: width 0.5s;
+            position: relative;
+        }
+        
+        .flatline {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #0f0;
+            transform: translateY(-50%);
+            opacity: 0;
+            animation: flatlineAppear 3s forwards 2s;
+        }
+        
+        @keyframes flatlineAppear {
+            to {
+                opacity: 0.5;
+            }
+        }
+        
+        .song-list {
+            margin-top: 40px;
+        }
+        
+        .song-item {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #222;
+            position: relative;
+            transition: all 0.5s;
+            cursor: pointer;
+        }
+        
+        .song-item:hover {
+            background: rgba(128, 0, 0, 0.1);
+        }
+        
+        .song-item.dying {
+            animation: songDeath 5s forwards;
+        }
+        
+        @keyframes songDeath {
+            0% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            50% {
+                opacity: 0.5;
+                transform: translateX(-10px);
+            }
+            100% {
+                opacity: 0.3;
+                transform: translateX(0) scale(0.95);
+                filter: grayscale(100%) blur(1px);
+            }
+        }
+        
+        .album-cover {
+            width: 60px;
+            height: 60px;
+            background: #222;
+            margin-right: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all 2s;
+        }
+        
+        .album-cover.tombstone {
+            border-radius: 50% 50% 0 0;
+            background: linear-gradient(180deg, #333 0%, #222 50%, #111 100%);
+            filter: grayscale(100%);
+        }
+        
+        .album-cover.tombstone::after {
+            content: "RIP";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            color: #666;
+            font-family: 'Creepster', cursive;
+        }
+        
+        .song-info {
+            flex: 1;
+        }
+        
+        .song-title {
+            font-size: 1.1em;
+            color: #aaa;
+            margin-bottom: 5px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .song-title.corrupting {
+            animation: corrupt 3s infinite;
+        }
+        
+        @keyframes corrupt {
+            0%, 100% {
+                filter: blur(0px);
+                text-shadow: none;
+            }
+            25% {
+                filter: blur(0.5px);
+                text-shadow: 2px 0 red, -2px 0 cyan;
+            }
+            50% {
+                filter: blur(1px);
+                text-shadow: 4px 0 red, -4px 0 cyan;
+            }
+        }
+        
+        .song-artist {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .eulogy {
+            font-size: 0.8em;
+            color: #555;
+            font-style: italic;
+            margin-top: 5px;
+            opacity: 0;
+            animation: fadeIn 2s forwards 1s;
+        }
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .our-song-marker {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #400;
+            color: #a00;
+            padding: 5px 10px;
+            font-size: 0.8em;
+            font-family: 'Creepster', cursive;
+            animation: glow 2s infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(128, 0, 0, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(128, 0, 0, 0.8);
+            }
+        }
+        
+        .candle-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5em;
+            margin-left: 10px;
+            transition: all 0.3s;
+        }
+        
+        .candle-btn:hover {
+            transform: scale(1.2);
+            filter: drop-shadow(0 0 10px rgba(255, 200, 0, 0.5));
+        }
+        
+        .message-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Nosifer', cursive;
+            font-size: 2em;
+            color: #a00;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            text-shadow: 0 0 30px rgba(255, 0, 0, 0.8);
+            animation: messageAppear 5s forwards 3s;
+        }
+        
+        @keyframes messageAppear {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+            100% {
+                opacity: 0.8;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+        
+        .final-message {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.9em;
+            color: #666;
+            text-align: center;
+            opacity: 0;
+            animation: fadeIn 3s forwards 8s;
+        }
+        
+        /* Distorted audio effect visualization */
+        .audio-distortion {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(255, 0, 0, 0.03) 2px,
+                rgba(255, 0, 0, 0.03) 4px
+            );
+            animation: distort 0.5s infinite;
+        }
+        
+        .audio-distortion.active {
+            opacity: 1;
+        }
+        
+        @keyframes distort {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            50% {
+                transform: translateX(2px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="audio-distortion" id="audioDistortion"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1 class="playlist-title">Summer Nights Together</h1>
+            <div class="playlist-status">
+                Was shared with Sarah<br>
+                <span class="orphaned">Orphaned playlist - No longer collaborative</span>
+            </div>
+            <div class="duration-info">
+                3 hours of happiness, now an eternity of sorrow
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" onclick="exhumeMemory()">Exhume Random Memory</button>
+            <button class="btn btn-play" onclick="playDistorted()">▶</button>
+            <button class="btn btn-bury" onclick="buryNext()">Bury</button>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+            <div class="flatline"></div>
+        </div>
+        
+        <div class="song-list">
+            <div class="song-item" data-song="1">
+                <div class="album-cover" id="cover1"></div>
+                <div class="song-info">
+                    <div class="song-title">Perfect</div>
+                    <div class="song-artist">Ed Sheeran</div>
+                    <div class="eulogy">This was our song. Now it's just noise.</div>
+                </div>
+                <button class="candle-btn" onclick="lightCandle(this)">🕯️</button>
+                <div class="our-song-marker">OUR SONG</div>
+            </div>
+            
+            <div class="song-item" data-song="2">
+                <div class="album-cover" id="cover2"></div>
+                <div class="song-info">
+                    <div class="song-title">Thinking Out Loud</div>
+                    <div class="song-artist">Ed Sheeran</div>
+                    <div class="eulogy">We danced to this. The floor remembers our ghosts.</div>
+                </div>
+                <button class="candle-btn" onclick="lightCandle(this)">🕯️</button>
+            </div>
+            
+            <div class="song-item" data-song="3">
+                <div class="album-cover" id="cover3"></div>
+                <div class="song-info">
+                    <div class="song-title">All of Me</div>
+                    <div class="song-artist">John Legend</div>
+                    <div class="eulogy">You had all of me. Now there's nothing left.</div>
+                </div>
+                <button class="candle-btn" onclick="lightCandle(this)">🕯️</button>
+            </div>
+            
+            <div class="song-item" data-song="4">
+                <div class="album-cover" id="cover4"></div>
+                <div class="song-info">
+                    <div class="song-title">Can't Help Falling in Love</div>
+                    <div class="song-artist">Elvis Presley</div>
+                    <div class="eulogy">I couldn't help it. Now I can't help but forget.</div>
+                </div>
+                <button class="candle-btn" onclick="lightCandle(this)">🕯️</button>
+            </div>
+            
+            <div class="song-item" data-song="5">
+                <div class="album-cover" id="cover5"></div>
+                <div class="song-info">
+                    <div class="song-title">Make You Feel My Love</div>
+                    <div class="song-artist">Adele</div>
+                    <div class="eulogy">The storms came. You weren't there to hold me.</div>
+                </div>
+                <button class="candle-btn" onclick="lightCandle(this)">🕯️</button>
+            </div>
+            
+            <div class="song-item" data-song="6">
+                <div class="album-cover" id="cover6"></div>
+                <div class="song-info">
+                    <div class="song-title">A Thousand Years</div>
+                    <div class="song-artist">Christina Perri</div>
+                    <div class="eulogy">A thousand years condensed into a painful memory.</div>
+                </div>
+                <button class="candle-btn" onclick="lightCandle(this)">🕯️</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="message-overlay" id="messageOverlay">
+        THESE SONGS DIED WITH YOUR LOVE
+    </div>
+    
+    <div class="final-message">
+        MUSIC WILL NEVER SOUND THE SAME
+    </div>
+    
+    <audio id="distortedAudio"></audio>
+    
+    <script>
+        // Create tombstone particles
+        function createTombstoneParticles() {
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'tombstone-particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 10 + 's';
+                particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+                document.body.appendChild(particle);
+            }
+        }
+        
+        // Initialize decay effects
+        function initDecay() {
+            setTimeout(() => {
+                document.querySelectorAll('.album-cover').forEach((cover, index) => {
+                    setTimeout(() => {
+                        cover.classList.add('tombstone');
+                    }, index * 500);
+                });
+                
+                document.querySelectorAll('.song-title').forEach((title, index) => {
+                    setTimeout(() => {
+                        title.classList.add('corrupting');
+                    }, index * 700);
+                });
+                
+                document.querySelectorAll('.song-item').forEach((item, index) => {
+                    setTimeout(() => {
+                        item.classList.add('dying');
+                    }, index * 1000);
+                });
+            }, 2000);
+        }
+        
+        // Play distorted audio simulation
+        let isPlaying = false;
+        function playDistorted() {
+            const btn = document.querySelector('.btn-play');
+            const distortion = document.getElementById('audioDistortion');
+            
+            if (!isPlaying) {
+                isPlaying = true;
+                btn.textContent = '⏸';
+                distortion.classList.add('active');
+                
+                // Simulate progress
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += 0.5;
+                    document.getElementById('progressBar').style.width = progress + '%';
+                    
+                    if (progress >= 100) {
+                        clearInterval(progressInterval);
+                        isPlaying = false;
+                        btn.textContent = '▶';
+                        distortion.classList.remove('active');
+                    }
+                }, 100);
+                
+                // Create audio context for distortion effect
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(100, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 2);
+                
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 3);
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.start();
+                oscillator.stop(audioContext.currentTime + 3);
+            } else {
+                isPlaying = false;
+                btn.textContent = '▶';
+                distortion.classList.remove('active');
+            }
+        }
+        
+        // Bury the next song
+        let currentSong = 0;
+        function buryNext() {
+            const songs = document.querySelectorAll('.song-item');
+            if (currentSong < songs.length) {
+                const song = songs[currentSong];
+                song.style.opacity = '0.2';
+                song.style.transform = 'translateY(10px)';
+                song.style.filter = 'grayscale(100%) blur(2px)';
+                currentSong++;
+                
+                if (currentSong === songs.length) {
+                    document.getElementById('messageOverlay').style.opacity = '1';
+                }
+            }
+        }
+        
+        // Exhume random memory
+        function exhumeMemory() {
+            const songs = document.querySelectorAll('.song-item');
+            const randomIndex = Math.floor(Math.random() * songs.length);
+            const song = songs[randomIndex];
+            
+            song.style.animation = 'none';
+            setTimeout(() => {
+                song.style.animation = 'pulse 2s';
+            }, 10);
+        }
+        
+        // Light candle effect
+        function lightCandle(btn) {
+            btn.style.filter = 'drop-shadow(0 0 20px rgba(255, 200, 0, 0.8))';
+            btn.textContent = '🔥';
+            setTimeout(() => {
+                btn.style.filter = 'drop-shadow(0 0 10px rgba(255, 200, 0, 0.5))';
+                btn.textContent = '🕯️';
+            }, 2000);
+        }
+        
+        // Initialize on load
+        window.addEventListener('load', () => {
+            createTombstoneParticles();
+            initDecay();
+        });
+    </script>
+</body>
+</html>

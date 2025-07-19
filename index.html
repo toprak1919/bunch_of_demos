@@ -579,6 +579,83 @@
                 <div class="portal-description" style="border-color: #ff5722;">Witness the extinguishing of a cosmic bond, as two halves of one soul are torn apart for eternity</div>
             </a>
         </div>
+
+        <!-- The Void Between Hearts Section -->
+        <div class="section-divider">
+            <div class="divider-line" style="background: linear-gradient(90deg, transparent, #000000, #1a0033, #000000, transparent); height: 2px;"></div>
+            <div style="position: relative; height: 120px; display: flex; align-items: center; justify-content: center;">
+                <div style="position: absolute; width: 150px; height: 150px; background: radial-gradient(circle, transparent 30%, #000000 50%, #1a0033 70%, transparent 100%); border-radius: 50%; animation: void-pulse 4s ease-in-out infinite;"></div>
+                <h2 class="section-title" style="color: #1a0033; text-shadow: 0 0 30px #000000, 0 0 60px #1a0033, inset 0 0 20px #000000; position: relative; z-index: 1;">The Void Between Hearts</h2>
+            </div>
+            <p class="section-subtitle" style="color: #4a0080; text-shadow: 0 0 10px #000000;">Where absence becomes eternal and silence speaks louder than any scream</p>
+            <p class="section-subtitle" style="color: #2d004d; font-size: 0.85rem; margin-top: 0.5rem; opacity: 0.7;">The final frontier of loss - where even memories cease to exist</p>
+            <div class="divider-line" style="background: linear-gradient(90deg, transparent, #000000, #1a0033, #000000, transparent); height: 2px;"></div>
+        </div>
+
+        <style>
+            @keyframes void-pulse {
+                0%, 100% { 
+                    transform: scale(1); 
+                    filter: blur(3px);
+                    opacity: 0.3;
+                }
+                50% { 
+                    transform: scale(1.2); 
+                    filter: blur(8px);
+                    opacity: 0.6;
+                }
+            }
+            
+            .portal[data-portal^="void-heart"] .portal-symbol {
+                animation: void-drift 6s ease-in-out infinite;
+            }
+            
+            @keyframes void-drift {
+                0%, 100% { transform: translateY(0) scale(1); opacity: 0.7; }
+                50% { transform: translateY(-10px) scale(0.95); opacity: 1; }
+            }
+            
+            .portal[data-portal^="void-heart"]:hover .portal-symbol {
+                animation: void-collapse 1s ease-in-out infinite;
+            }
+            
+            @keyframes void-collapse {
+                0%, 100% { transform: scale(1) rotate(0deg); filter: brightness(0.5); }
+                50% { transform: scale(0.8) rotate(180deg); filter: brightness(0.2); }
+            }
+        </style>
+
+        <div class="portal-grid">
+            <a href="last-text-shrine.html" class="portal" data-portal="void-heart-text" style="--portal-color: #1a0033;">
+                <div class="portal-symbol" style="color: #4a0080; text-shadow: 0 0 20px #000000;">📱</div>
+                <div class="portal-name" style="color: #4a0080;">Last Text Shrine</div>
+                <div class="portal-description" style="border-color: #1a0033; background: rgba(0, 0, 0, 0.95);">Their final message frozen in time - the last words before the eternal silence began, unanswered forever</div>
+            </a>
+            
+            <a href="empty-side.html" class="portal" data-portal="void-heart-empty" style="--portal-color: #2d004d;">
+                <div class="portal-symbol" style="color: #2d004d; text-shadow: 0 0 20px #000000;">🛏️</div>
+                <div class="portal-name" style="color: #2d004d;">The Empty Side</div>
+                <div class="portal-description" style="border-color: #2d004d; background: rgba(0, 0, 0, 0.95);">The cold void where they used to sleep - their absence more present than they ever were</div>
+            </a>
+            
+            <a href="love-to-silence.html" class="portal" data-portal="void-heart-silence" style="--portal-color: #000033;">
+                <div class="portal-symbol" style="color: #000033; text-shadow: 0 0 20px #000000;">🔇</div>
+                <div class="portal-name" style="color: #000033;">Love to Silence</div>
+                <div class="portal-description" style="border-color: #000033; background: rgba(0, 0, 0, 0.95);">Trace the journey from whispered promises to deafening nothingness - where "I love you" became eternal mute</div>
+            </a>
+            
+            <a href="playlist-funeral.html" class="portal" data-portal="void-heart-playlist" style="--portal-color: #1a001a;">
+                <div class="portal-symbol" style="color: #1a001a; text-shadow: 0 0 20px #000000;">🎵</div>
+                <div class="portal-name" style="color: #1a001a;">Playlist Funeral</div>
+                <div class="portal-description" style="border-color: #1a001a; background: rgba(0, 0, 0, 0.95);">Bury the songs that were "ours" - each melody now a ghost haunting empty speakers</div>
+            </a>
+            
+            <a href="future-eraser.html" class="portal" data-portal="void-heart-future" style="--portal-color: #0d0d0d;">
+                <div class="portal-symbol" style="color: #0d0d0d; text-shadow: 0 0 20px #000000;">⏭️</div>
+                <div class="portal-name" style="color: #0d0d0d;">Future Eraser</div>
+                <div class="portal-description" style="border-color: #0d0d0d; background: rgba(0, 0, 0, 0.95);">Delete the dreams you built together - watch tomorrow dissolve into the void of never</div>
+            </a>
+        </div>
     </div>
     
     <!-- Secret message -->

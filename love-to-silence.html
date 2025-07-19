@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love to Silence - A Language Lost</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital@0;1&family=Courier+Prime&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a0a;
+            color: #ddd;
+            font-family: 'Crimson Text', serif;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        /* Dictionary background */
+        .dictionary-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(255,255,255,0.03) 2px,
+                    rgba(255,255,255,0.03) 4px
+                );
+            z-index: 1;
+        }
+        
+        .dictionary-words {
+            position: fixed;
+            font-size: 14px;
+            color: rgba(255,255,255,0.05);
+            font-family: 'Courier Prime', monospace;
+            pointer-events: none;
+            z-index: 2;
+        }
+        
+        .erasing {
+            animation: erase 8s forwards;
+        }
+        
+        @keyframes erase {
+            0% { opacity: 0.05; text-decoration: none; }
+            50% { opacity: 0.03; text-decoration: line-through; }
+            100% { opacity: 0; letter-spacing: -10px; }
+        }
+        
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+            text-align: center;
+            letter-spacing: 3px;
+            animation: fadeIn 2s ease-out;
+        }
+        
+        .subtitle {
+            font-size: 18px;
+            color: #888;
+            margin-bottom: 50px;
+            text-align: center;
+            font-style: italic;
+        }
+        
+        .days-counter {
+            color: #ff6b6b;
+        }
+        
+        /* Waveform */
+        .waveform-container {
+            width: 100%;
+            height: 100px;
+            margin: 30px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .waveform {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+        }
+        
+        .wave-bar {
+            width: 3px;
+            background: #ff6b6b;
+            transition: all 0.3s ease;
+            opacity: 0.8;
+        }
+        
+        .flatlining .wave-bar {
+            animation: flatline 3s forwards;
+        }
+        
+        @keyframes flatline {
+            to {
+                height: 1px !important;
+                opacity: 0.3;
+            }
+        }
+        
+        /* Input section */
+        .input-section {
+            width: 100%;
+            margin: 40px 0;
+        }
+        
+        .input-label {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #aaa;
+        }
+        
+        #loveInput {
+            width: 100%;
+            padding: 15px;
+            font-size: 24px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            font-family: 'Crimson Text', serif;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        #loveInput:focus {
+            outline: none;
+            border-color: rgba(255,107,107,0.3);
+            background: rgba(255,255,255,0.08);
+        }
+        
+        .translate-btn {
+            margin-top: 20px;
+            padding: 12px 30px;
+            font-size: 18px;
+            background: rgba(255,107,107,0.2);
+            border: 1px solid rgba(255,107,107,0.5);
+            color: #ff6b6b;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            font-family: 'Crimson Text', serif;
+        }
+        
+        .translate-btn:hover {
+            background: rgba(255,107,107,0.3);
+            transform: translateY(-2px);
+        }
+        
+        /* Translation display */
+        .translation-display {
+            width: 100%;
+            margin: 40px 0;
+            text-align: center;
+        }
+        
+        .decaying-text {
+            font-size: 36px;
+            min-height: 50px;
+            letter-spacing: 2px;
+            position: relative;
+        }
+        
+        .decaying-letter {
+            display: inline-block;
+            transition: all 0.5s ease;
+        }
+        
+        .fading {
+            opacity: 0;
+            transform: translateY(10px) scale(0.8);
+            filter: blur(2px);
+        }
+        
+        /* Corrupted phrases */
+        .corrupted-phrases {
+            margin: 40px 0;
+            width: 100%;
+        }
+        
+        .phrase-pair {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 15px 0;
+            font-size: 24px;
+            opacity: 0;
+            animation: appearAndCorrupt 5s ease-out forwards;
+        }
+        
+        .original {
+            color: #ff6b6b;
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+        
+        .arrow {
+            margin: 0 20px;
+            color: #666;
+        }
+        
+        .corrupted {
+            color: #888;
+        }
+        
+        @keyframes appearAndCorrupt {
+            0% { opacity: 0; transform: translateX(-20px); }
+            20% { opacity: 1; transform: translateX(0); }
+            80% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+        
+        /* Voice recorder */
+        .voice-section {
+            margin: 40px 0;
+            text-align: center;
+        }
+        
+        .record-btn {
+            padding: 15px 30px;
+            font-size: 18px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #ddd;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .record-btn:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .recording {
+            background: rgba(255,107,107,0.3);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        /* Echo effect */
+        .echo-container {
+            height: 100px;
+            position: relative;
+            margin: 20px 0;
+        }
+        
+        .echo {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            opacity: 0;
+            color: #ff6b6b;
+        }
+        
+        .echo.active {
+            animation: echoFade 3s ease-out forwards;
+        }
+        
+        @keyframes echoFade {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); letter-spacing: 20px; }
+        }
+        
+        /* Message */
+        .final-message {
+            font-size: 28px;
+            color: #ff6b6b;
+            text-align: center;
+            margin: 60px 0;
+            opacity: 0;
+            animation: fadeIn 3s ease-out 2s forwards;
+            letter-spacing: 3px;
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        
+        /* Cursor */
+        .cursor {
+            display: inline-block;
+            width: 3px;
+            height: 30px;
+            background: #fff;
+            animation: blink 1s infinite;
+            vertical-align: text-bottom;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        /* Static noise */
+        .static-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 100;
+            background-image: 
+                repeating-radial-gradient(
+                    circle at 50% 50%,
+                    transparent 0,
+                    rgba(255,255,255,0.05) 1px,
+                    transparent 2px
+                );
+            animation: static 0.1s infinite;
+        }
+        
+        .static-active {
+            opacity: 0.3;
+        }
+        
+        @keyframes static {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-1px, 1px); }
+        }
+        
+        /* Heart emoji transformation */
+        .emoji-transform {
+            font-size: 36px;
+            margin: 20px;
+            display: inline-block;
+            transition: all 1s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="dictionary-bg"></div>
+    <div class="static-overlay" id="staticOverlay"></div>
+    
+    <!-- Dictionary words in background -->
+    <div id="dictionaryWords"></div>
+    
+    <div class="container">
+        <h1>Love to Silence</h1>
+        <p class="subtitle">From poetry to silence in <span class="days-counter" id="daysCounter">0</span> days</p>
+        
+        <!-- Waveform visualization -->
+        <div class="waveform-container">
+            <div class="waveform" id="waveform"></div>
+        </div>
+        
+        <!-- Input section -->
+        <div class="input-section">
+            <p class="input-label">Enter old love messages...</p>
+            <input type="text" id="loveInput" placeholder="I love you..." autocomplete="off">
+            <button class="translate-btn" onclick="translateToSilence()">Translate to Silence</button>
+        </div>
+        
+        <!-- Translation display -->
+        <div class="translation-display">
+            <div class="decaying-text" id="decayingText"></div>
+        </div>
+        
+        <!-- Corrupted phrases -->
+        <div class="corrupted-phrases" id="corruptedPhrases"></div>
+        
+        <!-- Voice recorder section -->
+        <div class="voice-section">
+            <p style="margin-bottom: 20px; color: #888;">Say their name, hear it echo into void</p>
+            <button class="record-btn" id="recordBtn" onclick="toggleRecording()">
+                <span id="recordText">Press to Record</span>
+            </button>
+            <div class="echo-container" id="echoContainer"></div>
+        </div>
+        
+        <!-- Emoji transformation -->
+        <div style="text-align: center; margin: 40px 0;">
+            <span class="emoji-transform" id="emojiTransform"></span>
+        </div>
+        
+        <!-- Final message -->
+        <div class="final-message">
+            LOVE HAS NO LANGUAGE ANYMORE<span class="cursor"></span>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize days counter
+        let days = 0;
+        const daysCounter = document.getElementById('daysCounter');
+        setInterval(() => {
+            days += 0.1;
+            daysCounter.textContent = Math.floor(days);
+        }, 100);
+        
+        // Create waveform
+        const waveform = document.getElementById('waveform');
+        for (let i = 0; i < 50; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'wave-bar';
+            bar.style.height = Math.random() * 80 + 20 + 'px';
+            waveform.appendChild(bar);
+        }
+        
+        // Dictionary words background
+        const dictionaryWords = document.getElementById('dictionaryWords');
+        const loveWords = ['love', 'forever', 'always', 'together', 'heart', 'soul', 'beloved', 'darling', 'sweetheart', 'dear', 'precious', 'eternal', 'infinite', 'devotion', 'passion', 'romance', 'affection', 'adore', 'cherish', 'treasure'];
+        
+        function createDictionaryWord() {
+            const word = document.createElement('div');
+            word.className = 'dictionary-words erasing';
+            word.textContent = loveWords[Math.floor(Math.random() * loveWords.length)];
+            word.style.left = Math.random() * window.innerWidth + 'px';
+            word.style.top = Math.random() * window.innerHeight + 'px';
+            dictionaryWords.appendChild(word);
+            
+            setTimeout(() => word.remove(), 8000);
+        }
+        
+        setInterval(createDictionaryWord, 500);
+        
+        // Translation effect
+        const translations = {
+            'forever': 'never',
+            'always': 'was',
+            'together': 'apart',
+            'love': 'void',
+            'heart': 'hurt',
+            'soul': 'hole',
+            'mine': 'gone',
+            'us': 'me',
+            'we': 'i',
+            'our': 'my'
+        };
+        
+        function translateToSilence() {
+            const input = document.getElementById('loveInput').value;
+            if (!input) return;
+            
+            const decayingText = document.getElementById('decayingText');
+            decayingText.innerHTML = '';
+            
+            // Create spans for each character
+            const chars = input.split('');
+            chars.forEach((char, index) => {
+                const span = document.createElement('span');
+                span.className = 'decaying-letter';
+                span.textContent = char;
+                decayingText.appendChild(span);
+                
+                // Gradually fade and remove letters
+                setTimeout(() => {
+                    span.classList.add('fading');
+                    setTimeout(() => {
+                        span.textContent = char === ' ' ? ' ' : '';
+                    }, 500);
+                }, index * 200 + 1000);
+            });
+            
+            // Trigger waveform flatline
+            setTimeout(() => {
+                waveform.classList.add('flatlining');
+                document.getElementById('staticOverlay').classList.add('static-active');
+                
+                setTimeout(() => {
+                    document.getElementById('staticOverlay').classList.remove('static-active');
+                }, 3000);
+            }, 2000);
+            
+            // Show corrupted phrases
+            showCorruptedPhrases();
+            
+            // Show emoji transformation
+            showEmojiTransformation();
+            
+            // Clear input after delay
+            setTimeout(() => {
+                document.getElementById('loveInput').value = '';
+            }, chars.length * 200 + 2000);
+        }
+        
+        function showCorruptedPhrases() {
+            const container = document.getElementById('corruptedPhrases');
+            container.innerHTML = '';
+            
+            const phrases = [
+                { original: 'Forever', corrupted: 'Never' },
+                { original: 'Always', corrupted: 'Was' },
+                { original: 'Together', corrupted: 'Apart' },
+                { original: 'My love', corrupted: 'Stranger' },
+                { original: 'Soulmate', corrupted: 'Nobody' }
+            ];
+            
+            phrases.forEach((phrase, index) => {
+                setTimeout(() => {
+                    const div = document.createElement('div');
+                    div.className = 'phrase-pair';
+                    div.style.animationDelay = index * 0.5 + 's';
+                    div.innerHTML = `
+                        <span class="original">${phrase.original}</span>
+                        <span class="arrow">→</span>
+                        <span class="corrupted">${phrase.corrupted}</span>
+                    `;
+                    container.appendChild(div);
+                }, index * 500);
+            });
+        }
+        
+        function showEmojiTransformation() {
+            const emojiTransform = document.getElementById('emojiTransform');
+            const stages = ['❤️', '💔', '🖤', ''];
+            let stage = 0;
+            
+            const interval = setInterval(() => {
+                emojiTransform.textContent = stages[stage];
+                stage++;
+                if (stage >= stages.length) {
+                    clearInterval(interval);
+                }
+            }, 1000);
+        }
+        
+        // Voice recording simulation
+        let isRecording = false;
+        function toggleRecording() {
+            const recordBtn = document.getElementById('recordBtn');
+            const recordText = document.getElementById('recordText');
+            const echoContainer = document.getElementById('echoContainer');
+            
+            isRecording = !isRecording;
+            
+            if (isRecording) {
+                recordBtn.classList.add('recording');
+                recordText.textContent = 'Recording...';
+                
+                // Simulate recording for 3 seconds
+                setTimeout(() => {
+                    recordBtn.classList.remove('recording');
+                    recordText.textContent = 'Press to Record';
+                    isRecording = false;
+                    
+                    // Create echo effect
+                    createEcho();
+                }, 3000);
+            }
+        }
+        
+        function createEcho() {
+            const echoContainer = document.getElementById('echoContainer');
+            echoContainer.innerHTML = '';
+            
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    const echo = document.createElement('div');
+                    echo.className = 'echo active';
+                    echo.textContent = 'their name';
+                    echo.style.animationDelay = i * 0.5 + 's';
+                    echoContainer.appendChild(echo);
+                }, i * 500);
+            }
+        }
+        
+        // Auto-decay any typed text
+        document.getElementById('loveInput').addEventListener('input', function(e) {
+            if (e.target.value.length > 10) {
+                setTimeout(() => {
+                    const currentValue = e.target.value;
+                    const decayedValue = currentValue.split('').map((char, index) => {
+                        return Math.random() > 0.7 ? ' ' : char;
+                    }).join('');
+                    e.target.value = decayedValue;
+                }, 2000);
+            }
+        });
+        
+        // Periodic waveform animation
+        setInterval(() => {
+            const bars = document.querySelectorAll('.wave-bar');
+            bars.forEach(bar => {
+                if (!waveform.classList.contains('flatlining')) {
+                    bar.style.height = Math.random() * 80 + 20 + 'px';
+                }
+            });
+        }, 300);
+    </script>
+</body>
+</html>
