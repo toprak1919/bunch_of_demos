@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Graveyard - Where Love Goes to Die</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Creepster&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Cinzel', serif;
+            background: #0a0a0a;
+            color: #666;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Rain effect */
+        .rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.3;
+            z-index: 1;
+        }
+        
+        .rain::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><line x1="50" y1="0" x2="50" y2="20" stroke="white" stroke-width="0.5" opacity="0.5"/></svg>') repeat;
+            animation: rainFall 0.3s linear infinite;
+        }
+        
+        @keyframes rainFall {
+            to { transform: translateY(100px); }
+        }
+        
+        /* Lightning effect */
+        .lightning {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0;
+        }
+        
+        .lightning.flash {
+            animation: lightningFlash 0.5s ease-out;
+        }
+        
+        @keyframes lightningFlash {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; background: rgba(255, 255, 255, 0.05); }
+        }
+        
+        /* Cemetery background */
+        .cemetery {
+            position: relative;
+            min-height: 100vh;
+            background: 
+                radial-gradient(ellipse at center bottom, #1a1a1a 0%, #000 100%),
+                linear-gradient(180deg, #000 0%, #0a0a0a 100%);
+            padding: 2rem;
+            z-index: 2;
+        }
+        
+        /* Dead trees */
+        .dead-trees {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 300px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300"><path d="M100 300 Q80 200 60 100 Q55 80 50 100 Q45 120 40 100 Q35 80 30 100 Q25 150 20 300 M200 300 Q180 150 160 50 Q155 30 150 50 Q145 70 140 50 Q135 30 130 50 Q125 100 120 300" stroke="%23222" stroke-width="3" fill="none"/></svg>') repeat-x;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        
+        /* Fog effect */
+        .fog {
+            position: fixed;
+            bottom: 0;
+            left: -100%;
+            width: 200%;
+            height: 200px;
+            background: linear-gradient(180deg, transparent 0%, rgba(100, 100, 100, 0.1) 100%);
+            animation: fogDrift 30s linear infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes fogDrift {
+            to { transform: translateX(50%); }
+        }
+        
+        /* Chapel in distance */
+        .chapel {
+            position: fixed;
+            top: 50px;
+            right: 50px;
+            width: 100px;
+            height: 150px;
+            background: #111;
+            opacity: 0.2;
+            clip-path: polygon(50% 0%, 0% 40%, 0% 100%, 100% 100%, 100% 40%);
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .title {
+            font-family: 'Creepster', cursive;
+            font-size: 3rem;
+            color: #444;
+            text-shadow: 2px 2px 4px #000;
+            letter-spacing: 3px;
+            animation: flicker 4s infinite;
+        }
+        
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            color: #333;
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+        
+        /* Memory input */
+        .burial-ceremony {
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .memory-input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #222;
+            color: #666;
+            font-family: inherit;
+            font-size: 1rem;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .memory-input:focus {
+            outline: none;
+            border-color: #333;
+            box-shadow: 0 0 10px rgba(100, 0, 0, 0.5);
+        }
+        
+        .memory-input::placeholder {
+            color: #333;
+            font-style: italic;
+        }
+        
+        .bury-button {
+            margin-top: 1rem;
+            padding: 0.8rem 2rem;
+            background: #1a0000;
+            border: 2px solid #330000;
+            color: #666;
+            font-family: inherit;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .bury-button:hover {
+            background: #330000;
+            transform: scale(1.05);
+        }
+        
+        .bury-button:active {
+            transform: scale(0.95);
+        }
+        
+        /* Graveyard grid */
+        .graveyard {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 3rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 5;
+        }
+        
+        /* Tombstones */
+        .grave {
+            position: relative;
+            animation: riseFromGround 1s ease-out;
+            perspective: 1000px;
+        }
+        
+        @keyframes riseFromGround {
+            from {
+                opacity: 0;
+                transform: translateY(50px) rotateX(-20deg);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) rotateX(0);
+            }
+        }
+        
+        .tombstone {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            border: 2px solid #111;
+            border-radius: 10px 10px 0 0;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .tombstone:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9);
+        }
+        
+        /* Cracks animation */
+        .tombstone.cracking::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M30 10 L35 30 L25 50 L35 80 L30 100" stroke="%23000" stroke-width="1" fill="none" opacity="0.5"/><path d="M70 20 L65 40 L75 60 L65 90" stroke="%23000" stroke-width="1" fill="none" opacity="0.5"/></svg>') no-repeat center;
+            background-size: cover;
+            opacity: 0;
+            animation: crackAppear 3s ease-in forwards;
+            pointer-events: none;
+        }
+        
+        @keyframes crackAppear {
+            to { opacity: 1; }
+        }
+        
+        .epitaph {
+            font-size: 1.2rem;
+            color: #555;
+            margin-bottom: 1rem;
+            text-shadow: 1px 1px 2px #000;
+            font-weight: 600;
+        }
+        
+        .memory-text {
+            font-size: 0.9rem;
+            color: #444;
+            font-style: italic;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+        
+        .dates {
+            font-size: 0.8rem;
+            color: #333;
+            margin-top: auto;
+        }
+        
+        .visit-counter {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: #333;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 0.3rem 0.8rem;
+            border-radius: 3px;
+        }
+        
+        /* Flowers */
+        .flower-spot {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+        
+        .flower {
+            width: 30px;
+            height: 40px;
+            background: #8B0000;
+            clip-path: ellipse(15px 20px at center);
+            position: relative;
+            cursor: pointer;
+            transition: all 2s;
+            opacity: 0;
+        }
+        
+        .flower.placed {
+            opacity: 1;
+            animation: wilt 3s ease-in forwards;
+        }
+        
+        @keyframes wilt {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                filter: brightness(1);
+            }
+            100% {
+                transform: translateY(10px) rotate(45deg);
+                filter: brightness(0.3) grayscale(1);
+                opacity: 0.3;
+            }
+        }
+        
+        .place-flower-btn {
+            position: absolute;
+            bottom: -40px;
+            right: 10px;
+            background: none;
+            border: 1px solid #333;
+            color: #444;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        .place-flower-btn:hover {
+            background: rgba(139, 0, 0, 0.1);
+            color: #666;
+        }
+        
+        /* Ghosts */
+        .ghost {
+            position: absolute;
+            bottom: -30px;
+            width: 50px;
+            height: 80px;
+            opacity: 0;
+            animation: haunt 10s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        .ghost.left {
+            left: -60px;
+            animation-delay: 0s;
+        }
+        
+        .ghost.right {
+            right: -60px;
+            animation-delay: 5s;
+        }
+        
+        @keyframes haunt {
+            0%, 100% { opacity: 0; transform: translateY(20px); }
+            50% { opacity: 0.3; transform: translateY(0); }
+        }
+        
+        .ghost-figure {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50% 50% 0 0;
+            position: relative;
+        }
+        
+        .ghost-figure::after {
+            content: '😢';
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.5rem;
+            opacity: 0.5;
+        }
+        
+        /* Special graves */
+        .grave.milestone .tombstone {
+            background: linear-gradient(135deg, #1a0d00 0%, #0d0600 100%);
+            border-color: #331a00;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .grave.milestone .tombstone::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, transparent 0%, rgba(139, 0, 0, 0.1) 100%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+        
+        .grave.final {
+            grid-column: 1 / -1;
+            max-width: 400px;
+            margin: 3rem auto;
+        }
+        
+        .grave.final .tombstone {
+            background: linear-gradient(135deg, #000 0%, #1a0000 100%);
+            border: 3px solid #330000;
+            min-height: 250px;
+            font-size: 1.3rem;
+        }
+        
+        .grave.final .epitaph {
+            font-size: 1.8rem;
+            color: #660000;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        /* Dig up feature */
+        .dig-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: 1px solid #222;
+            color: #333;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.6rem;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        .tombstone:hover .dig-button {
+            opacity: 1;
+        }
+        
+        .dig-button:hover {
+            background: rgba(0, 0, 0, 0.5);
+            color: #555;
+        }
+        
+        .corrupted-memory {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid #330000;
+            padding: 2rem;
+            text-align: center;
+            display: none;
+            z-index: 100;
+            max-width: 300px;
+        }
+        
+        .corrupted-memory.show {
+            display: block;
+            animation: glitch 0.3s ease-in-out;
+        }
+        
+        @keyframes glitch {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            25% { transform: translate(-48%, -50%) scale(1.05); }
+            50% { transform: translate(-52%, -50%) scale(0.95); }
+            75% { transform: translate(-50%, -48%) scale(1.02); }
+        }
+        
+        .corrupted-text {
+            color: #660000;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            filter: blur(0.5px);
+            animation: corrupt 2s ease-in-out infinite;
+        }
+        
+        @keyframes corrupt {
+            0%, 100% { filter: blur(0.5px); }
+            50% { filter: blur(1px) hue-rotate(180deg); }
+        }
+        
+        .close-corrupted {
+            background: #1a0000;
+            border: 1px solid #330000;
+            color: #666;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.8rem;
+        }
+        
+        /* Caretaker's note */
+        .caretaker-note {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #222;
+            padding: 1rem;
+            max-width: 200px;
+            font-size: 0.8rem;
+            color: #444;
+            font-style: italic;
+            opacity: 0.7;
+            z-index: 20;
+        }
+        
+        /* Sound toggle */
+        .sound-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #222;
+            color: #444;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.8rem;
+            z-index: 100;
+            transition: all 0.3s;
+        }
+        
+        .sound-toggle:hover {
+            background: rgba(0, 0, 0, 0.9);
+            color: #666;
+        }
+        
+        /* Audio context */
+        .audio-context {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Rain effect -->
+    <div class="rain"></div>
+    
+    <!-- Lightning -->
+    <div class="lightning" id="lightning"></div>
+    
+    <!-- Cemetery -->
+    <div class="cemetery">
+        <!-- Background elements -->
+        <div class="dead-trees"></div>
+        <div class="fog"></div>
+        <div class="chapel"></div>
+        
+        <!-- Header -->
+        <header class="header">
+            <h1 class="title">MEMORY GRAVEYARD</h1>
+            <p class="subtitle">A cemetery for memories that now belong to no one</p>
+        </header>
+        
+        <!-- Burial ceremony -->
+        <div class="burial-ceremony">
+            <input type="text" 
+                   class="memory-input" 
+                   id="memoryInput" 
+                   placeholder="Enter a memory to bury forever..."
+                   maxlength="100">
+            <button class="bury-button" id="buryButton">BURY THIS MEMORY</button>
+        </div>
+        
+        <!-- Graveyard -->
+        <div class="graveyard" id="graveyard">
+            <!-- Pre-existing graves -->
+            <div class="grave milestone">
+                <div class="tombstone cracking">
+                    <div class="epitaph">Our First Kiss</div>
+                    <div class="memory-text">"Under the stars, everything felt eternal"</div>
+                    <div class="dates">Born: May 15, 2019<br>Died: When you stopped loving me</div>
+                    <div class="visit-counter">VISITED BY: ONLY YOU - 147 times</div>
+                    <button class="dig-button">Dig Up</button>
+                    <div class="corrupted-memory">
+                        <div class="corrupted-text">Th̸̢͠e ̴͔̈́s̶̱̈t̷̬̾ả̶̳r̸̺̄s̴̱͐ ̶̜̇ẁ̶̬e̷̮͐r̴̰̈e̶̺͌ ̸̭̏ǹ̴̰ë̵́ͅv̴̱̏ë̶́r̶̬̈ ̷̱̇r̸̜̈́ë̶́ͅa̸̭̍l̴̰̈́</div>
+                        <button class="close-corrupted">Close</button>
+                    </div>
+                </div>
+                <div class="flower-spot">
+                    <div class="flower"></div>
+                </div>
+                <button class="place-flower-btn">Place Flower</button>
+                <div class="ghost left"><div class="ghost-figure"></div></div>
+                <div class="ghost right"><div class="ghost-figure"></div></div>
+            </div>
+            
+            <div class="grave">
+                <div class="tombstone cracking">
+                    <div class="epitaph">Our Song</div>
+                    <div class="memory-text">"That melody that made us dance in the kitchen"</div>
+                    <div class="dates">Born: June 3, 2019<br>Died: Now it only brings tears</div>
+                    <div class="visit-counter">VISITED BY: ONLY YOU - 89 times</div>
+                    <button class="dig-button">Dig Up</button>
+                    <div class="corrupted-memory">
+                        <div class="corrupted-text">T̷h̶e̴ ̸m̶u̷s̵i̶c̸ ̴s̷o̶u̵n̴d̶s̵ ̸l̷i̴k̶e̷ ̶s̴c̵r̶e̷a̸m̴i̶n̴g̷ ̵n̸o̶w̴</div>
+                        <button class="close-corrupted">Close</button>
+                    </div>
+                </div>
+                <div class="flower-spot">
+                    <div class="flower"></div>
+                </div>
+                <button class="place-flower-btn">Place Flower</button>
+                <div class="ghost left"><div class="ghost-figure"></div></div>
+            </div>
+            
+            <div class="grave milestone">
+                <div class="tombstone cracking">
+                    <div class="epitaph">Moving In Together</div>
+                    <div class="memory-text">"We painted the walls yellow and called it home"</div>
+                    <div class="dates">Born: October 12, 2019<br>Died: The walls remember our fights</div>
+                    <div class="visit-counter">VISITED BY: ONLY YOU - 203 times</div>
+                    <button class="dig-button">Dig Up</button>
+                    <div class="corrupted-memory">
+                        <div class="corrupted-text">T̴h̷e̵ ̶w̸a̴l̶l̷s̶ ̸a̷r̴e̶ ̵s̶t̷a̸i̶n̷e̴d̵ ̶w̷i̴t̸h̶ ̷t̶e̸a̷r̶s̴</div>
+                        <button class="close-corrupted">Close</button>
+                    </div>
+                </div>
+                <div class="flower-spot">
+                    <div class="flower"></div>
+                </div>
+                <button class="place-flower-btn">Place Flower</button>
+                <div class="ghost right"><div class="ghost-figure"></div></div>
+            </div>
+            
+            <!-- Final grave -->
+            <div class="grave final">
+                <div class="tombstone">
+                    <div class="epitaph">HERE LIES US</div>
+                    <div class="memory-text">Alex & Jordan<br>"Forever" lasted 3 years, 7 months, 12 days</div>
+                    <div class="dates">Together: February 14, 2019<br>Apart: September 26, 2022</div>
+                    <div class="visit-counter">VISITED BY: ONLY YOU - Every single day</div>
+                </div>
+                <div class="flower-spot">
+                    <div class="flower"></div>
+                </div>
+                <button class="place-flower-btn">Place Flower</button>
+                <div class="ghost left"><div class="ghost-figure"></div></div>
+                <div class="ghost right"><div class="ghost-figure"></div></div>
+            </div>
+        </div>
+        
+        <!-- Caretaker's note -->
+        <div class="caretaker-note">
+            "Some ghosts never stop visiting. I see you here every night, mourning what once was. The dead can't hear you anymore." - Caretaker
+        </div>
+        
+        <!-- Sound toggle -->
+        <button class="sound-toggle" id="soundToggle">🔇 Enable Sound</button>
+    </div>
+    
+    <!-- Audio context for sound effects -->
+    <div class="audio-context" id="audioContext"></div>
+    
+    <script>
+        // Sound system
+        let soundEnabled = false;
+        const soundToggle = document.getElementById('soundToggle');
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        soundToggle.addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            soundToggle.textContent = soundEnabled ? '🔊 Disable Sound' : '🔇 Enable Sound';
+            if (soundEnabled) {
+                audioContext.resume();
+                playAmbientRain();
+            }
+        });
+        
+        // Sound effects
+        function playChurchBell() {
+            if (!soundEnabled) return;
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(130.81, audioContext.currentTime); // C3
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.1);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 3);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 3);
+        }
+        
+        function playThunder() {
+            if (!soundEnabled) return;
+            const bufferSize = audioContext.sampleRate * 2;
+            const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+            const output = buffer.getChannelData(0);
+            
+            for (let i = 0; i < bufferSize; i++) {
+                output[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 2);
+            }
+            
+            const whiteNoise = audioContext.createBufferSource();
+            const gainNode = audioContext.createGain();
+            const filter = audioContext.createBiquadFilter();
+            
+            whiteNoise.buffer = buffer;
+            filter.type = "lowpass";
+            filter.frequency.setValueAtTime(400, audioContext.currentTime);
+            
+            whiteNoise.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
+            
+            whiteNoise.start(audioContext.currentTime);
+        }
+        
+        function playDirtSound() {
+            if (!soundEnabled) return;
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            const filter = audioContext.createBiquadFilter();
+            
+            oscillator.type = 'sawtooth';
+            filter.type = 'lowpass';
+            filter.frequency.value = 200;
+            
+            oscillator.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(50, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+        
+        function playAmbientRain() {
+            if (!soundEnabled) return;
+            const bufferSize = audioContext.sampleRate * 0.5;
+            const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+            const output = buffer.getChannelData(0);
+            
+            for (let i = 0; i < bufferSize; i++) {
+                output[i] = (Math.random() * 2 - 1) * 0.05;
+            }
+            
+            const whiteNoise = audioContext.createBufferSource();
+            const gainNode = audioContext.createGain();
+            const filter = audioContext.createBiquadFilter();
+            
+            whiteNoise.buffer = buffer;
+            whiteNoise.loop = true;
+            filter.type = "highpass";
+            filter.frequency.value = 1000;
+            
+            whiteNoise.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            gainNode.gain.value = 0.05;
+            whiteNoise.start(audioContext.currentTime);
+        }
+        
+        // Epitaph templates
+        const epitaphs = [
+            "Here lies our first date",
+            "Our favorite restaurant",
+            "The way you laughed",
+            "Sunday mornings together",
+            "Your hand in mine",
+            "The promises we made",
+            "Our inside jokes",
+            "The future we planned",
+            "Late night conversations",
+            "The way you looked at me",
+            "Our secret places",
+            "The dreams we shared"
+        ];
+        
+        // Burial functionality
+        const memoryInput = document.getElementById('memoryInput');
+        const buryButton = document.getElementById('buryButton');
+        const graveyard = document.getElementById('graveyard');
+        const lightning = document.getElementById('lightning');
+        
+        let graveCount = 3;
+        
+        buryButton.addEventListener('click', buryMemory);
+        memoryInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') buryMemory();
+        });
+        
+        function buryMemory() {
+            const memory = memoryInput.value.trim();
+            if (!memory) return;
+            
+            // Create new grave
+            const grave = createGrave(memory);
+            
+            // Insert before the final grave
+            const finalGrave = document.querySelector('.grave.final');
+            graveyard.insertBefore(grave, finalGrave);
+            
+            // Clear input
+            memoryInput.value = '';
+            
+            // Effects
+            playChurchBell();
+            playDirtSound();
+            
+            // Lightning for painful memories
+            if (memory.toLowerCase().includes('love') || 
+                memory.toLowerCase().includes('forever') || 
+                memory.toLowerCase().includes('promise')) {
+                triggerLightning();
+                setTimeout(playThunder, 200);
+            }
+            
+            // Add cracks over time
+            setTimeout(() => {
+                grave.querySelector('.tombstone').classList.add('cracking');
+            }, 5000);
+        }
+        
+        function createGrave(memory) {
+            graveCount++;
+            const grave = document.createElement('div');
+            grave.className = 'grave';
+            
+            const epitaph = epitaphs[Math.floor(Math.random() * epitaphs.length)];
+            const visitCount = Math.floor(Math.random() * 200) + 1;
+            
+            grave.innerHTML = `
+                <div class="tombstone">
+                    <div class="epitaph">${epitaph}</div>
+                    <div class="memory-text">"${memory}"</div>
+                    <div class="dates">Born: When we were happy<br>Died: ${new Date().toLocaleDateString()}</div>
+                    <div class="visit-counter">VISITED BY: ONLY YOU - ${visitCount} times</div>
+                    <button class="dig-button">Dig Up</button>
+                    <div class="corrupted-memory">
+                        <div class="corrupted-text">${corruptText(memory)}</div>
+                        <button class="close-corrupted">Close</button>
+                    </div>
+                </div>
+                <div class="flower-spot">
+                    <div class="flower"></div>
+                </div>
+                <button class="place-flower-btn">Place Flower</button>
+                <div class="ghost left"><div class="ghost-figure"></div></div>
+                ${Math.random() > 0.5 ? '<div class="ghost right"><div class="ghost-figure"></div></div>' : ''}
+            `;
+            
+            // Add event listeners
+            const flowerBtn = grave.querySelector('.place-flower-btn');
+            const flower = grave.querySelector('.flower');
+            flowerBtn.addEventListener('click', () => placeFlower(flower));
+            
+            const digBtn = grave.querySelector('.dig-button');
+            const corruptedMemory = grave.querySelector('.corrupted-memory');
+            const closeBtn = grave.querySelector('.close-corrupted');
+            
+            digBtn.addEventListener('click', () => digUpMemory(corruptedMemory));
+            closeBtn.addEventListener('click', () => {
+                corruptedMemory.classList.remove('show');
+            });
+            
+            return grave;
+        }
+        
+        function corruptText(text) {
+            const corrupted = text.split('').map(char => {
+                if (Math.random() > 0.7 && char !== ' ') {
+                    const zalgo = ['̸', '̴', '̷', '̶', '̵'];
+                    return char + zalgo[Math.floor(Math.random() * zalgo.length)];
+                }
+                return char;
+            }).join('');
+            
+            const phrases = [
+                ' was a lie',
+                ' never mattered',
+                ' is dead now',
+                ' meant nothing',
+                ' was never real'
+            ];
+            
+            return corrupted + phrases[Math.floor(Math.random() * phrases.length)];
+        }
+        
+        function placeFlower(flower) {
+            flower.classList.add('placed');
+            playDirtSound();
+            
+            // Reset after wilting
+            setTimeout(() => {
+                flower.classList.remove('placed');
+            }, 3000);
+        }
+        
+        function digUpMemory(corruptedMemory) {
+            corruptedMemory.classList.add('show');
+            playDirtSound();
+            if (soundEnabled) {
+                // Creepy whisper sound
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(100, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 1);
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 1);
+            }
+        }
+        
+        function triggerLightning() {
+            lightning.classList.add('flash');
+            setTimeout(() => {
+                lightning.classList.remove('flash');
+            }, 500);
+        }
+        
+        // Add event listeners to existing graves
+        document.querySelectorAll('.place-flower-btn').forEach(btn => {
+            const flower = btn.parentElement.querySelector('.flower');
+            btn.addEventListener('click', () => placeFlower(flower));
+        });
+        
+        document.querySelectorAll('.dig-button').forEach(btn => {
+            const corruptedMemory = btn.parentElement.querySelector('.corrupted-memory');
+            btn.addEventListener('click', () => digUpMemory(corruptedMemory));
+        });
+        
+        document.querySelectorAll('.close-corrupted').forEach(btn => {
+            btn.addEventListener('click', () => {
+                btn.parentElement.classList.remove('show');
+            });
+        });
+        
+        // Periodic lightning
+        setInterval(() => {
+            if (Math.random() > 0.9) {
+                triggerLightning();
+                setTimeout(playThunder, 200);
+            }
+        }, 10000);
+        
+        // Update visit counters occasionally
+        setInterval(() => {
+            document.querySelectorAll('.visit-counter').forEach(counter => {
+                if (Math.random() > 0.8) {
+                    const currentCount = parseInt(counter.textContent.match(/\d+/)[0]);
+                    counter.textContent = `VISITED BY: ONLY YOU - ${currentCount + 1} times`;
+                }
+            });
+        }, 30000);
+        
+        // Warning message
+        console.log('%cSHARED MEMORIES DIE WHEN LOVE DIES', 'color: #660000; font-size: 20px; font-weight: bold;');
+    </script>
+</body>
+</html>

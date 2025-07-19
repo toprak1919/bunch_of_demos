@@ -131,6 +131,28 @@
             transform: scale(1.2);
         }
         
+        /* Soul Severance portals */
+        .portal[data-portal="soul-severing"] .portal-symbol::before,
+        .portal[data-portal="love-decay"] .portal-symbol::before,
+        .portal[data-portal="phantom-touch"] .portal-symbol::before,
+        .portal[data-portal="memory-graveyard"] .portal-symbol::before,
+        .portal[data-portal="twin-flame-death"] .portal-symbol::before {
+            border-color: var(--portal-color, #d4af37);
+        }
+        
+        .portal[data-portal="soul-severing"]:hover .portal-symbol,
+        .portal[data-portal="love-decay"]:hover .portal-symbol,
+        .portal[data-portal="phantom-touch"]:hover .portal-symbol,
+        .portal[data-portal="memory-graveyard"]:hover .portal-symbol,
+        .portal[data-portal="twin-flame-death"]:hover .portal-symbol {
+            animation: soul-pulse 1s ease-in-out infinite;
+        }
+        
+        @keyframes soul-pulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+        
         @keyframes portal-spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
@@ -514,6 +536,47 @@
                 <div class="portal-symbol">🪞</div>
                 <div class="portal-name">Shadow Mirror</div>
                 <div class="portal-description">Face what you deny</div>
+            </a>
+        </div>
+
+        <!-- Soul Severance Section -->
+        <div class="section-divider">
+            <div class="divider-line" style="background: linear-gradient(90deg, transparent, #8b0000, transparent);"></div>
+            <h2 class="section-title" style="color: #ff1744; text-shadow: 0 0 20px #ff174480, 0 0 40px #8b000060;">Soul Severance</h2>
+            <p class="section-subtitle" style="color: #b71c1c;">Where twin flames die and souls are torn asunder</p>
+            <p class="section-subtitle" style="color: #8b0000; font-size: 0.9rem; margin-top: 0.5rem;">Enter the realm where love becomes death, where connections decay into shadows</p>
+            <div class="divider-line" style="background: linear-gradient(90deg, transparent, #8b0000, transparent);"></div>
+        </div>
+
+        <div class="portal-grid">
+            <a href="soul-severing.html" class="portal" data-portal="soul-severing" style="--portal-color: #ff1744;">
+                <div class="portal-symbol" style="color: #ff1744;">✂️</div>
+                <div class="portal-name" style="color: #ff1744;">Soul Severing</div>
+                <div class="portal-description" style="border-color: #ff1744;">Cut the ethereal threads that bind you to another's essence, forever severing what was once inseparable</div>
+            </a>
+            
+            <a href="love-decay.html" class="portal" data-portal="love-decay" style="--portal-color: #b71c1c;">
+                <div class="portal-symbol" style="color: #b71c1c;">⚰️</div>
+                <div class="portal-name" style="color: #b71c1c;">Love's Decay</div>
+                <div class="portal-description" style="border-color: #b71c1c;">Watch as passion rots into poison, as devotion decomposes into dust and regret</div>
+            </a>
+            
+            <a href="phantom-touch.html" class="portal" data-portal="phantom-touch" style="--portal-color: #9c27b0;">
+                <div class="portal-symbol" style="color: #9c27b0;">👻</div>
+                <div class="portal-name" style="color: #9c27b0;">Phantom Touch</div>
+                <div class="portal-description" style="border-color: #9c27b0;">Feel the ghost of their embrace, a haunting reminder of warmth that will never return</div>
+            </a>
+            
+            <a href="memory-graveyard.html" class="portal" data-portal="memory-graveyard" style="--portal-color: #616161;">
+                <div class="portal-symbol" style="color: #616161;">🪦</div>
+                <div class="portal-name" style="color: #616161;">Memory Graveyard</div>
+                <div class="portal-description" style="border-color: #616161;">Bury the moments that once meant everything, mark their tombstones with tears</div>
+            </a>
+            
+            <a href="twin-flame-death.html" class="portal" data-portal="twin-flame-death" style="--portal-color: #ff5722;">
+                <div class="portal-symbol" style="color: #ff5722;">🔥</div>
+                <div class="portal-name" style="color: #ff5722;">Twin Flame Death</div>
+                <div class="portal-description" style="border-color: #ff5722;">Witness the extinguishing of a cosmic bond, as two halves of one soul are torn apart for eternity</div>
             </a>
         </div>
     </div>

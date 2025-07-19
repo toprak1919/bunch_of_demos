@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love Decay Timeline - Watch Your Relationship Die</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Georgia', serif;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Garden Background */
+        .garden-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #87CEEB 0%, #98FB98 50%, #228B22 100%);
+            transition: all 3s ease;
+            z-index: -2;
+        }
+
+        .garden-bg.dying {
+            background: linear-gradient(to bottom, #2c2c2c 0%, #1a1a1a 50%, #000 100%);
+        }
+
+        .garden-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 80%, transparent 30%, rgba(139, 69, 19, 0.3) 30.5%),
+                radial-gradient(circle at 80% 80%, transparent 30%, rgba(139, 69, 19, 0.3) 30.5%),
+                radial-gradient(circle at 50% 90%, transparent 40%, rgba(34, 139, 34, 0.5) 40.5%);
+            transition: opacity 3s ease;
+        }
+
+        .garden-bg.dying::before {
+            opacity: 0;
+        }
+
+        /* Wilting flowers */
+        .flowers {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 200px;
+            z-index: -1;
+        }
+
+        .flower {
+            position: absolute;
+            bottom: 0;
+            width: 60px;
+            height: 150px;
+            transition: all 2s ease;
+        }
+
+        .flower::before {
+            content: '🌺';
+            font-size: 40px;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: all 2s ease;
+        }
+
+        .flower.dead::before {
+            content: '🥀';
+            filter: grayscale(100%) brightness(0.3);
+            transform: translateX(-50%) rotate(45deg);
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+        }
+
+        .title {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #888;
+            font-style: italic;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            text-align: center;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.8);
+            margin: 20px auto;
+            max-width: 600px;
+            border-radius: 10px;
+            border: 2px solid #333;
+        }
+
+        .upload-btn {
+            background: #8B0000;
+            color: #fff;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .upload-btn:hover {
+            background: #660000;
+            transform: scale(1.05);
+        }
+
+        input[type="file"], input[type="date"] {
+            display: none;
+        }
+
+        .date-inputs {
+            margin: 20px 0;
+        }
+
+        .date-input-group {
+            display: inline-block;
+            margin: 0 10px;
+        }
+
+        .date-label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ccc;
+        }
+
+        .date-display {
+            background: #1a1a1a;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: 1px solid #333;
+        }
+
+        /* Timeline */
+        .timeline-container {
+            display: none;
+            position: relative;
+            padding: 50px 0;
+            min-height: 100vh;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(to bottom, #ff69b4 0%, #ff1493 50%, #8b0000 100%);
+            transform: translateX(-50%);
+            transition: all 3s ease;
+        }
+
+        .timeline-line.decayed {
+            background: linear-gradient(to bottom, #333 0%, #222 50%, #000 100%);
+        }
+
+        /* Memory Items */
+        .memory-item {
+            position: relative;
+            margin: 50px auto;
+            width: 80%;
+            max-width: 800px;
+            opacity: 0;
+            transform: translateY(50px);
+            animation: fadeIn 1s forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .memory-content {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .memory-content.decaying {
+            background: rgba(0, 0, 0, 0.8);
+            filter: sepia(100%) contrast(1.2);
+        }
+
+        .memory-content.dead {
+            background: #000;
+            filter: grayscale(100%) brightness(0.3);
+        }
+
+        .memory-photo {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            transition: all 2s ease;
+        }
+
+        .memory-photo.decaying {
+            filter: sepia(80%) blur(1px);
+            transform: scale(0.95);
+        }
+
+        .memory-photo.dead {
+            filter: grayscale(100%) blur(3px) brightness(0.3);
+            transform: scale(0.9);
+            opacity: 0.5;
+        }
+
+        .memory-text {
+            flex: 1;
+        }
+
+        .memory-date {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .memory-title {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            transition: all 1s ease;
+        }
+
+        .memory-title.corrupted {
+            text-decoration: line-through;
+            color: #8b0000;
+        }
+
+        .memory-description {
+            line-height: 1.6;
+            transition: all 1s ease;
+        }
+
+        .rot-text {
+            display: inline-block;
+            transition: all 0.5s ease;
+        }
+
+        .rot-text.rotting {
+            transform: rotate(random(-5deg, 5deg)) translateY(2px);
+            opacity: 0.7;
+            color: #8b0000;
+        }
+
+        /* Dark Overlays */
+        .dark-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle, transparent 0%, rgba(0, 0, 0, 0.8) 100%);
+            opacity: 0;
+            transition: opacity 2s ease;
+            pointer-events: none;
+        }
+
+        .dark-overlay.active {
+            opacity: 1;
+        }
+
+        /* Red Flags */
+        .red-flag {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 2em;
+            opacity: 0;
+            transition: all 1s ease;
+            animation: flagWave 2s infinite;
+        }
+
+        .red-flag.visible {
+            opacity: 1;
+        }
+
+        @keyframes flagWave {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        /* Warning Messages */
+        .warning-message {
+            position: absolute;
+            background: rgba(139, 0, 0, 0.9);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 1s ease;
+            z-index: 10;
+            white-space: nowrap;
+        }
+
+        .warning-message.visible {
+            opacity: 1;
+            animation: glitch 0.3s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+        }
+
+        /* Statistics */
+        .stats-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #8b0000;
+            display: none;
+            z-index: 100;
+        }
+
+        .stat-item {
+            margin: 10px 0;
+            font-size: 0.9em;
+        }
+
+        .stat-label {
+            color: #888;
+        }
+
+        .stat-value {
+            color: #ff4444;
+            font-weight: bold;
+        }
+
+        /* Controls */
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+            z-index: 100;
+        }
+
+        .decay-btn {
+            background: #8b0000;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .decay-btn:hover {
+            background: #660000;
+            transform: scale(1.05);
+        }
+
+        /* Epitaph */
+        .epitaph {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: #000;
+            padding: 40px;
+            border: 3px solid #8b0000;
+            border-radius: 10px;
+            z-index: 1000;
+        }
+
+        .epitaph h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #8b0000;
+        }
+
+        .epitaph-text {
+            font-size: 1.5em;
+            line-height: 1.6;
+        }
+
+        /* Digital Ash Effect */
+        .ash-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #333;
+            border-radius: 50%;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @keyframes ashFloat {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--x), var(--y)) scale(0.5);
+            }
+        }
+
+        /* Audio Controls */
+        .audio-controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            display: none;
+        }
+
+        .audio-btn {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+        }
+    </style>
+</head>
+<body>
+    <!-- Garden Background -->
+    <div class="garden-bg" id="gardenBg"></div>
+    <div class="flowers" id="flowersContainer"></div>
+
+    <!-- Header -->
+    <div class="header">
+        <h1 class="title">LOVE DECAY TIMELINE</h1>
+        <p class="subtitle">Watch Your Relationship Rot in Reverse</p>
+    </div>
+
+    <!-- Upload Section -->
+    <div class="upload-section" id="uploadSection">
+        <h2>Feed Your Memories to the Void</h2>
+        <p style="margin: 20px 0; color: #888;">Upload your photos and dates. Watch them die.</p>
+        
+        <div class="date-inputs">
+            <div class="date-input-group">
+                <label class="date-label">First Meeting</label>
+                <div class="date-display" id="startDateDisplay" onclick="document.getElementById('startDate').click()">
+                    Select Date
+                </div>
+                <input type="date" id="startDate" onchange="updateDateDisplay('start')">
+            </div>
+            <div class="date-input-group">
+                <label class="date-label">Final Goodbye</label>
+                <div class="date-display" id="endDateDisplay" onclick="document.getElementById('endDate').click()">
+                    Select Date
+                </div>
+                <input type="date" id="endDate" onchange="updateDateDisplay('end')">
+            </div>
+        </div>
+
+        <button class="upload-btn" onclick="document.getElementById('photoUpload').click()">
+            Upload Relationship Photos
+        </button>
+        <input type="file" id="photoUpload" multiple accept="image/*" onchange="handlePhotoUpload(event)">
+        
+        <button class="upload-btn" id="startDecay" style="display: none;" onclick="initializeTimeline()">
+            Begin the Decay
+        </button>
+    </div>
+
+    <!-- Timeline Container -->
+    <div class="timeline-container" id="timelineContainer">
+        <div class="timeline-line" id="timelineLine"></div>
+        <div id="memoriesContainer"></div>
+    </div>
+
+    <!-- Statistics Panel -->
+    <div class="stats-panel" id="statsPanel">
+        <h3 style="margin-bottom: 15px; color: #ff4444;">RELATIONSHIP STATISTICS</h3>
+        <div class="stat-item">
+            <span class="stat-label">Love Decay Rate:</span>
+            <span class="stat-value" id="decayRate">2.3% daily</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Days Together:</span>
+            <span class="stat-value" id="totalDays">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Point of No Return:</span>
+            <span class="stat-value" id="pointOfNoReturn">Day 0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Current Decay:</span>
+            <span class="stat-value" id="currentDecay">0%</span>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls" id="controls">
+        <button class="decay-btn" onclick="accelerateDecay()">
+            ACCELERATE DECAY
+        </button>
+    </div>
+
+    <!-- Audio Controls -->
+    <div class="audio-controls" id="audioControls">
+        <button class="audio-btn" onclick="toggleAudio()">🔊</button>
+    </div>
+
+    <!-- Epitaph -->
+    <div class="epitaph" id="epitaph">
+        <h2>R.I.P.</h2>
+        <div class="epitaph-text">
+            <p id="epitaphText">LOVE LIVED: 0 DAYS</p>
+            <p>LOVE DIED: SLOWLY</p>
+        </div>
+    </div>
+
+    <!-- Audio Element -->
+    <audio id="loveAudio" loop>
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSl9y+/XjzQGFGO76+ylVBEGPJvd8824hBAEL4Kq4+OcUAsLUqzj77RiFAU5k9vwo1scASiCyu/UkDYFE1+s6uyGFwQ4gL7w3LdWBgxVrO7qjEIFHHi23aFLDxxyqNXosFwEBziP2evJ2JIgAyVylN78x3kUBDmM0+7GgDMLHm9mutnlf84TBECoz9+OTRE7l9z03Jo2AFdd4Nun/BQHNXWwx/bWsTATBl+p+P6bOAUte5wAAAD/+zYMGHGpyOuuOQEnfo3yqz0NHXzB8NC6bhwUJ3Gn3eShWBURPJXb9cN6HQo7nOLu3LxhEAhYvu3YtGIbBj6W5PnCcB8LL5LaytmBHxUpjdjexKNwGRE7k9Hi2relIAErcqbOlaM9CQ1sxPDit2UhEyuAx+zSrTgBKI/N5sO6dSEHW5ngqHkNEXDA8cS+gicCS5PU7bSOHgROodTxxXMeAg+Kx+ziuVUaBlul4tNuHgBUrvXQr2AkEECT1+3BeR4KLZjZ+M+FSAUOg83L57d1Hg5eru2KiDUJN4/Y7MSgZwwbdbnp1q5iGA1um+XRlzcETKvc+8V1HgMzfdjwsVsXHTyR0+zNhy4BGH6zydqgWxIERa7e3LaQPQc0hb25wpcsBBt1usz98JFABCWBzOLUlzoHG3m97MyqWBYKSLHk6LJlHg9Rmu3IkjQFDnmP48KDHABYreLsmTcJD3+bw/vBk0UIVazq4LNuKAVHnM7tu3gnBU6x9MqOKBwXnO7OqVIaCDp6ltrPr0IHE27Cwe+RWAY0bsTnx7FgGQU4gdDq0LJYDQMpeMnf074OBTWf5tClQwcef8vz06dtEwdNiMX5yrVSGAZUpt/krTwOEnrP7squWQ0Ddbny4K5iEgoVVZXzzIkYBCh7xf3PhyQBM3vDy+m3WwUGWLfgu3IgDFej1uuiVw8ceL/ZvmwfCCdzudbXlzsJa5vm3YkyBSl8w+rfvGAmDlmvvNuNKgxUkt7qzZwtDy+Iy+vQrU8LB1ix4N2xbQwMVbbf77doEBJYoOPbu1sGEGy37Ny4WxMFUrDbpVoTBlms79SrYg4HL3i82qVcBQRapszAsioGeoHd68qjXAUvhtXeyJofBjiNxO7KiToFF22zwqNdFQdKo8vUnigLSYnM7cysSAMJb77tz55MAAApZn+08Nq2VBEKRp7c78uyaAYKcK/g5r+IJQtNmNH7wngREWmx49OvWgUMgcXM5rJiC0yYy/SzTBM1hM754KdeEQJNo+XRjR8DOpTLzrdjFglJq9jw" type="audio/wav">
+    </audio>
+
+    <script>
+        let photos = [];
+        let startDate = null;
+        let endDate = null;
+        let decayLevel = 0;
+        let audioReversed = false;
+
+        // Initialize garden
+        function createGarden() {
+            const container = document.getElementById('flowersContainer');
+            for (let i = 0; i < 20; i++) {
+                const flower = document.createElement('div');
+                flower.className = 'flower';
+                flower.style.left = `${Math.random() * 100}%`;
+                flower.style.transform = `scale(${0.5 + Math.random() * 0.5})`;
+                flower.style.animationDelay = `${Math.random() * 2}s`;
+                container.appendChild(flower);
+            }
+        }
+
+        createGarden();
+
+        function updateDateDisplay(type) {
+            const input = document.getElementById(type + 'Date');
+            const display = document.getElementById(type + 'DateDisplay');
+            if (input.value) {
+                const date = new Date(input.value);
+                display.textContent = date.toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+                
+                if (type === 'start') {
+                    startDate = date;
+                } else {
+                    endDate = date;
+                }
+                
+                checkReadyToStart();
+            }
+        }
+
+        function handlePhotoUpload(event) {
+            const files = event.target.files;
+            for (let file of files) {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        photos.push({
+                            url: e.target.result,
+                            name: file.name
+                        });
+                        checkReadyToStart();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        }
+
+        function checkReadyToStart() {
+            if (photos.length > 0 && startDate && endDate) {
+                document.getElementById('startDecay').style.display = 'inline-block';
+            }
+        }
+
+        function initializeTimeline() {
+            document.getElementById('uploadSection').style.display = 'none';
+            document.getElementById('timelineContainer').style.display = 'block';
+            document.getElementById('controls').style.display = 'block';
+            document.getElementById('statsPanel').style.display = 'block';
+            document.getElementById('audioControls').style.display = 'block';
+            
+            createMemories();
+            updateStatistics();
+            startBackgroundMusic();
+        }
+
+        function createMemories() {
+            const container = document.getElementById('memoriesContainer');
+            const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+            const memoryInterval = Math.floor(totalDays / photos.length);
+            
+            const milestones = [
+                { day: 1, title: "First Meeting", description: "When everything was perfect and full of possibility" },
+                { day: Math.floor(totalDays * 0.1), title: "First Kiss", description: "The spark that would eventually burn out" },
+                { day: Math.floor(totalDays * 0.3), title: "Moving In Together", description: "Building a life that would crumble" },
+                { day: Math.floor(totalDays * 0.5), title: "Peak Happiness", description: "The summit before the inevitable descent" },
+                { day: Math.floor(totalDays * 0.7), title: "First Real Fight", description: "Cracks beginning to show", warning: "THIS IS WHERE IT STARTED DYING" },
+                { day: Math.floor(totalDays * 0.85), title: "Growing Apart", description: "Two strangers sharing a bed", warning: "POINT OF NO RETURN" },
+                { day: Math.floor(totalDays * 0.95), title: "The Talk", description: "Both knowing but neither saying", warning: "IT'S ALREADY OVER" },
+                { day: totalDays, title: "Final Goodbye", description: "The last kiss that tasted like an epitaph" }
+            ];
+            
+            let photoIndex = 0;
+            milestones.forEach((milestone, index) => {
+                const memory = document.createElement('div');
+                memory.className = 'memory-item';
+                memory.style.animationDelay = `${index * 0.3}s`;
+                
+                const date = new Date(startDate.getTime() + milestone.day * 24 * 60 * 60 * 1000);
+                const photo = photos[photoIndex % photos.length];
+                photoIndex++;
+                
+                memory.innerHTML = `
+                    <div class="memory-content" id="memory-${index}">
+                        <div class="dark-overlay"></div>
+                        <img src="${photo.url}" alt="Memory" class="memory-photo">
+                        <div class="memory-text">
+                            <div class="memory-date">${date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                            <h3 class="memory-title">${milestone.title}</h3>
+                            <p class="memory-description">${milestone.description}</p>
+                        </div>
+                        <div class="red-flag">🚩</div>
+                        ${milestone.warning ? `<div class="warning-message">${milestone.warning}</div>` : ''}
+                    </div>
+                `;
+                
+                container.appendChild(memory);
+            });
+        }
+
+        function updateStatistics() {
+            const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+            document.getElementById('totalDays').textContent = totalDays;
+            document.getElementById('pointOfNoReturn').textContent = `Day ${Math.floor(totalDays * 0.7)}`;
+            document.getElementById('epitaphText').textContent = `LOVE LIVED: ${totalDays} DAYS`;
+        }
+
+        function accelerateDecay() {
+            decayLevel = Math.min(decayLevel + 20, 100);
+            applyDecay();
+            
+            if (decayLevel >= 100) {
+                triggerFinalDeath();
+            }
+        }
+
+        function applyDecay() {
+            document.getElementById('currentDecay').textContent = decayLevel + '%';
+            
+            // Decay timeline
+            if (decayLevel > 30) {
+                document.getElementById('timelineLine').classList.add('decayed');
+            }
+            
+            // Decay garden
+            if (decayLevel > 20) {
+                document.getElementById('gardenBg').classList.add('dying');
+                document.querySelectorAll('.flower').forEach(flower => {
+                    flower.classList.add('dead');
+                });
+            }
+            
+            // Decay memories
+            const memories = document.querySelectorAll('.memory-content');
+            memories.forEach((memory, index) => {
+                const threshold = (index / memories.length) * 100;
+                
+                if (decayLevel > threshold) {
+                    memory.classList.add('decaying');
+                    memory.querySelector('.dark-overlay').classList.add('active');
+                    memory.querySelector('.memory-photo').classList.add('decaying');
+                    
+                    // Show red flags
+                    if (decayLevel > threshold + 10) {
+                        memory.querySelector('.red-flag').classList.add('visible');
+                    }
+                    
+                    // Show warnings
+                    const warning = memory.querySelector('.warning-message');
+                    if (warning && decayLevel > threshold + 5) {
+                        warning.classList.add('visible');
+                    }
+                    
+                    // Corrupt text
+                    if (decayLevel > threshold + 15) {
+                        corruptText(memory);
+                        memory.querySelector('.memory-title').classList.add('corrupted');
+                    }
+                    
+                    // Full death
+                    if (decayLevel > threshold + 25) {
+                        memory.classList.add('dead');
+                        memory.querySelector('.memory-photo').classList.add('dead');
+                    }
+                }
+            });
+            
+            // Reverse and distort audio
+            if (decayLevel > 50 && !audioReversed) {
+                reverseAudio();
+            }
+        }
+
+        function corruptText(element) {
+            const textElements = element.querySelectorAll('p');
+            textElements.forEach(p => {
+                const words = p.textContent.split(' ');
+                p.innerHTML = words.map(word => {
+                    if (Math.random() > 0.7) {
+                        return `<span class="rot-text rotting">${word}</span>`;
+                    }
+                    return `<span class="rot-text">${word}</span>`;
+                }).join(' ');
+            });
+        }
+
+        function triggerFinalDeath() {
+            // Create ash effect
+            const memories = document.querySelectorAll('.memory-item');
+            memories.forEach((memory, index) => {
+                setTimeout(() => {
+                    createAshEffect(memory);
+                    memory.style.opacity = '0';
+                    memory.style.transform = 'scale(0.8)';
+                }, index * 200);
+            });
+            
+            // Show epitaph
+            setTimeout(() => {
+                document.getElementById('epitaph').style.display = 'block';
+                document.getElementById('controls').style.display = 'none';
+                document.getElementById('audioControls').style.display = 'none';
+            }, memories.length * 200 + 1000);
+        }
+
+        function createAshEffect(element) {
+            const rect = element.getBoundingClientRect();
+            for (let i = 0; i < 50; i++) {
+                const ash = document.createElement('div');
+                ash.className = 'ash-particle';
+                ash.style.left = rect.left + Math.random() * rect.width + 'px';
+                ash.style.top = rect.top + Math.random() * rect.height + 'px';
+                ash.style.setProperty('--x', (Math.random() - 0.5) * 200 + 'px');
+                ash.style.setProperty('--y', -Math.random() * 300 + 'px');
+                ash.style.animation = `ashFloat ${2 + Math.random() * 2}s ease-out forwards`;
+                ash.style.animationDelay = Math.random() * 0.5 + 's';
+                document.body.appendChild(ash);
+                
+                setTimeout(() => ash.remove(), 4000);
+            }
+        }
+
+        function startBackgroundMusic() {
+            const audio = document.getElementById('loveAudio');
+            audio.volume = 0.3;
+            audio.play().catch(e => console.log('Audio autoplay blocked'));
+        }
+
+        function reverseAudio() {
+            const audio = document.getElementById('loveAudio');
+            audio.playbackRate = -1; // This doesn't actually work in browsers, but represents the concept
+            audio.volume = 0.1;
+            audioReversed = true;
+        }
+
+        function toggleAudio() {
+            const audio = document.getElementById('loveAudio');
+            if (audio.paused) {
+                audio.play();
+            } else {
+                audio.pause();
+            }
+        }
+
+        // Auto-decay over time
+        setInterval(() => {
+            if (decayLevel < 100 && document.getElementById('timelineContainer').style.display === 'block') {
+                decayLevel = Math.min(decayLevel + 0.5, 100);
+                applyDecay();
+                
+                if (decayLevel >= 100) {
+                    triggerFinalDeath();
+                }
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

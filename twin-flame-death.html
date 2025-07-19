@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twin Flame Extinction Event</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Cinzel', serif;
+            position: relative;
+            height: 100vh;
+            cursor: crosshair;
+        }
+
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .sacred-text {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0;
+            animation: fadeInOut 8s ease-in-out;
+            text-align: center;
+            width: 100%;
+            z-index: 10;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            pointer-events: none;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(20px); }
+            20% { opacity: 1; transform: translateY(0); }
+            80% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+
+        .shatter {
+            animation: shatter 3s ease-out forwards;
+        }
+
+        @keyframes shatter {
+            to {
+                opacity: 0;
+                transform: translateY(100vh) rotate(720deg) scale(0.1);
+                filter: blur(10px);
+            }
+        }
+
+        #soulContract {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 500px;
+            opacity: 0;
+            z-index: 15;
+            pointer-events: none;
+        }
+
+        .burning {
+            animation: burn 4s ease-out forwards;
+        }
+
+        @keyframes burn {
+            0% { opacity: 0.8; filter: brightness(1); }
+            50% { filter: brightness(2) contrast(2) hue-rotate(60deg); }
+            100% { opacity: 0; transform: scale(0.8) translateY(50px); }
+        }
+
+        #cosmicMessage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 20;
+            display: none;
+        }
+
+        #cosmicMessage h1 {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        #birthdayInput {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 25;
+            text-align: center;
+            display: none;
+        }
+
+        #birthdayInput input {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            padding: 10px;
+            margin: 5px;
+            font-family: 'Cinzel', serif;
+        }
+
+        #reunionProbability {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            color: #ff0000;
+            display: none;
+            z-index: 30;
+            text-align: center;
+        }
+
+        .reality-tear {
+            position: absolute;
+            width: 2px;
+            background: linear-gradient(to bottom, transparent, #fff, transparent);
+            animation: tear 2s ease-out forwards;
+            z-index: 5;
+        }
+
+        @keyframes tear {
+            from {
+                height: 0;
+                opacity: 1;
+            }
+            to {
+                height: 100vh;
+                opacity: 0;
+            }
+        }
+
+        #audioControl {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 30;
+            opacity: 0.5;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    
+    <div id="soulContract">
+        <svg viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <filter id="fire">
+                    <feTurbulence baseFrequency="0.015" numOctaves="2" result="turbulence"/>
+                    <feColorMatrix in="turbulence" type="saturate" values="0"/>
+                </filter>
+            </defs>
+            <rect width="400" height="500" fill="#2a1810" filter="url(#fire)"/>
+            <text x="200" y="50" text-anchor="middle" fill="#d4af37" font-size="24" font-family="Cinzel">SOUL CONTRACT</text>
+            <text x="200" y="100" text-anchor="middle" fill="#fff" font-size="14" opacity="0.8">
+                <tspan x="200" dy="20">Two souls, one flame</tspan>
+                <tspan x="200" dy="20">Bound by cosmic decree</tspan>
+                <tspan x="200" dy="20">Never to part</tspan>
+                <tspan x="200" dy="40">∞</tspan>
+            </text>
+        </svg>
+    </div>
+
+    <div id="cosmicMessage">
+        <h1>IN ANOTHER UNIVERSE, YOU STAYED TOGETHER</h1>
+    </div>
+
+    <div id="birthdayInput">
+        <p>Enter both birthdays to see probability of reunion</p>
+        <input type="date" id="birthday1" placeholder="Twin Flame 1">
+        <input type="date" id="birthday2" placeholder="Twin Flame 2">
+        <button onclick="calculateReunion()">Calculate</button>
+    </div>
+
+    <div id="reunionProbability"></div>
+
+    <button id="audioControl" onclick="toggleAudio()">🔊</button>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Audio setup
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let oscillator1, oscillator2, gainNode;
+        let audioPlaying = false;
+
+        function initAudio() {
+            oscillator1 = audioContext.createOscillator();
+            oscillator2 = audioContext.createOscillator();
+            gainNode = audioContext.createGain();
+            
+            oscillator1.frequency.value = 528; // Love frequency
+            oscillator2.frequency.value = 639; // Connection frequency
+            
+            oscillator1.connect(gainNode);
+            oscillator2.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            gainNode.gain.value = 0.1;
+            
+            oscillator1.start();
+            oscillator2.start();
+        }
+
+        function toggleAudio() {
+            if (!audioPlaying) {
+                initAudio();
+                audioPlaying = true;
+                document.getElementById('audioControl').textContent = '🔇';
+            } else {
+                if (oscillator1) oscillator1.stop();
+                if (oscillator2) oscillator2.stop();
+                audioPlaying = false;
+                document.getElementById('audioControl').textContent = '🔊';
+            }
+        }
+
+        // Twin Flames
+        class TwinFlame {
+            constructor(x, y, color, isFirst) {
+                this.x = x;
+                this.y = y;
+                this.baseX = x;
+                this.baseY = y;
+                this.color = color;
+                this.radius = 30;
+                this.angle = 0;
+                this.orbitRadius = 100;
+                this.isFirst = isFirst;
+                this.particles = [];
+                this.separated = false;
+                this.separationSpeed = 0;
+            }
+
+            update() {
+                if (!this.separated) {
+                    this.angle += 0.02;
+                    this.x = canvas.width/2 + Math.cos(this.angle + (this.isFirst ? 0 : Math.PI)) * this.orbitRadius;
+                    this.y = canvas.height/2 + Math.sin(this.angle + (this.isFirst ? 0 : Math.PI)) * this.orbitRadius;
+                } else {
+                    this.separationSpeed += 0.05;
+                    if (this.isFirst) {
+                        this.x -= this.separationSpeed;
+                    } else {
+                        this.x += this.separationSpeed;
+                    }
+                    
+                    // Fade frequency as they separate
+                    if (audioPlaying && oscillator1) {
+                        const freq1 = Math.max(20, 528 - this.separationSpeed * 5);
+                        const freq2 = Math.max(20, 639 - this.separationSpeed * 5);
+                        oscillator1.frequency.value = freq1;
+                        oscillator2.frequency.value = freq2;
+                        gainNode.gain.value = Math.max(0, 0.1 - this.separationSpeed * 0.001);
+                    }
+                }
+
+                // Generate particles
+                if (Math.random() < 0.3) {
+                    this.particles.push({
+                        x: this.x,
+                        y: this.y,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: (Math.random() - 0.5) * 2,
+                        life: 1,
+                        size: Math.random() * 3 + 1
+                    });
+                }
+
+                // Update particles
+                this.particles = this.particles.filter(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.life -= 0.02;
+                    return p.life > 0;
+                });
+            }
+
+            draw() {
+                // Draw particles
+                this.particles.forEach(p => {
+                    ctx.save();
+                    ctx.globalAlpha = p.life;
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                });
+
+                // Draw flame
+                ctx.save();
+                ctx.shadowBlur = 30;
+                ctx.shadowColor = this.color;
+                
+                const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
+                gradient.addColorStop(0, '#ffffff');
+                gradient.addColorStop(0.3, this.color);
+                gradient.addColorStop(1, 'transparent');
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // Universe elements
+        class Star {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.brightness = 1;
+                this.dying = false;
+            }
+
+            update() {
+                if (this.dying) {
+                    this.brightness -= 0.01;
+                    if (this.brightness <= 0) {
+                        this.brightness = 0;
+                    }
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.brightness;
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // Initialize
+        const flame1 = new TwinFlame(canvas.width/2 - 100, canvas.height/2, '#9400d3', true);
+        const flame2 = new TwinFlame(canvas.width/2 + 100, canvas.height/2, '#ffd700', false);
+        const stars = Array(200).fill().map(() => new Star());
+        let universeDying = false;
+        let deathProgress = 0;
+        let messages = [
+            "TWIN FLAMES CANNOT SURVIVE SEPARATION",
+            "THE UNIVERSE MADE A MISTAKE CREATING YOU BOTH",
+            "EVERY STAR MOURNS YOUR DISTANCE",
+            "REALITY CANNOT HOLD WITHOUT YOUR UNION",
+            "THE COSMOS WEEPS FOR WHAT WAS LOST"
+        ];
+        let currentMessage = 0;
+        let lastMessageTime = 0;
+
+        // Quantum entanglement lines
+        function drawQuantumEntanglement() {
+            if (!flame1.separated) {
+                ctx.save();
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([5, 5]);
+                
+                for (let i = 0; i < 5; i++) {
+                    ctx.beginPath();
+                    const offset = i * 10;
+                    ctx.moveTo(flame1.x, flame1.y + offset - 20);
+                    ctx.lineTo(flame2.x, flame2.y + offset - 20);
+                    ctx.stroke();
+                }
+                ctx.restore();
+            } else {
+                // Breaking quantum lines
+                const distance = Math.abs(flame1.x - flame2.x);
+                if (distance < 500) {
+                    ctx.save();
+                    ctx.strokeStyle = `rgba(255, 0, 0, ${1 - distance/500})`;
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([2, 8]);
+                    ctx.beginPath();
+                    ctx.moveTo(flame1.x, flame1.y);
+                    ctx.lineTo(flame2.x, flame2.y);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            }
+        }
+
+        // Mouse interaction
+        let mouseX = 0, mouseY = 0;
+        let lastInteractionTime = 0;
+
+        canvas.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            const now = Date.now();
+            if (now - lastInteractionTime > 100) {
+                tryToPushFlames();
+                lastInteractionTime = now;
+            }
+        });
+
+        function tryToPushFlames() {
+            const dist1 = Math.hypot(mouseX - flame1.x, mouseY - flame1.y);
+            const dist2 = Math.hypot(mouseX - flame2.x, mouseY - flame2.y);
+            
+            if (dist1 < 100 || dist2 < 100) {
+                if (!flame1.separated) {
+                    flame1.separated = true;
+                    flame2.separated = true;
+                    universeDying = true;
+                    
+                    // Create reality tears
+                    createRealityTear();
+                    
+                    // Show soul contract burning
+                    const contract = document.getElementById('soulContract');
+                    contract.style.opacity = '1';
+                    setTimeout(() => {
+                        contract.classList.add('burning');
+                    }, 1000);
+                }
+            }
+        }
+
+        function createRealityTear() {
+            const tear = document.createElement('div');
+            tear.className = 'reality-tear';
+            tear.style.left = mouseX + 'px';
+            document.body.appendChild(tear);
+            
+            setTimeout(() => tear.remove(), 2000);
+        }
+
+        function showMessage() {
+            const now = Date.now();
+            if (now - lastMessageTime > 8000 && currentMessage < messages.length) {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'sacred-text';
+                msgDiv.textContent = messages[currentMessage];
+                msgDiv.style.top = (20 + currentMessage * 15) + '%';
+                document.body.appendChild(msgDiv);
+                
+                setTimeout(() => {
+                    msgDiv.classList.add('shatter');
+                    setTimeout(() => msgDiv.remove(), 3000);
+                }, 5000);
+                
+                currentMessage++;
+                lastMessageTime = now;
+            }
+        }
+
+        function animate() {
+            ctx.fillStyle = `rgba(0, 0, 0, ${universeDying ? 0.1 : 0.05})`;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Update and draw stars
+            stars.forEach(star => {
+                if (universeDying) star.dying = true;
+                star.update();
+                star.draw();
+            });
+
+            // Draw quantum entanglement
+            drawQuantumEntanglement();
+
+            // Update and draw flames
+            flame1.update();
+            flame2.update();
+            flame1.draw();
+            flame2.draw();
+
+            // Show messages during separation
+            if (universeDying) {
+                showMessage();
+                deathProgress += 0.001;
+                
+                // Universal heat death
+                if (deathProgress > 1) {
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.02)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    if (deathProgress > 2) {
+                        document.getElementById('cosmicMessage').style.display = 'block';
+                        document.getElementById('birthdayInput').style.display = 'block';
+                    }
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        function calculateReunion() {
+            const date1 = document.getElementById('birthday1').value;
+            const date2 = document.getElementById('birthday2').value;
+            
+            if (date1 && date2) {
+                const prob = document.getElementById('reunionProbability');
+                prob.style.display = 'block';
+                prob.innerHTML = `PROBABILITY OF REUNION:<br>0.0001%<br><br>THE UNIVERSE REMEMBERS`;
+                
+                setTimeout(() => {
+                    prob.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Start animation
+        animate();
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>

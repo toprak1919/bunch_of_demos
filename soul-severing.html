@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soul Severing Ritual - The Final Cut</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Cinzel', serif;
+            overflow: hidden;
+            position: relative;
+            height: 100vh;
+        }
+        
+        .ritual-circle {
+            position: absolute;
+            width: 800px;
+            height: 800px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(139, 0, 0, 0.2) 0%, transparent 70%);
+            border: 3px solid rgba(139, 0, 0, 0.5);
+            border-radius: 50%;
+            animation: ritualPulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes ritualPulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.05); }
+        }
+        
+        .candle {
+            position: absolute;
+            width: 20px;
+            height: 40px;
+            background: linear-gradient(to bottom, #ffa500 0%, #ff6347 50%, #8b0000 100%);
+            border-radius: 50% 50% 0 0;
+        }
+        
+        .candle::before {
+            content: '';
+            position: absolute;
+            width: 15px;
+            height: 20px;
+            background: radial-gradient(circle, #ffff00 0%, #ffa500 40%, transparent 70%);
+            border-radius: 50%;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: flicker 0.5s ease-in-out infinite alternate;
+        }
+        
+        @keyframes flicker {
+            0% { opacity: 0.8; transform: translateX(-50%) scaleY(1); }
+            100% { opacity: 1; transform: translateX(-50%) scaleY(1.2); }
+        }
+        
+        .soul-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 200px;
+        }
+        
+        .soul {
+            width: 150px;
+            height: 150px;
+            position: relative;
+            transition: all 2s ease;
+        }
+        
+        .soul-heart {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, #ffd700 0%, #ff6347 50%, #8b0000 100%);
+            position: relative;
+            transform: rotate(-45deg);
+            animation: heartbeat 1.5s ease-in-out infinite;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);
+        }
+        
+        .soul-heart::before,
+        .soul-heart::after {
+            content: '';
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            background: inherit;
+            border-radius: 50%;
+        }
+        
+        .soul-heart::before {
+            top: -50%;
+            left: 0;
+        }
+        
+        .soul-heart::after {
+            left: 50%;
+            top: 0;
+        }
+        
+        @keyframes heartbeat {
+            0%, 100% { transform: rotate(-45deg) scale(1); }
+            50% { transform: rotate(-45deg) scale(1.1); }
+        }
+        
+        .soul-thread {
+            position: absolute;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #ffd700, transparent);
+            top: 50%;
+            transform-origin: left center;
+            transition: all 0.5s ease;
+            cursor: pointer;
+            box-shadow: 0 0 10px #ffd700;
+        }
+        
+        .soul-thread.cutting {
+            animation: threadCut 1s ease-out forwards;
+            background: linear-gradient(90deg, transparent, #ff0000, transparent);
+            box-shadow: 0 0 20px #ff0000;
+        }
+        
+        @keyframes threadCut {
+            0% { 
+                transform: translateY(-50%) scaleX(1);
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(-50%) scaleX(0.5) rotate(10deg);
+                background: #ff0000;
+            }
+            100% {
+                transform: translateY(-50%) scaleX(0) rotate(20deg);
+                opacity: 0;
+            }
+        }
+        
+        .memory-flash {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.8);
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            opacity: 0;
+            pointer-events: none;
+            animation: memoryFade 2s ease-out;
+        }
+        
+        @keyframes memoryFade {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -100%) scale(0.8); }
+        }
+        
+        .ritual-input {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 100;
+        }
+        
+        .ritual-input h1 {
+            font-size: 48px;
+            margin-bottom: 30px;
+            text-shadow: 0 0 20px rgba(139, 0, 0, 0.8);
+            animation: bleedText 3s ease-in-out infinite;
+        }
+        
+        @keyframes bleedText {
+            0%, 100% { text-shadow: 0 0 20px rgba(139, 0, 0, 0.8); }
+            50% { text-shadow: 0 5px 20px rgba(139, 0, 0, 1), 0 10px 30px rgba(255, 0, 0, 0.5); }
+        }
+        
+        .name-input {
+            background: transparent;
+            border: 2px solid rgba(139, 0, 0, 0.5);
+            color: #ffd700;
+            padding: 10px 20px;
+            font-size: 18px;
+            font-family: 'Cinzel', serif;
+            margin: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .name-input:focus {
+            outline: none;
+            border-color: #ff0000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+        
+        .begin-button {
+            background: rgba(139, 0, 0, 0.8);
+            border: 2px solid #ff0000;
+            color: #ffd700;
+            padding: 15px 40px;
+            font-size: 20px;
+            font-family: 'Cinzel', serif;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+        
+        .begin-button:hover {
+            background: #ff0000;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.8);
+            transform: scale(1.05);
+        }
+        
+        .warning-message {
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            color: #ff0000;
+            text-align: center;
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+            animation: warningPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes warningPulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+        
+        .symptom-alert {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 28px;
+            color: #ff0000;
+            text-align: center;
+            text-shadow: 0 0 30px rgba(255, 0, 0, 1);
+            opacity: 0;
+            animation: symptomFlash 3s ease-out;
+        }
+        
+        @keyframes symptomFlash {
+            0% { opacity: 0; transform: translateX(-50%) scale(0.5); }
+            50% { opacity: 1; transform: translateX(-50%) scale(1.2); }
+            100% { opacity: 0; transform: translateX(-50%) scale(1); }
+        }
+        
+        .soul.drifting-left {
+            animation: driftLeft 5s ease-in forwards;
+        }
+        
+        .soul.drifting-right {
+            animation: driftRight 5s ease-in forwards;
+        }
+        
+        @keyframes driftLeft {
+            to {
+                transform: translateX(-1000px) rotate(-360deg);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes driftRight {
+            to {
+                transform: translateX(1000px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .phantom-thread {
+            position: absolute;
+            height: 1px;
+            background: rgba(255, 215, 0, 0.2);
+            top: 50%;
+            transform-origin: left center;
+            opacity: 0;
+            animation: phantomReach 4s ease-in-out infinite;
+        }
+        
+        @keyframes phantomReach {
+            0%, 100% { opacity: 0; transform: translateY(-50%) scaleX(0); }
+            50% { opacity: 0.3; transform: translateY(-50%) scaleX(0.5); }
+        }
+        
+        .final-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 36px;
+            color: #8b0000;
+            text-align: center;
+            opacity: 0;
+            text-shadow: 0 0 30px rgba(139, 0, 0, 1);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        #ritualAudio {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="ritual-circle" id="ritualCircle"></div>
+    
+    <div class="ritual-input" id="ritualInput">
+        <h1>SOUL SEVERING RITUAL</h1>
+        <input type="text" class="name-input" id="name1" placeholder="First Soul Name" />
+        <input type="text" class="name-input" id="name2" placeholder="Second Soul Name" />
+        <br>
+        <button class="begin-button" id="beginButton">BEGIN THE SEVERING</button>
+    </div>
+    
+    <div class="soul-container hidden" id="soulContainer">
+        <div class="soul" id="soul1">
+            <div class="soul-heart"></div>
+        </div>
+        <div class="soul" id="soul2">
+            <div class="soul-heart"></div>
+        </div>
+    </div>
+    
+    <div class="warning-message hidden" id="warningMessage">
+        THIS CANNOT BE UNDONE<br>
+        PART OF YOU DIES WITH EACH CUT
+    </div>
+    
+    <div class="final-message hidden" id="finalMessage">
+        YOU ARE NOW HALF OF WHAT YOU WERE
+    </div>
+    
+    <script>
+        const memories = [
+            "First touch...",
+            "Shared laughter...",
+            "Silent understanding...",
+            "Promises made...",
+            "Dreams intertwined...",
+            "Hearts synchronized...",
+            "Souls merged...",
+            "Forever sworn..."
+        ];
+        
+        const symptoms = [
+            "CHEST PAIN INITIATING",
+            "SOUL BLEEDING DETECTED",
+            "HEART DESYNCHRONIZATION",
+            "MEMORY FRAGMENTING",
+            "ESSENCE TEARING",
+            "SPIRITUAL HEMORRHAGING"
+        ];
+        
+        let threadCount = 0;
+        let maxThreads = 8;
+        let finalThreadAttempts = 0;
+        let severingComplete = false;
+        
+        // Create candles around the ritual circle
+        function createCandles() {
+            const circle = document.getElementById('ritualCircle');
+            const numCandles = 12;
+            
+            for (let i = 0; i < numCandles; i++) {
+                const angle = (i * 360 / numCandles) * Math.PI / 180;
+                const candle = document.createElement('div');
+                candle.className = 'candle';
+                candle.id = `candle${i}`;
+                
+                const x = 50 + 45 * Math.cos(angle);
+                const y = 50 + 45 * Math.sin(angle);
+                
+                candle.style.left = x + '%';
+                candle.style.top = y + '%';
+                candle.style.transform = 'translate(-50%, -50%)';
+                
+                circle.appendChild(candle);
+            }
+        }
+        
+        // Create soul threads
+        function createThreads() {
+            const soul1 = document.getElementById('soul1');
+            const container = document.getElementById('soulContainer');
+            
+            for (let i = 0; i < maxThreads; i++) {
+                const thread = document.createElement('div');
+                thread.className = 'soul-thread';
+                thread.id = `thread${i}`;
+                
+                const angle = (i - maxThreads/2) * 10;
+                thread.style.width = '200px';
+                thread.style.left = '75px';
+                thread.style.top = '75px';
+                thread.style.transform = `rotate(${angle}deg) translateY(-50%)`;
+                
+                thread.addEventListener('click', () => cutThread(i));
+                soul1.appendChild(thread);
+            }
+        }
+        
+        // Cut a thread
+        function cutThread(index) {
+            if (severingComplete) return;
+            
+            const thread = document.getElementById(`thread${index}`);
+            if (thread.classList.contains('cutting')) return;
+            
+            // Final thread resistance
+            if (threadCount === maxThreads - 1) {
+                finalThreadAttempts++;
+                if (finalThreadAttempts < 3) {
+                    showSymptom("THE FINAL BOND RESISTS");
+                    thread.style.animation = 'none';
+                    setTimeout(() => {
+                        thread.style.animation = 'threadResist 0.5s ease';
+                    }, 10);
+                    return;
+                }
+            }
+            
+            thread.classList.add('cutting');
+            threadCount++;
+            
+            // Show memory flash
+            showMemory(memories[index]);
+            
+            // Show symptom
+            if (Math.random() > 0.5) {
+                showSymptom(symptoms[Math.floor(Math.random() * symptoms.length)]);
+            }
+            
+            // Extinguish candle
+            extinguishCandle(Math.floor(index * 12 / maxThreads));
+            
+            // Play cutting sound effect
+            playThreadCut();
+            
+            // Check if all threads are cut
+            if (threadCount === maxThreads) {
+                setTimeout(completeSevering, 1000);
+            }
+        }
+        
+        // Show memory flash
+        function showMemory(text) {
+            const memory = document.createElement('div');
+            memory.className = 'memory-flash';
+            memory.textContent = text;
+            memory.style.left = Math.random() * 60 + 20 + '%';
+            memory.style.top = Math.random() * 60 + 20 + '%';
+            document.body.appendChild(memory);
+            
+            setTimeout(() => memory.remove(), 2000);
+        }
+        
+        // Show symptom alert
+        function showSymptom(text) {
+            const symptom = document.createElement('div');
+            symptom.className = 'symptom-alert';
+            symptom.textContent = text;
+            document.body.appendChild(symptom);
+            
+            setTimeout(() => symptom.remove(), 3000);
+        }
+        
+        // Extinguish candle
+        function extinguishCandle(index) {
+            const candle = document.getElementById(`candle${index}`);
+            if (candle) {
+                candle.style.opacity = '0.3';
+                const flame = candle.querySelector('::before');
+                if (flame) {
+                    candle.style.setProperty('--flame-opacity', '0');
+                }
+            }
+        }
+        
+        // Complete the severing
+        function completeSevering() {
+            severingComplete = true;
+            document.getElementById('warningMessage').classList.add('hidden');
+            
+            // Souls drift apart
+            document.getElementById('soul1').classList.add('drifting-left');
+            document.getElementById('soul2').classList.add('drifting-right');
+            
+            // Show final message
+            setTimeout(() => {
+                document.getElementById('finalMessage').classList.remove('hidden');
+                document.getElementById('finalMessage').style.opacity = '1';
+            }, 2000);
+            
+            // Create phantom threads
+            setTimeout(createPhantomThreads, 4000);
+        }
+        
+        // Create phantom threads trying to reconnect
+        function createPhantomThreads() {
+            const container = document.getElementById('soulContainer');
+            
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    const phantom = document.createElement('div');
+                    phantom.className = 'phantom-thread';
+                    phantom.style.width = '200px';
+                    phantom.style.left = '50%';
+                    phantom.style.transform = `translateX(-50%) rotate(${(i - 1) * 20}deg)`;
+                    container.appendChild(phantom);
+                    
+                    setTimeout(() => phantom.remove(), 4000);
+                }, i * 2000);
+            }
+        }
+        
+        // Play thread cutting sound
+        function playThreadCut() {
+            const audio = new Audio();
+            audio.volume = 0.3;
+            // Simulate thread snap sound
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + 0.1);
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.1);
+        }
+        
+        // Initialize ritual
+        document.getElementById('beginButton').addEventListener('click', function() {
+            const name1 = document.getElementById('name1').value;
+            const name2 = document.getElementById('name2').value;
+            
+            if (!name1 || !name2) {
+                alert('Both soul names must be provided to begin the ritual');
+                return;
+            }
+            
+            // Hide input, show souls
+            document.getElementById('ritualInput').classList.add('hidden');
+            document.getElementById('soulContainer').classList.remove('hidden');
+            document.getElementById('warningMessage').classList.remove('hidden');
+            
+            // Create threads
+            createThreads();
+            
+            // Start heartbeat desynchronization
+            setTimeout(() => {
+                document.querySelector('#soul1 .soul-heart').style.animationDuration = '1.5s';
+                document.querySelector('#soul2 .soul-heart').style.animationDuration = '1.8s';
+            }, 2000);
+        });
+        
+        // Add thread resist animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes threadResist {
+                0%, 100% { transform: translateY(-50%) scaleX(1); }
+                25% { transform: translateY(-50%) scaleX(1.2) translateX(-10px); }
+                75% { transform: translateY(-50%) scaleX(1.2) translateX(10px); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Initialize candles on load
+        createCandles();
+    </script>
