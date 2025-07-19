@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNKNOWN NUMBER</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #0a0a0f;
+            color: #e0e8ff;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Static noise background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(255, 255, 255, 0.03) 0px,
+                    transparent 1px,
+                    transparent 2px,
+                    rgba(255, 255, 255, 0.03) 3px
+                );
+            animation: static 8s steps(10) infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        @keyframes static {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(10px); }
+        }
+        
+        /* Phone container */
+        .phone-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
+            margin: 0 auto;
+            background: rgba(15, 15, 25, 0.95);
+            border-left: 1px solid rgba(224, 232, 255, 0.1);
+            border-right: 1px solid rgba(224, 232, 255, 0.1);
+            z-index: 2;
+            overflow: hidden;
+        }
+        
+        /* Header */
+        .header {
+            background: rgba(20, 20, 35, 0.9);
+            padding: 20px;
+            border-bottom: 1px solid rgba(224, 232, 255, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+        
+        .contact-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .profile-pic {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(224, 232, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .profile-pic::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, 
+                rgba(224, 232, 255, 0.1) 0%, 
+                transparent 70%);
+            animation: pulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 0.8; transform: scale(1.2); }
+        }
+        
+        .contact-name {
+            flex: 1;
+        }
+        
+        .name {
+            font-size: 18px;
+            font-weight: 500;
+            color: #e0e8ff;
+            animation: glitch 15s infinite;
+        }
+        
+        .last-seen {
+            font-size: 13px;
+            color: rgba(224, 232, 255, 0.4);
+            margin-top: 3px;
+            animation: timeGlitch 8s infinite;
+        }
+        
+        @keyframes glitch {
+            0%, 90% { opacity: 1; }
+            91% { opacity: 0.8; transform: translateX(-2px); }
+            92% { opacity: 0.6; transform: translateX(2px); }
+            93% { opacity: 0.8; transform: translateX(-1px); }
+            94%, 100% { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes timeGlitch {
+            0%, 85% { opacity: 0.4; }
+            86% { opacity: 0; }
+            87% { opacity: 0.6; content: "last seen 127 years ago"; }
+            88% { opacity: 0.2; }
+            89%, 100% { opacity: 0.4; }
+        }
+        
+        /* Messages container */
+        .messages-container {
+            height: calc(100vh - 180px);
+            overflow-y: auto;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .messages-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .messages-container::-webkit-scrollbar-track {
+            background: rgba(224, 232, 255, 0.05);
+        }
+        
+        .messages-container::-webkit-scrollbar-thumb {
+            background: rgba(224, 232, 255, 0.2);
+            border-radius: 2px;
+        }
+        
+        /* Messages */
+        .message {
+            margin-bottom: 20px;
+            opacity: 0;
+            animation: fadeInGhost 2s forwards;
+        }
+        
+        @keyframes fadeInGhost {
+            0% { 
+                opacity: 0; 
+                transform: translateY(10px);
+            }
+            50% { 
+                opacity: 0.3; 
+            }
+            100% { 
+                opacity: 0.7; 
+                transform: translateY(0);
+            }
+        }
+        
+        .message.received {
+            display: flex;
+            justify-content: flex-start;
+        }
+        
+        .message.sent {
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            position: relative;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+        
+        .received .message-bubble {
+            background: rgba(224, 232, 255, 0.08);
+            color: rgba(224, 232, 255, 0.8);
+            animation: phaseIn 20s infinite;
+        }
+        
+        .sent .message-bubble {
+            background: rgba(59, 130, 246, 0.15);
+            color: rgba(224, 232, 255, 0.9);
+            position: relative;
+        }
+        
+        .sent .message-bubble.failed {
+            animation: sendFail 2s forwards;
+        }
+        
+        @keyframes phaseIn {
+            0%, 70%, 100% { 
+                opacity: 0.8; 
+                filter: blur(0);
+            }
+            80% { 
+                opacity: 0.3; 
+                filter: blur(1px);
+            }
+            85% { 
+                opacity: 0.5; 
+                filter: blur(0.5px);
+            }
+        }
+        
+        @keyframes sendFail {
+            0% { 
+                opacity: 0.9; 
+                transform: translateX(0);
+            }
+            20% {
+                transform: translateX(-2px);
+            }
+            40% {
+                transform: translateX(2px);
+            }
+            60% {
+                transform: translateX(-1px);
+                opacity: 0.6;
+            }
+            100% {
+                opacity: 0.3;
+                transform: translateX(0);
+            }
+        }
+        
+        .error-indicator {
+            position: absolute;
+            right: -25px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ff4444;
+            font-size: 18px;
+            opacity: 0;
+            animation: errorPulse 2s infinite;
+            animation-delay: 2s;
+        }
+        
+        @keyframes errorPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+        
+        .message-time {
+            font-size: 11px;
+            color: rgba(224, 232, 255, 0.3);
+            margin-top: 4px;
+            animation: timeFlicker 10s infinite;
+        }
+        
+        @keyframes timeFlicker {
+            0%, 95% { opacity: 0.3; }
+            96% { opacity: 0; }
+            97% { opacity: 0.5; }
+            98%, 100% { opacity: 0.3; }
+        }
+        
+        /* Input area */
+        .input-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(20, 20, 35, 0.95);
+            border-top: 1px solid rgba(224, 232, 255, 0.1);
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 10;
+        }
+        
+        .message-input {
+            flex: 1;
+            background: rgba(224, 232, 255, 0.05);
+            border: 1px solid rgba(224, 232, 255, 0.1);
+            border-radius: 24px;
+            padding: 12px 20px;
+            color: #e0e8ff;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        .message-input:focus {
+            border-color: rgba(224, 232, 255, 0.2);
+            background: rgba(224, 232, 255, 0.08);
+        }
+        
+        .message-input::placeholder {
+            color: rgba(224, 232, 255, 0.3);
+        }
+        
+        .send-button {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(59, 130, 246, 0.2);
+            border: none;
+            color: rgba(224, 232, 255, 0.6);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-size: 20px;
+        }
+        
+        .send-button:hover {
+            background: rgba(59, 130, 246, 0.3);
+            color: rgba(224, 232, 255, 0.8);
+        }
+        
+        /* Silhouettes */
+        .silhouette {
+            position: fixed;
+            width: 200px;
+            height: 300px;
+            background: rgba(224, 232, 255, 0.02);
+            filter: blur(40px);
+            animation: drift 30s infinite ease-in-out;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .silhouette:nth-child(1) {
+            top: 10%;
+            left: -100px;
+            animation-delay: 0s;
+        }
+        
+        .silhouette:nth-child(2) {
+            bottom: 20%;
+            right: -100px;
+            animation-delay: 10s;
+            animation-duration: 35s;
+        }
+        
+        @keyframes drift {
+            0%, 100% { transform: translateX(0) translateY(0) scale(1); opacity: 0; }
+            20% { opacity: 0.02; }
+            50% { transform: translateX(100px) translateY(-30px) scale(1.1); opacity: 0.03; }
+            80% { opacity: 0.02; }
+        }
+        
+        /* Special 3:33 AM effect */
+        .clarity-mode .message-bubble {
+            animation: clarityPulse 5s ease-in-out;
+        }
+        
+        @keyframes clarityPulse {
+            0%, 100% { 
+                opacity: 0.7; 
+                filter: blur(0);
+            }
+            50% { 
+                opacity: 1; 
+                filter: blur(0);
+                box-shadow: 0 0 20px rgba(224, 232, 255, 0.3);
+            }
+        }
+        
+        .clarity-mode .name {
+            animation: none;
+            opacity: 1;
+        }
+        
+        .clarity-mode .last-seen {
+            animation: none;
+            opacity: 0.6;
+        }
+        
+        /* Notification sound (visual indicator) */
+        .notification-ghost {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(224, 232, 255, 0.1);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        .notification-ghost.active {
+            animation: notificationPulse 1s ease-out;
+        }
+        
+        @keyframes notificationPulse {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            50% {
+                opacity: 0.3;
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(2);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="silhouette"></div>
+    <div class="silhouette"></div>
+    
+    <div class="phone-container">
+        <div class="header">
+            <div class="contact-info">
+                <div class="profile-pic"></div>
+                <div class="contact-name">
+                    <div class="name">UNKNOWN NUMBER</div>
+                    <div class="last-seen">last seen 47 days ago</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="messages-container" id="messagesContainer">
+            <!-- Messages will be dynamically added here -->
+        </div>
+        
+        <div class="input-container">
+            <input type="text" class="message-input" id="messageInput" placeholder="Type a message...">
+            <button class="send-button" id="sendButton">→</button>
+        </div>
+    </div>
+    
+    <div class="notification-ghost" id="notificationGhost"></div>
+    
+    <script>
+        // Ghost messages that appear randomly
+        const ghostMessages = [
+            "I miss you",
+            "Where did we go wrong?",
+            "I'm sorry",
+            "Do you still think of me?",
+            "I wish we could talk",
+            "Everything reminds me of you",
+            "I hope you're happy",
+            "I still have your messages",
+            "Sometimes I see you in dreams",
+            "The silence is deafening",
+            "I keep typing but never send",
+            "Are you there?",
+            "I'm still here",
+            "We were good together",
+            "I can't let go",
+            "Please come back",
+            "I understand why you left",
+            "Your last message still haunts me",
+            "I deleted our photos but kept the memories",
+            "3:33 AM again"
+        ];
+        
+        // Glitched last seen times
+        const lastSeenTimes = [
+            "last seen 47 days ago",
+            "last seen 3 months ago",
+            "last seen ERROR ago",
+            "last seen ∞ days ago",
+            "last seen yesterday",
+            "last seen never",
+            "last seen 127 years ago",
+            "last seen just now",
+            "last seen [REDACTED]",
+            "last seen in another life"
+        ];
+        
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const notificationGhost = document.getElementById('notificationGhost');
+        const lastSeenElement = document.querySelector('.last-seen');
+        const nameElement = document.querySelector('.name');
+        
+        // Initialize with some ghost messages
+        function initializeMessages() {
+            setTimeout(() => addGhostMessage(), 1000);
+            setTimeout(() => addGhostMessage(), 3000);
+            setTimeout(() => addGhostMessage(), 5000);
+        }
+        
+        // Add a ghost message
+        function addGhostMessage() {
+            const message = ghostMessages[Math.floor(Math.random() * ghostMessages.length)];
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message received';
+            
+            const time = new Date();
+            const hours = Math.floor(Math.random() * 24);
+            const minutes = Math.floor(Math.random() * 60);
+            const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+            
+            messageDiv.innerHTML = `
+                <div class="message-bubble">
+                    ${message}
+                    <div class="message-time">${timeString}</div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Trigger notification effect
+            notificationGhost.classList.add('active');
+            setTimeout(() => notificationGhost.classList.remove('active'), 1000);
+            
+            // Play distorted notification sound (simulated visually)
+            document.body.style.filter = 'brightness(1.1)';
+            setTimeout(() => document.body.style.filter = 'brightness(1)', 100);
+        }
+        
+        // Send message (always fails)
+        function sendMessage() {
+            const text = messageInput.value.trim();
+            if (!text) return;
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message sent';
+            
+            const time = new Date();
+            const timeString = `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}`;
+            
+            messageDiv.innerHTML = `
+                <div class="message-bubble failed">
+                    ${text}
+                    <div class="message-time">${timeString}</div>
+                    <span class="error-indicator">!</span>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            messageInput.value = '';
+            
+            // Glitch effect on send
+            document.body.style.filter = 'saturate(0.5)';
+            setTimeout(() => document.body.style.filter = 'saturate(1)', 200);
+        }
+        
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+        
+        // Random ghost messages
+        setInterval(() => {
+            if (Math.random() < 0.3) {
+                addGhostMessage();
+            }
+        }, 15000);
+        
+        // Change last seen time randomly
+        setInterval(() => {
+            lastSeenElement.textContent = lastSeenTimes[Math.floor(Math.random() * lastSeenTimes.length)];
+        }, 20000);
+        
+        // Glitch the name occasionally
+        setInterval(() => {
+            if (Math.random() < 0.1) {
+                nameElement.textContent = 'UNK̸N̷O̶W̴N̵ ̶N̷U̸M̶B̵E̷R̴';
+                setTimeout(() => nameElement.textContent = 'UNKNOWN NUMBER', 500);
+            }
+        }, 10000);
+        
+        // Check for 3:33 AM
+        function checkSpecialTime() {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            
+            if (hours === 3 && minutes === 33) {
+                document.body.classList.add('clarity-mode');
+                nameElement.textContent = 'Alexandra';
+                lastSeenElement.textContent = 'last seen 2 years ago';
+                
+                // Add a special message
+                setTimeout(() => {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'message received';
+                    messageDiv.innerHTML = `
+                        <div class="message-bubble">
+                            I forgive you
+                            <div class="message-time">03:33</div>
+                        </div>
+                    `;
+                    messagesContainer.appendChild(messageDiv);
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }, 1000);
+                
+                setTimeout(() => {
+                    document.body.classList.remove('clarity-mode');
+                    nameElement.textContent = 'UNKNOWN NUMBER';
+                    lastSeenElement.textContent = 'last seen 47 days ago';
+                }, 60000);
+            }
+        }
+        
+        setInterval(checkSpecialTime, 1000);
+        
+        // Initialize
+        initializeMessages();
+        
+        // Add CSS animation for typing indicator
+        const style = document.createElement('style');
+        style.textContent = `
+            .typing-indicator {
+                display: inline-flex;
+                align-items: center;
+                padding: 12px 16px;
+                background: rgba(224, 232, 255, 0.08);
+                border-radius: 18px;
+                margin-bottom: 20px;
+            }
+            
+            .typing-indicator span {
+                height: 8px;
+                width: 8px;
+                background: rgba(224, 232, 255, 0.4);
+                border-radius: 50%;
+                display: inline-block;
+                margin: 0 2px;
+                animation: typing 1.4s infinite ease-in-out;
+            }
+            
+            .typing-indicator span:nth-child(1) {
+                animation-delay: -0.32s;
+            }
+            
+            .typing-indicator span:nth-child(2) {
+                animation-delay: -0.16s;
+            }
+            
+            @keyframes typing {
+                0%, 80%, 100% {
+                    transform: scale(1);
+                    opacity: 0.4;
+                }
+                40% {
+                    transform: scale(1.3);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Occasionally show typing indicator
+        setInterval(() => {
+            if (Math.random() < 0.2) {
+                const typingDiv = document.createElement('div');
+                typingDiv.className = 'message received';
+                typingDiv.innerHTML = `
+                    <div class="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                `;
+                messagesContainer.appendChild(typingDiv);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                
+                setTimeout(() => {
+                    typingDiv.remove();
+                    addGhostMessage();
+                }, 3000);
+            }
+        }, 25000);
+    </script>
+</body>
+</html>

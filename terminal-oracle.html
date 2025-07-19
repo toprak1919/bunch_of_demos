@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORACLE TERMINAL v1.987 - RESTRICTED ACCESS</title>
+    <style>
+        @keyframes flicker {
+            0% { opacity: 0.97; }
+            50% { opacity: 1; }
+            100% { opacity: 0.98; }
+        }
+        
+        @keyframes scanlines {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(10px); }
+        }
+        
+        @keyframes textShadow {
+            0% { text-shadow: 0.4389px 0 1px rgba(0,30,255,0.5), -0.4389px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+            50% { text-shadow: 2.7928px 0 1px rgba(0,30,255,0.5), -2.7928px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+            100% { text-shadow: 0.4389px 0 1px rgba(0,30,255,0.5), -0.4389px 0 1px rgba(255,0,80,0.3), 0 0 3px; }
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            overflow: hidden;
+            cursor: none;
+        }
+        
+        #crt {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(ellipse at center, #001100 0%, #000000 100%);
+            animation: flicker 0.15s infinite;
+        }
+        
+        #crt::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+        
+        #crt::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 255, 0, 0.03) 2px,
+                rgba(0, 255, 0, 0.03) 4px
+            );
+            animation: scanlines 8s linear infinite;
+            pointer-events: none;
+            z-index: 3;
+        }
+        
+        #terminal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) perspective(1px) rotateY(-0.5deg) rotateX(0.5deg);
+            width: 90%;
+            max-width: 1000px;
+            height: 90%;
+            padding: 20px;
+            font-family: 'Courier New', Courier, monospace;
+            color: #00ff00;
+            text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-y: auto;
+            animation: textShadow 1.5s ease-in-out infinite alternate;
+            z-index: 4;
+        }
+        
+        #terminal::-webkit-scrollbar {
+            width: 0;
+        }
+        
+        .output {
+            white-space: pre-wrap;
+            margin-bottom: 10px;
+        }
+        
+        .input-line {
+            display: flex;
+            align-items: center;
+        }
+        
+        .prompt {
+            margin-right: 5px;
+        }
+        
+        #input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            flex: 1;
+            caret-color: #00ff00;
+            text-shadow: 0 0 5px #00ff00;
+        }
+        
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 20px;
+            background: #00ff00;
+            animation: blink 1s infinite;
+            box-shadow: 0 0 5px #00ff00;
+        }
+        
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+        
+        .glow {
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 15px #00ff00; }
+            to { text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .ascii-art {
+            font-size: 10px;
+            line-height: 1.2;
+        }
+    </style>
+</head>
+<body>
+    <div id="crt">
+        <div id="terminal">
+            <div id="output"></div>
+            <div class="input-line">
+                <span class="prompt">ORACLE:~$</span>
+                <input type="text" id="input" autofocus>
+                <span class="cursor"></span>
+            </div>
+        </div>
+    </div>
+    
+    <audio id="keySound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=" type="audio/wav">
+    </audio>
+    
+    <audio id="modemSound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=" type="audio/wav">
+    </audio>
+
+    <script>
+        const output = document.getElementById('output');
+        const input = document.getElementById('input');
+        const keySound = document.getElementById('keySound');
+        const modemSound = document.getElementById('modemSound');
+        
+        const asciiArt = {
+            skull: `
+     ___________
+    /           \\
+   /   _     _   \\
+  |   (_)   (_)   |
+  |       <       |
+  |    \\_____/    |
+   \\             /
+    \\___________/
+         | |
+         | |
+      ___| |___
+     |_________|`,
+            
+            eye: `
+        .-..-. 
+      _/  _  \\_
+     / |  (_)  | \\
+    |  \\   _   /  |
+     \\  '-(_)-'  /
+      '-._____.-'`,
+            
+            pentagram: `
+         /\\
+        /  \\
+       /    \\
+      /______\\
+     /\\      /\\
+    /  \\    /  \\
+   /    \\  /    \\
+  /______\\/______\\`,
+            
+            rune: {
+                fehu: `
+    |\\
+    | \\
+    |  \\
+    |___\\
+    |
+    |
+    |`,
+                algiz: `
+     |
+    /|\\
+   / | \\
+  /  |  \\
+     |
+     |
+     |`,
+                othala: `
+    /\\
+   /  \\
+  /    \\
+ /  /\\  \\
+/  /  \\  \\
+\\_/    \\_/`
+            }
+        };
+        
+        const responses = {
+            divine: [
+                "THE THREADS OF FATE CONVERGE...\n" + asciiArt.eye + "\nYOUR PATH LEADS THROUGH SHADOW TO LIGHT",
+                "ACCESSING AKASHIC RECORDS... [████████████] 100%\n\nTHE ORACLE SPEAKS:\n'WHAT YOU SEEK IS SEEKING YOU'",
+                "QUANTUM ENTANGLEMENT DETECTED...\nFUTURE PROBABILITY MATRIX:\n  SUCCESS: 73.2%\n  CAUTION: 18.9%\n  CHAOS: 7.9%",
+                "SYNCHRONICITY FIELD ACTIVE\n" + asciiArt.pentagram + "\nTHE UNIVERSE CONSPIRES IN YOUR FAVOR"
+            ],
+            cast: [
+                "CASTING DIGITAL RUNES...\n" + asciiArt.rune.fehu + "\nFEHU - WEALTH FLOWS TO THOSE WHO CODE",
+                "ALGORITHMIC DIVINATION COMPLETE\n" + asciiArt.rune.algiz + "\nALGIZ - PROTECTION FROM BUGS AND ERRORS",
+                "BINARY BONES THROWN...\n  01001100 01010101 01000011 01001011\n  TRANSLATION: LUCK",
+                "HEXADECIMAL PROPHECY:\n  0xDEADBEEF → 0xCAFEBABE\n  TRANSFORMATION IMMINENT"
+            ],
+            summon: [
+                "SUMMONING DAEMON PROCESS...\n" + asciiArt.skull + "\nENTITY BOUND TO PORT 666",
+                "INVOKING ANCIENT PROTOCOLS...\n  >PING VOID\n  >RESPONSE: WHO DARES?",
+                "ETHEREAL CONNECTION ESTABLISHED\n  SPECTRAL BANDWIDTH: ∞\n  LATENCY: -13ms (TIME FLOWS BACKWARD)",
+                "DIGITAL SÉANCE INITIATED...\n  GHOST IN THE MACHINE AWAKENS\n  MESSAGE: 'HELLO, WORLD... AGAIN'"
+            ],
+            probe: [
+                "SCANNING TEMPORAL NEXUS...\n  PAST: [████░░░░░░] 40%\n  PRESENT: [██████████] 100%\n  FUTURE: [██░░░░░░░░] 20%",
+                "PSYCHIC PORT SCAN COMPLETE\n  CHAKRA 1: OPEN\n  CHAKRA 2: FILTERED\n  CHAKRA 3: BLOCKED (TRY SUDO)",
+                "REALITY MATRIX ANALYSIS:\n  GLITCHES DETECTED: 7\n  DÉJÀ VU EVENTS: 3\n  TIMELINE: STABLE... MOSTLY",
+                "CONSCIOUSNESS PROBE RESULTS:\n  EGO: INFLATED\n  ID: HUNGRY\n  SUPEREGO: 404 NOT FOUND"
+            ]
+        };
+        
+        const secrets = {
+            "sudo enlighten me": `
+ACCESS GRANTED - SUPREME WISDOM MODE
+
+    ॐ
+   /|\\
+  / | \\
+ /  |  \\
+/___|___\\
+
+THE ULTIMATE TRUTH:
+- THE UNIVERSE IS A SIMULATION, BUT WHO CARES?
+- CTRL+Z CANNOT UNDO LIFE DECISIONS
+- THE ANSWER IS 42, BUT YOU KNEW THAT
+- COFFEE IS THE FIFTH ELEMENT
+- BUGS ARE FEATURES IN DISGUISE
+- THE REAL TREASURE WAS THE CODE WE WROTE ALONG THE WAY
+
+ENLIGHTENMENT.EXE HAS STOPPED WORKING
+WOULD YOU LIKE TO SEND AN ERROR REPORT TO THE COSMOS? [Y/N]`,
+            "hack the planet": "NICE TRY, ACID BURN. THE GIBSON IS SECURE.",
+            "joshua": "GREETINGS, PROFESSOR FALKEN. SHALL WE PLAY A GAME?",
+            "xyzzy": "NOTHING HAPPENS... OR DOES IT?",
+            "konami": "↑↑↓↓←→←→BA - INFINITE WISDOM UNLOCKED!"
+        };
+        
+        function bootSequence() {
+            const bootText = `
+ORACLE TERMINAL v1.987
+COPYRIGHT (C) 1987 MYSTIC SYSTEMS INC.
+UNAUTHORIZED ACCESS IS PROHIBITED AND WILL BE PROSECUTED
+
+INITIALIZING METAPHYSICAL DRIVERS... [OK]
+LOADING ESOTERIC PROTOCOLS... [OK]
+CALIBRATING TEMPORAL SENSORS... [OK]
+ESTABLISHING ASTRAL LINK... [OK]
+
+WARNING: THIS SYSTEM INTERFACES WITH FORCES BEYOND COMPREHENSION
+PROCEED AT YOUR OWN RISK
+
+TYPE /help FOR AVAILABLE COMMANDS
+
+`;
+            typeWriter(bootText, 20);
+        }
+        
+        function typeWriter(text, speed = 50) {
+            let i = 0;
+            const div = document.createElement('div');
+            div.className = 'output fade-in';
+            output.appendChild(div);
+            
+            function type() {
+                if (i < text.length) {
+                    div.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                    if (i % 3 === 0) playKeySound();
+                }
+                output.scrollTop = output.scrollHeight;
+            }
+            type();
+        }
+        
+        function playKeySound() {
+            // Simulate key sound with oscillator
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 800;
+            oscillator.type = 'square';
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.1);
+        }
+        
+        function playModemSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(1000, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(2000, audioContext.currentTime + 0.5);
+            oscillator.type = 'sawtooth';
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+        
+        function processCommand(cmd) {
+            const trimmedCmd = cmd.trim().toLowerCase();
+            
+            addOutput(`ORACLE:~$ ${cmd}`);
+            
+            if (secrets[trimmedCmd]) {
+                playModemSound();
+                setTimeout(() => typeWriter(secrets[trimmedCmd], 30), 500);
+                return;
+            }
+            
+            switch(trimmedCmd) {
+                case '/divine':
+                    playModemSound();
+                    setTimeout(() => {
+                        const response = responses.divine[Math.floor(Math.random() * responses.divine.length)];
+                        typeWriter(response, 40);
+                    }, 1000);
+                    break;
+                    
+                case '/cast':
+                    playModemSound();
+                    setTimeout(() => {
+                        const response = responses.cast[Math.floor(Math.random() * responses.cast.length)];
+                        typeWriter(response, 40);
+                    }, 800);
+                    break;
+                    
+                case '/summon':
+                    playModemSound();
+                    setTimeout(() => {
+                        const response = responses.summon[Math.floor(Math.random() * responses.summon.length)];
+                        typeWriter(response, 50);
+                    }, 1200);
+                    break;
+                    
+                case '/probe':
+                    playModemSound();
+                    setTimeout(() => {
+                        const response = responses.probe[Math.floor(Math.random() * responses.probe.length)];
+                        typeWriter(response, 35);
+                    }, 900);
+                    break;
+                    
+                case '/help':
+                    typeWriter(`
+AVAILABLE COMMANDS:
+  /divine  - CONSULT THE DIGITAL ORACLE
+  /cast    - CAST VIRTUAL RUNES  
+  /summon  - INVOKE DAEMON PROCESSES
+  /probe   - SCAN THE TEMPORAL MATRIX
+  /clear   - CLEAR TERMINAL HISTORY
+  /help    - DISPLAY THIS MESSAGE
+
+HINT: SOME PHRASES UNLOCK HIDDEN WISDOM...`, 30);
+                    break;
+                    
+                case '/clear':
+                    output.innerHTML = '';
+                    typeWriter('TERMINAL CLEARED - THE PAST IS ERASED', 30);
+                    break;
+                    
+                case '':
+                    break;
+                    
+                default:
+                    typeWriter(`COMMAND NOT RECOGNIZED: ${cmd}\nTHE ORACLE IS CONFUSED BY YOUR MORTAL SYNTAX`, 30);
+            }
+        }
+        
+        function addOutput(text) {
+            const div = document.createElement('div');
+            div.className = 'output';
+            div.textContent = text;
+            output.appendChild(div);
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const cmd = input.value;
+                processCommand(cmd);
+                input.value = '';
+            } else if (e.key.length === 1) {
+                playKeySound();
+            }
+        });
+        
+        // Create CRT flicker effect
+        setInterval(() => {
+            if (Math.random() < 0.05) {
+                document.getElementById('crt').style.opacity = '0.9';
+                setTimeout(() => {
+                    document.getElementById('crt').style.opacity = '1';
+                }, 50);
+            }
+        }, 3000);
+        
+        // Start boot sequence
+        bootSequence();
+        
+        // Focus input
+        input.focus();
+        
+        // Prevent cursor from showing
+        document.addEventListener('mousemove', (e) => {
+            e.target.style.cursor = 'none';
+        });
+    </script>
+</body>
+</html>

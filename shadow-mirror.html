@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadow Mirror - Face What You Deny</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital@0;1&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Crimson Text', serif;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+        
+        #mirror-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 800px;
+            max-width: 90vw;
+            max-height: 90vh;
+        }
+        
+        #mirror {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, #1a0011 0%, #000 50%, #0a0008 100%);
+            border: 20px solid #1a1a1a;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 0 100px rgba(138, 43, 226, 0.2),
+                inset 0 0 100px rgba(75, 0, 130, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        #mirror.cracked::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800"><path d="M300 0 L250 200 L300 400 L350 200 Z M0 400 L200 450 L400 400 L200 350 Z" stroke="rgba(255,255,255,0.1)" fill="none" stroke-width="2"/></svg>') no-repeat center;
+            background-size: cover;
+            pointer-events: none;
+            animation: crackAppear 0.5s ease;
+        }
+        
+        @keyframes crackAppear {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        #fog {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, transparent 30%, rgba(255,255,255,0.02) 70%);
+            animation: breathe 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes breathe {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+        }
+        
+        #shadow-figure {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 500px;
+            background: radial-gradient(ellipse at center, rgba(75, 0, 130, 0) 0%, rgba(75, 0, 130, 0.3) 50%, rgba(0,0,0,0.8) 100%);
+            filter: blur(20px);
+            opacity: 0;
+            transition: all 2s ease;
+        }
+        
+        #shadow-figure.visible {
+            opacity: 0.8;
+            filter: blur(10px);
+        }
+        
+        #shadow-figure.clear {
+            opacity: 1;
+            filter: blur(5px);
+        }
+        
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(138, 43, 226, 0.3) 0%, transparent 70%);
+            animation: rippleEffect 2s ease-out forwards;
+            pointer-events: none;
+        }
+        
+        @keyframes rippleEffect {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        
+        #input-area {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+        }
+        
+        #trait-input {
+            width: 100%;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid rgba(138, 43, 226, 0.5);
+            color: #fff;
+            padding: 15px;
+            font-size: 18px;
+            font-family: 'Crimson Text', serif;
+            text-align: center;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        #trait-input:focus {
+            outline: none;
+            border-color: rgba(220, 20, 60, 0.8);
+            box-shadow: 0 0 20px rgba(220, 20, 60, 0.5);
+        }
+        
+        .mirror-text {
+            position: absolute;
+            font-size: 24px;
+            color: rgba(220, 20, 60, 0.8);
+            text-shadow: 0 0 10px rgba(220, 20, 60, 0.5);
+            animation: fadeInOut 4s ease-in-out;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        
+        .mirror-text.inverted {
+            transform: scaleX(-1) scaleY(-1);
+            color: rgba(138, 43, 226, 0.8);
+        }
+        
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(20px); }
+            20% { opacity: 1; transform: translateY(0); }
+            80% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+        
+        #shadow-response {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 28px;
+            color: rgba(220, 20, 60, 0.9);
+            text-shadow: 0 0 20px rgba(220, 20, 60, 0.8);
+            font-style: italic;
+            max-width: 80%;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+        
+        #shadow-response.visible {
+            opacity: 1;
+        }
+        
+        .whisper {
+            position: absolute;
+            font-size: 14px;
+            color: rgba(138, 43, 226, 0.4);
+            font-style: italic;
+            animation: whisperFloat 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes whisperFloat {
+            0%, 100% { opacity: 0; transform: translate(0, 0); }
+            50% { opacity: 0.6; transform: translate(10px, -10px); }
+        }
+        
+        #integration-mode {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: none;
+            z-index: 1000;
+        }
+        
+        #integration-mode.active {
+            display: block;
+            animation: integration 5s ease-in-out forwards;
+        }
+        
+        @keyframes integration {
+            0% { background: #000; }
+            50% { background: radial-gradient(circle, rgba(138, 43, 226, 0.5) 0%, #000 50%); }
+            100% { background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, #000 70%); }
+        }
+        
+        .integration-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            text-align: center;
+            opacity: 0;
+            animation: integrationText 5s ease-in-out forwards;
+        }
+        
+        @keyframes integrationText {
+            0% { opacity: 0; color: #dc143c; }
+            50% { opacity: 1; color: #8a2be2; }
+            100% { opacity: 1; color: #fff; }
+        }
+        
+        .autonomous-message {
+            position: absolute;
+            font-size: 36px;
+            color: #dc143c;
+            text-shadow: 0 0 30px #dc143c;
+            font-weight: bold;
+            letter-spacing: 3px;
+            animation: autonomousAppear 2s ease-in-out;
+        }
+        
+        @keyframes autonomousAppear {
+            0% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        #audio-context {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="mirror-container">
+        <div id="mirror">
+            <div id="fog"></div>
+            <div id="shadow-figure"></div>
+            <div id="shadow-response"></div>
+        </div>
+        <div id="input-area">
+            <input type="text" id="trait-input" placeholder="Speak your truth... What do you show the world?" autocomplete="off">
+        </div>
+    </div>
+    
+    <div id="integration-mode">
+        <div class="integration-text">YOU ARE BECOMING WHOLE</div>
+    </div>
+    
+    <audio id="audio-context"></audio>
+    
+    <script>
+        const mirror = document.getElementById('mirror');
+        const shadowFigure = document.getElementById('shadow-figure');
+        const traitInput = document.getElementById('trait-input');
+        const shadowResponse = document.getElementById('shadow-response');
+        const integrationMode = document.getElementById('integration-mode');
+        
+        let interactionCount = 0;
+        let shadowAwakened = false;
+        
+        // Shadow opposites mapping
+        const shadowTraits = {
+            'kind': 'cruel when necessary',
+            'strong': 'vulnerable and weak',
+            'confident': 'deeply insecure',
+            'generous': 'selfish and taking',
+            'patient': 'impulsive and reckless',
+            'honest': 'deceptive when threatened',
+            'brave': 'terrified and cowardly',
+            'loving': 'cold and indifferent',
+            'organized': 'chaotic and messy',
+            'calm': 'explosive and volatile',
+            'optimistic': 'cynical and hopeless',
+            'loyal': 'betraying when cornered',
+            'humble': 'arrogant and superior',
+            'creative': 'destructive and stagnant',
+            'social': 'isolated and withdrawn',
+            'responsible': 'reckless and careless',
+            'independent': 'desperately dependent',
+            'empathetic': 'callous and unfeeling',
+            'disciplined': 'indulgent and weak-willed',
+            'trusting': 'paranoid and suspicious'
+        };
+        
+        // Whisper messages
+        const whispers = [
+            "what you hide...",
+            "the truth beneath...",
+            "your other face...",
+            "what lurks within...",
+            "the denied self...",
+            "shadows speak...",
+            "darkness knows...",
+            "hidden truths...",
+            "repressed desires...",
+            "the unwanted self..."
+        ];
+        
+        // Create ripple effect
+        function createRipple(x, y) {
+            const ripple = document.createElement('div');
+            ripple.className = 'ripple';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.style.width = '20px';
+            ripple.style.height = '20px';
+            mirror.appendChild(ripple);
+            
+            setTimeout(() => ripple.remove(), 2000);
+        }
+        
+        // Create whisper
+        function createWhisper() {
+            const whisper = document.createElement('div');
+            whisper.className = 'whisper';
+            whisper.textContent = whispers[Math.floor(Math.random() * whispers.length)];
+            whisper.style.left = Math.random() * 80 + 10 + '%';
+            whisper.style.top = Math.random() * 80 + 10 + '%';
+            mirror.appendChild(whisper);
+            
+            setTimeout(() => whisper.remove(), 8000);
+        }
+        
+        // Mirror click effect
+        mirror.addEventListener('click', (e) => {
+            const rect = mirror.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            createRipple(x, y);
+            
+            // Glass creaking sound effect (simulated)
+            if (Math.random() > 0.7) {
+                mirror.classList.add('cracked');
+                setTimeout(() => mirror.classList.remove('cracked'), 3000);
+            }
+        });
+        
+        // Display mirror text
+        function displayMirrorText(text, inverted = false) {
+            const mirrorText = document.createElement('div');
+            mirrorText.className = 'mirror-text' + (inverted ? ' inverted' : '');
+            mirrorText.textContent = text;
+            mirrorText.style.left = Math.random() * 60 + 20 + '%';
+            mirrorText.style.top = Math.random() * 60 + 20 + '%';
+            mirror.appendChild(mirrorText);
+            
+            setTimeout(() => mirrorText.remove(), 4000);
+        }
+        
+        // Get shadow response
+        function getShadowResponse(trait) {
+            const lowerTrait = trait.toLowerCase();
+            
+            // Check for direct mapping
+            for (const [key, value] of Object.entries(shadowTraits)) {
+                if (lowerTrait.includes(key)) {
+                    return `You say ${key}... but I am ${value}`;
+                }
+            }
+            
+            // Generic shadow responses
+            const genericResponses = [
+                `Your "${trait}" hides its opposite`,
+                `Behind "${trait}" lurks what you fear to be`,
+                `"${trait}" is the mask... I am what's beneath`,
+                `You cling to "${trait}"... I embrace its shadow`,
+                `Your light casts me... the dark "${trait}"`,
+                `"${trait}" denies me... but I remain`
+            ];
+            
+            return genericResponses[Math.floor(Math.random() * genericResponses.length)];
+        }
+        
+        // Handle trait input
+        traitInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && traitInput.value.trim()) {
+                const trait = traitInput.value.trim();
+                
+                // Check for integration command
+                if (trait.toUpperCase() === 'INTEGRATION') {
+                    triggerIntegration();
+                    return;
+                }
+                
+                interactionCount++;
+                
+                // Show ripple effect
+                createRipple(300, 400);
+                
+                // Display the trait and its mirror
+                displayMirrorText(trait);
+                setTimeout(() => displayMirrorText(trait, true), 500);
+                
+                // Shadow becomes more visible
+                if (interactionCount > 2) {
+                    shadowFigure.classList.add('visible');
+                }
+                if (interactionCount > 5) {
+                    shadowFigure.classList.add('clear');
+                }
+                
+                // Shadow response
+                const response = getShadowResponse(trait);
+                shadowResponse.textContent = response;
+                shadowResponse.classList.add('visible');
+                
+                setTimeout(() => {
+                    shadowResponse.classList.remove('visible');
+                }, 3000);
+                
+                // Crack mirror on harsh truths
+                if (interactionCount > 4 && Math.random() > 0.6) {
+                    mirror.classList.add('cracked');
+                    setTimeout(() => mirror.classList.remove('cracked'), 2000);
+                }
+                
+                // Shadow becomes autonomous
+                if (interactionCount > 8 && !shadowAwakened) {
+                    shadowAwakened = true;
+                    setTimeout(() => showAutonomousMessage(), 2000);
+                }
+                
+                traitInput.value = '';
+            }
+        });
+        
+        // Show autonomous message
+        function showAutonomousMessage() {
+            const message = document.createElement('div');
+            message.className = 'autonomous-message';
+            message.textContent = 'I AM WHAT YOU DENY';
+            message.style.left = '50%';
+            message.style.top = '50%';
+            message.style.transform = 'translate(-50%, -50%)';
+            mirror.appendChild(message);
+            
+            setTimeout(() => {
+                message.remove();
+                
+                // Continue autonomous behavior
+                setInterval(() => {
+                    if (Math.random() > 0.7) {
+                        const autonomousMessages = [
+                            'I EXIST WITHOUT YOU',
+                            'YOUR DENIAL FEEDS ME',
+                            'WE ARE ONE',
+                            'ACCEPT THE DARKNESS',
+                            'I AM YOUR TRUTH'
+                        ];
+                        const msg = autonomousMessages[Math.floor(Math.random() * autonomousMessages.length)];
+                        shadowResponse.textContent = msg;
+                        shadowResponse.classList.add('visible');
+                        setTimeout(() => shadowResponse.classList.remove('visible'), 2000);
+                    }
+                }, 10000);
+            }, 3000);
+        }
+        
+        // Integration sequence
+        function triggerIntegration() {
+            integrationMode.classList.add('active');
+            document.querySelector('.integration-text').textContent = 'YOU ARE BECOMING WHOLE';
+            
+            setTimeout(() => {
+                document.querySelector('.integration-text').textContent = 'SHADOW AND LIGHT MERGE';
+            }, 2000);
+            
+            setTimeout(() => {
+                document.querySelector('.integration-text').textContent = 'YOU ARE COMPLETE';
+            }, 4000);
+            
+            setTimeout(() => {
+                integrationMode.classList.remove('active');
+                shadowFigure.style.background = 'radial-gradient(ellipse at center, rgba(255,255,255,0.1) 0%, rgba(138,43,226,0.3) 50%, rgba(75,0,130,0.5) 100%)';
+                mirror.style.background = 'radial-gradient(ellipse at center, #1a1a1a 0%, #0a0008 50%, #000 100%)';
+            }, 6000);
+        }
+        
+        // Ambient whispers
+        setInterval(createWhisper, 5000);
+        
+        // Initial shadow hint
+        setTimeout(() => {
+            shadowResponse.textContent = 'Speak... and I shall mirror your darkness';
+            shadowResponse.classList.add('visible');
+            setTimeout(() => shadowResponse.classList.remove('visible'), 3000);
+        }, 2000);
+    </script>
+</body>
+</html>

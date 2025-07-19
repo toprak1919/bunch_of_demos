@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGIL::CHAOS::PORTAL</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none;
+        }
+
+        body {
+            background: #000;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+            position: relative;
+        }
+
+        #static {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .chaos-layer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .interference {
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(255, 0, 255, 0.03) 2px,
+                rgba(255, 0, 255, 0.03) 4px
+            );
+            animation: scan 8s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .glitch-text {
+            position: absolute;
+            font-size: 2rem;
+            color: #ff00ff;
+            text-shadow: 
+                2px 2px 0 #00ffff,
+                -2px -2px 0 #ffff00,
+                0 0 20px #ff00ff;
+            animation: glitch 0.3s infinite;
+            font-family: 'Impact', sans-serif;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+
+        .sigil-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+        }
+
+        .floating-div {
+            position: absolute;
+            background: rgba(255, 0, 255, 0.1);
+            border: 2px solid;
+            animation: float 10s infinite ease-in-out;
+            mix-blend-mode: screen;
+            backdrop-filter: blur(5px);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+            25% { transform: translateY(-50px) rotate(90deg) scale(1.2); }
+            50% { transform: translateY(30px) rotate(180deg) scale(0.8); }
+            75% { transform: translateY(-30px) rotate(270deg) scale(1.1); }
+        }
+
+        .symbol {
+            position: absolute;
+            font-size: 24px;
+            animation: spin 5s linear infinite;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        #cursor-trail {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        .trail-symbol {
+            position: absolute;
+            font-size: 20px;
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00;
+            animation: fadeOut 2s forwards;
+            pointer-events: none;
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; transform: scale(2) rotate(720deg); }
+        }
+
+        .ordered {
+            animation: none !important;
+            transform: none !important;
+            color: #fff !important;
+            text-shadow: none !important;
+            background: rgba(0, 0, 0, 0.8) !important;
+            border: 1px solid #fff !important;
+        }
+
+        #secret-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 5rem;
+            color: #fff;
+            display: none;
+            z-index: 1000;
+            text-align: center;
+            font-family: 'Georgia', serif;
+        }
+
+        .noise-burst {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, 
+                rgba(255,0,255,0.8) 0%, 
+                rgba(0,255,255,0.8) 50%, 
+                rgba(255,255,0,0.8) 100%);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1000;
+            mix-blend-mode: difference;
+        }
+
+        .flash {
+            animation: flash 0.2s forwards;
+        }
+
+        @keyframes flash {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .chaos-text {
+            position: absolute;
+            font-size: 1.5rem;
+            white-space: nowrap;
+            z-index: 5;
+        }
+
+        @keyframes colorCycle {
+            0% { color: #ff00ff; }
+            33% { color: #00ff00; }
+            66% { color: #00ffff; }
+            100% { color: #ff00ff; }
+        }
+
+        .inverted {
+            filter: invert(100%);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="static"></canvas>
+    <canvas id="sigil-canvas" class="sigil-container"></canvas>
+    <div class="chaos-layer">
+        <div class="interference"></div>
+    </div>
+    <canvas id="cursor-trail"></canvas>
+    <div id="noise-burst" class="noise-burst"></div>
+    <div id="secret-message">ORDER FROM CHAOS</div>
+
+    <script>
+        // Occult symbols
+        const symbols = ['☿', '♀', '♁', '♂', '♃', '♄', '♅', '♆', '☉', '☽', '⛤', '⛧', '☠', '✠', '☨', '✡', '☪', '☯', '⚛', '♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓'];
+        
+        // Chaos text fragments
+        const chaosTexts = [
+            'BREAK THE SEAL', 'INVOKE CHAOS', 'SIGIL ACTIVATED', 'REALITY.EXE CORRUPTED',
+            'VOID CALLING', 'ENTROPY RISING', 'GLITCH IN THE MATRIX', 'PANDEMONIUM PROTOCOL',
+            'FRACTAL DREAMS', 'DIGITAL POSSESSION', 'HYPERSIGIL LOADING', 'CHAOS REIGNS',
+            'REALITY FRAGMENTED', 'DIMENSIONAL BREACH', 'NULL POINTER SOUL'
+        ];
+
+        // TV Static effect
+        const staticCanvas = document.getElementById('static');
+        const staticCtx = staticCanvas.getContext('2d');
+        staticCanvas.width = window.innerWidth;
+        staticCanvas.height = window.innerHeight;
+
+        function drawStatic() {
+            const imageData = staticCtx.createImageData(staticCanvas.width, staticCanvas.height);
+            const data = imageData.data;
+            
+            for (let i = 0; i < data.length; i += 4) {
+                const value = Math.random() * 255;
+                data[i] = value;
+                data[i + 1] = value;
+                data[i + 2] = value;
+                data[i + 3] = 255;
+            }
+            
+            staticCtx.putImageData(imageData, 0, 0);
+            requestAnimationFrame(drawStatic);
+        }
+        drawStatic();
+
+        // Sigil generation
+        const sigilCanvas = document.getElementById('sigil-canvas');
+        const sigilCtx = sigilCanvas.getContext('2d');
+        sigilCanvas.width = window.innerWidth;
+        sigilCanvas.height = window.innerHeight;
+
+        function drawSigil(x, y, size) {
+            sigilCtx.strokeStyle = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            sigilCtx.lineWidth = 2;
+            sigilCtx.globalAlpha = 0.6;
+            
+            sigilCtx.beginPath();
+            const points = Math.floor(Math.random() * 8) + 3;
+            for (let i = 0; i < points; i++) {
+                const angle = (Math.PI * 2 / points) * i;
+                const radius = size * (0.5 + Math.random() * 0.5);
+                const px = x + Math.cos(angle) * radius;
+                const py = y + Math.sin(angle) * radius;
+                
+                if (i === 0) {
+                    sigilCtx.moveTo(px, py);
+                } else {
+                    sigilCtx.lineTo(px, py);
+                }
+            }
+            sigilCtx.closePath();
+            sigilCtx.stroke();
+            
+            // Inner patterns
+            for (let j = 0; j < 3; j++) {
+                sigilCtx.beginPath();
+                sigilCtx.arc(x + (Math.random() - 0.5) * size, 
+                           y + (Math.random() - 0.5) * size, 
+                           Math.random() * size * 0.3, 
+                           0, Math.PI * 2);
+                sigilCtx.stroke();
+            }
+        }
+
+        function generateSigils() {
+            sigilCtx.clearRect(0, 0, sigilCanvas.width, sigilCanvas.height);
+            const count = Math.floor(Math.random() * 5) + 3;
+            
+            for (let i = 0; i < count; i++) {
+                drawSigil(
+                    Math.random() * sigilCanvas.width,
+                    Math.random() * sigilCanvas.height,
+                    50 + Math.random() * 150
+                );
+            }
+        }
+
+        setInterval(generateSigils, 2000);
+        generateSigils();
+
+        // Floating divs
+        function createFloatingDiv() {
+            const div = document.createElement('div');
+            div.className = 'floating-div';
+            div.style.width = Math.random() * 300 + 100 + 'px';
+            div.style.height = Math.random() * 300 + 100 + 'px';
+            div.style.left = Math.random() * window.innerWidth + 'px';
+            div.style.top = Math.random() * window.innerHeight + 'px';
+            div.style.borderColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            div.style.animationDuration = (5 + Math.random() * 10) + 's';
+            div.style.animationDelay = Math.random() * 5 + 's';
+            document.body.appendChild(div);
+            
+            setTimeout(() => div.remove(), 20000);
+        }
+
+        setInterval(createFloatingDiv, 1000);
+
+        // Glitch text
+        function createGlitchText() {
+            const text = document.createElement('div');
+            text.className = 'glitch-text';
+            text.textContent = chaosTexts[Math.floor(Math.random() * chaosTexts.length)];
+            text.style.left = Math.random() * (window.innerWidth - 200) + 'px';
+            text.style.top = Math.random() * (window.innerHeight - 100) + 'px';
+            text.style.transform = `rotate(${Math.random() * 360}deg)`;
+            document.body.appendChild(text);
+            
+            // Scramble effect
+            const original = text.textContent;
+            let scrambleInterval = setInterval(() => {
+                text.textContent = text.textContent.split('').map(char => 
+                    Math.random() > 0.5 ? char : symbols[Math.floor(Math.random() * symbols.length)]
+                ).join('');
+            }, 100);
+            
+            setTimeout(() => {
+                clearInterval(scrambleInterval);
+                text.textContent = original;
+                setTimeout(() => text.remove(), 2000);
+            }, 3000);
+        }
+
+        setInterval(createGlitchText, 2000);
+
+        // Floating symbols
+        function createSymbol() {
+            const symbol = document.createElement('div');
+            symbol.className = 'symbol';
+            symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+            symbol.style.left = Math.random() * window.innerWidth + 'px';
+            symbol.style.top = Math.random() * window.innerHeight + 'px';
+            symbol.style.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            symbol.style.fontSize = (20 + Math.random() * 40) + 'px';
+            document.body.appendChild(symbol);
+            
+            setTimeout(() => symbol.remove(), 10000);
+        }
+
+        setInterval(createSymbol, 500);
+
+        // Mouse trail
+        const trailCanvas = document.getElementById('cursor-trail');
+        const trailCtx = trailCanvas.getContext('2d');
+        trailCanvas.width = window.innerWidth;
+        trailCanvas.height = window.innerHeight;
+
+        let mouseX = 0, mouseY = 0;
+        
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            const trail = document.createElement('div');
+            trail.className = 'trail-symbol';
+            trail.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+            trail.style.left = mouseX + 'px';
+            trail.style.top = mouseY + 'px';
+            document.body.appendChild(trail);
+            
+            setTimeout(() => trail.remove(), 2000);
+        });
+
+        // Click noise burst
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        document.addEventListener('click', (e) => {
+            // Visual burst
+            const burst = document.getElementById('noise-burst');
+            burst.classList.add('flash');
+            setTimeout(() => burst.classList.remove('flash'), 200);
+            
+            // Audio burst
+            const bufferSize = audioContext.sampleRate * 0.1;
+            const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+            const data = buffer.getChannelData(0);
+            
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = (Math.random() - 0.5) * 2;
+            }
+            
+            const source = audioContext.createBufferSource();
+            source.buffer = buffer;
+            
+            const gainNode = audioContext.createGain();
+            gainNode.gain.value = 0.1;
+            
+            source.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            source.start();
+            
+            // Create explosion of symbols
+            for (let i = 0; i < 20; i++) {
+                const symbol = document.createElement('div');
+                symbol.className = 'trail-symbol';
+                symbol.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                symbol.style.left = e.clientX + 'px';
+                symbol.style.top = e.clientY + 'px';
+                symbol.style.animation = `fadeOut ${0.5 + Math.random() * 1.5}s forwards`;
+                document.body.appendChild(symbol);
+                setTimeout(() => symbol.remove(), 2000);
+            }
+        });
+
+        // Color inversion chaos
+        setInterval(() => {
+            if (Math.random() > 0.9) {
+                document.body.classList.toggle('inverted');
+                setTimeout(() => document.body.classList.toggle('inverted'), 100);
+            }
+        }, 3000);
+
+        // Chaos text crawler
+        function createChaosText() {
+            const text = document.createElement('div');
+            text.className = 'chaos-text';
+            text.textContent = chaosTexts[Math.floor(Math.random() * chaosTexts.length)];
+            text.style.top = Math.random() * window.innerHeight + 'px';
+            text.style.left = '-300px';
+            text.style.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            text.style.fontSize = (1 + Math.random() * 2) + 'rem';
+            text.style.fontFamily = ['Impact', 'Georgia', 'Comic Sans MS', 'Papyrus'][Math.floor(Math.random() * 4)];
+            
+            document.body.appendChild(text);
+            
+            let x = -300;
+            const speed = 2 + Math.random() * 5;
+            const wave = Math.random() * 50;
+            const baseY = parseFloat(text.style.top);
+            
+            const moveInterval = setInterval(() => {
+                x += speed;
+                text.style.left = x + 'px';
+                text.style.top = baseY + Math.sin(x * 0.01) * wave + 'px';
+                text.style.transform = `rotate(${Math.sin(x * 0.02) * 30}deg) scale(${1 + Math.sin(x * 0.03) * 0.3})`;
+                
+                if (x > window.innerWidth + 300) {
+                    clearInterval(moveInterval);
+                    text.remove();
+                }
+            }, 20);
+        }
+
+        setInterval(createChaosText, 1500);
+
+        // Easter egg - type "CHAOS"
+        let typedString = '';
+        document.addEventListener('keypress', (e) => {
+            typedString += e.key.toUpperCase();
+            if (typedString.length > 5) {
+                typedString = typedString.slice(-5);
+            }
+            
+            if (typedString === 'CHAOS') {
+                document.body.classList.add('ordered');
+                document.getElementById('secret-message').style.display = 'block';
+                
+                // Stop all animations temporarily
+                document.querySelectorAll('*').forEach(el => {
+                    if (el.classList.contains('glitch-text') || 
+                        el.classList.contains('floating-div') || 
+                        el.classList.contains('symbol')) {
+                        el.classList.add('ordered');
+                    }
+                });
+                
+                setTimeout(() => {
+                    document.body.classList.remove('ordered');
+                    document.getElementById('secret-message').style.display = 'none';
+                    document.querySelectorAll('.ordered').forEach(el => {
+                        el.classList.remove('ordered');
+                    });
+                }, 3000);
+                
+                typedString = '';
+            }
+        });
+
+        // Window resize handler
+        window.addEventListener('resize', () => {
+            staticCanvas.width = window.innerWidth;
+            staticCanvas.height = window.innerHeight;
+            sigilCanvas.width = window.innerWidth;
+            sigilCanvas.height = window.innerHeight;
+            trailCanvas.width = window.innerWidth;
+            trailCanvas.height = window.innerHeight;
+        });
+
+        // Initial chaos burst
+        for (let i = 0; i < 10; i++) {
+            setTimeout(createFloatingDiv, i * 100);
+            setTimeout(createSymbol, i * 50);
+        }
+    </script>
+</body>
+</html>

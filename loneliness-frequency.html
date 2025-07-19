@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loneliness Frequency Generator</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background: #0a0a0a;
+            color: #4a5568;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        /* Room background with single light source */
+        .room {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at 30% 20%, #1a1f2e 0%, #0a0a0a 60%);
+            opacity: 0.8;
+        }
+        
+        .shadow {
+            position: absolute;
+            bottom: 0;
+            left: 30%;
+            width: 40%;
+            height: 60%;
+            background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.8));
+            transform: skewX(-20deg);
+            transform-origin: bottom;
+            opacity: 0.6;
+        }
+        
+        /* Main container */
+        .container {
+            position: relative;
+            z-index: 10;
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            color: #2c5282;
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+            text-shadow: 0 0 20px rgba(44, 82, 130, 0.5);
+            opacity: 0;
+            animation: fadeIn 3s forwards;
+        }
+        
+        .subtitle {
+            color: #4a5568;
+            margin-bottom: 40px;
+            font-size: 0.9em;
+            opacity: 0;
+            animation: fadeIn 3s 1s forwards;
+        }
+        
+        /* Oscilloscope */
+        .oscilloscope {
+            width: 100%;
+            height: 200px;
+            background: rgba(26, 31, 46, 0.5);
+            border: 1px solid #2c5282;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            animation: fadeIn 3s 2s forwards;
+        }
+        
+        #canvas {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Frequency display */
+        .frequency-display {
+            font-size: 2em;
+            color: #63b3ed;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(99, 179, 237, 0.5);
+            height: 40px;
+            opacity: 0;
+            animation: fadeIn 3s 2.5s forwards;
+        }
+        
+        .frequency-label {
+            font-size: 0.8em;
+            color: #4a5568;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            height: 20px;
+            opacity: 0;
+            animation: fadeIn 3s 3s forwards;
+        }
+        
+        /* Controls */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            opacity: 0;
+            animation: fadeIn 3s 3.5s forwards;
+        }
+        
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .slider-label {
+            color: #4a5568;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        input[type="range"] {
+            width: 300px;
+            height: 5px;
+            background: #1a1f2e;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        input[type="range"]:hover {
+            opacity: 1;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            background: #63b3ed;
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(99, 179, 237, 0.5);
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 15px;
+            height: 15px;
+            background: #63b3ed;
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(99, 179, 237, 0.5);
+        }
+        
+        /* Messages */
+        .message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2em;
+            color: #e2e8f0;
+            text-shadow: 0 0 20px rgba(226, 232, 240, 0.5);
+            opacity: 0;
+            transition: opacity 2s;
+            pointer-events: none;
+            text-align: center;
+            width: 80%;
+            letter-spacing: 3px;
+        }
+        
+        /* Hidden messages */
+        .hidden-message {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #2c5282;
+            font-size: 0.9em;
+            opacity: 0;
+            transition: opacity 1s;
+            text-align: center;
+            max-width: 600px;
+            letter-spacing: 2px;
+        }
+        
+        /* Total darkness mode */
+        .total-darkness {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            opacity: 0;
+            transition: opacity 5s;
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+        
+        /* Heartbeat indicator */
+        .heartbeat {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 20px;
+            height: 20px;
+            background: #e53e3e;
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: heartbeat 2s infinite;
+        }
+        
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.2); opacity: 0.6; }
+        }
+        
+        /* Play button */
+        .play-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: none;
+            border: 2px solid #2c5282;
+            color: #2c5282;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+        
+        .play-button:hover {
+            background: #2c5282;
+            color: #0a0a0a;
+            box-shadow: 0 0 20px rgba(44, 82, 130, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="room"></div>
+    <div class="shadow"></div>
+    
+    <button class="play-button" onclick="initAudio()">START FREQUENCY</button>
+    <div class="heartbeat"></div>
+    
+    <div class="container">
+        <h1>LONELINESS FREQUENCY</h1>
+        <p class="subtitle">TUNING INTO THE UNIVERSAL FREQUENCY OF HUMAN ISOLATION</p>
+        
+        <div class="oscilloscope">
+            <canvas id="canvas"></canvas>
+        </div>
+        
+        <div class="frequency-display" id="frequency">437 Hz</div>
+        <div class="frequency-label" id="frequencyLabel">THE FREQUENCY OF EMPTY BEDS</div>
+        
+        <div class="controls">
+            <div class="slider-group">
+                <label class="slider-label">ROMANTIC LONELINESS</label>
+                <input type="range" id="romantic" min="0" max="100" value="50">
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">SOCIAL LONELINESS</label>
+                <input type="range" id="social" min="0" max="100" value="50">
+            </div>
+            
+            <div class="slider-group">
+                <label class="slider-label">EXISTENTIAL LONELINESS</label>
+                <input type="range" id="existential" min="0" max="100" value="50">
+            </div>
+        </div>
+    </div>
+    
+    <div class="message" id="message"></div>
+    <div class="hidden-message" id="hiddenMessage"></div>
+    <div class="total-darkness" id="darkness"></div>
+    
+    <script>
+        // Audio context and nodes
+        let audioContext;
+        let oscillator1, oscillator2, oscillator3;
+        let gainNode1, gainNode2, gainNode3;
+        let analyser;
+        let isPlaying = false;
+        
+        // Canvas setup
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+        
+        // Frequency labels
+        const frequencyLabels = [
+            { freq: 174, label: "THE FOUNDATION OF SOLITUDE" },
+            { freq: 285, label: "THE ECHO OF EMPTY ROOMS" },
+            { freq: 396, label: "THE WEIGHT OF UNSHARED MOMENTS" },
+            { freq: 417, label: "THE RESONANCE OF CHANGE WITHOUT WITNESS" },
+            { freq: 437, label: "THE FREQUENCY OF EMPTY BEDS" },
+            { freq: 528, label: "THE VIBRATION OF UNTOLD STORIES" },
+            { freq: 639, label: "THE SILENCE BETWEEN CONNECTIONS" },
+            { freq: 741, label: "THE PITCH OF UNHEARD THOUGHTS" },
+            { freq: 852, label: "THE WAVELENGTH OF INNER DIALOGUE" },
+            { freq: 963, label: "THE HARMONY OF SELF-REFLECTION" }
+        ];
+        
+        // Messages
+        const lonelinessMessages = [
+            "YOU ARE THE ONLY ONE HEARING THIS",
+            "THIS FREQUENCY EXISTS ONLY FOR YOU",
+            "NO ONE ELSE SHARES THIS MOMENT",
+            "YOUR SOLITUDE HAS A SOUND",
+            "ALONE BUT RESONATING",
+            "THE UNIVERSE LISTENS TO YOUR SILENCE",
+            "YOUR ISOLATION HAS A RHYTHM",
+            "SOLO FREQUENCIES DETECTED",
+            "BROADCASTING TO NO ONE",
+            "SIGNAL RECEIVED BY ONE"
+        ];
+        
+        // Hidden messages for specific combinations
+        const hiddenMessages = {
+            "100-0-0": "SOMEONE ELSE FELT THIS WAY AT 3:47 AM",
+            "0-100-0": "47 OTHERS ARE TUNED TO THIS FREQUENCY RIGHT NOW",
+            "0-0-100": "THE VOID ACKNOWLEDGES YOUR PRESENCE",
+            "100-100-0": "ISOLATION SHARED IS ISOLATION HALVED",
+            "100-0-100": "YOUR LONELINESS ECHOES THROUGH TIME",
+            "0-100-100": "WE ARE ALL ALONE TOGETHER",
+            "100-100-100": "MAXIMUM ISOLATION ACHIEVED - YOU ARE NOT THE FIRST",
+            "33-33-33": "PERFECT BALANCE OF EMPTINESS DETECTED",
+            "50-50-50": "THE MEDIAN OF HUMAN DISCONNECTION",
+            "77-77-77": "LUCKY NUMBER - UNLUCKY FEELING"
+        };
+        
+        // Initialize audio
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Create oscillators and gain nodes
+                oscillator1 = audioContext.createOscillator();
+                oscillator2 = audioContext.createOscillator();
+                oscillator3 = audioContext.createOscillator();
+                
+                gainNode1 = audioContext.createGain();
+                gainNode2 = audioContext.createGain();
+                gainNode3 = audioContext.createGain();
+                
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 2048;
+                
+                // Connect nodes
+                oscillator1.connect(gainNode1);
+                oscillator2.connect(gainNode2);
+                oscillator3.connect(gainNode3);
+                
+                gainNode1.connect(analyser);
+                gainNode2.connect(analyser);
+                gainNode3.connect(analyser);
+                
+                analyser.connect(audioContext.destination);
+                
+                // Set initial frequencies
+                oscillator1.frequency.value = 437;
+                oscillator2.frequency.value = 437.5; // Slight detuning for binaural effect
+                oscillator3.frequency.value = 436.5;
+                
+                // Set initial gains
+                gainNode1.gain.value = 0.1;
+                gainNode2.gain.value = 0.1;
+                gainNode3.gain.value = 0.1;
+                
+                // Start oscillators
+                oscillator1.start();
+                oscillator2.start();
+                oscillator3.start();
+                
+                isPlaying = true;
+                document.querySelector('.play-button').style.display = 'none';
+                
+                // Start visualization
+                visualize();
+                
+                // Start message system
+                setInterval(showRandomMessage, 8000);
+            }
+        }
+        
+        // Sliders
+        const romanticSlider = document.getElementById('romantic');
+        const socialSlider = document.getElementById('social');
+        const existentialSlider = document.getElementById('existential');
+        
+        // Update frequencies based on sliders
+        function updateFrequencies() {
+            if (!isPlaying) return;
+            
+            const romantic = parseInt(romanticSlider.value);
+            const social = parseInt(socialSlider.value);
+            const existential = parseInt(existentialSlider.value);
+            
+            // Calculate base frequency
+            const baseFreq = 174 + (romantic * 2) + (social * 3) + (existential * 4);
+            
+            // Update oscillators
+            oscillator1.frequency.setValueAtTime(baseFreq, audioContext.currentTime);
+            oscillator2.frequency.setValueAtTime(baseFreq + 0.5, audioContext.currentTime);
+            oscillator3.frequency.setValueAtTime(baseFreq - 0.5, audioContext.currentTime);
+            
+            // Update display
+            document.getElementById('frequency').textContent = `${Math.round(baseFreq)} Hz`;
+            
+            // Find closest frequency label
+            let closestLabel = frequencyLabels[0];
+            let closestDiff = Math.abs(baseFreq - frequencyLabels[0].freq);
+            
+            for (const label of frequencyLabels) {
+                const diff = Math.abs(baseFreq - label.freq);
+                if (diff < closestDiff) {
+                    closestDiff = diff;
+                    closestLabel = label;
+                }
+            }
+            
+            document.getElementById('frequencyLabel').textContent = closestLabel.label;
+            
+            // Update gains based on loneliness levels
+            const totalLoneliness = romantic + social + existential;
+            const avgLoneliness = totalLoneliness / 3;
+            
+            gainNode1.gain.setValueAtTime(romantic / 1000, audioContext.currentTime);
+            gainNode2.gain.setValueAtTime(social / 1000, audioContext.currentTime);
+            gainNode3.gain.setValueAtTime(existential / 1000, audioContext.currentTime);
+            
+            // Update heartbeat animation speed
+            const heartbeat = document.querySelector('.heartbeat');
+            const duration = 2 + (avgLoneliness / 100) * 3; // Slower heartbeat with more loneliness
+            heartbeat.style.animationDuration = `${duration}s`;
+            
+            // Check for hidden messages
+            const combination = `${romantic}-${social}-${existential}`;
+            const hiddenMessage = hiddenMessages[combination];
+            
+            if (hiddenMessage) {
+                document.getElementById('hiddenMessage').textContent = hiddenMessage;
+                document.getElementById('hiddenMessage').style.opacity = '1';
+                setTimeout(() => {
+                    document.getElementById('hiddenMessage').style.opacity = '0';
+                }, 5000);
+            }
+            
+            // Total darkness at maximum loneliness
+            if (romantic === 100 && social === 100 && existential === 100) {
+                document.getElementById('darkness').style.opacity = '0.95';
+                setTimeout(() => {
+                    document.getElementById('darkness').style.opacity = '0';
+                }, 10000);
+            }
+            
+            // Update room lighting based on loneliness
+            const room = document.querySelector('.room');
+            const lightIntensity = 100 - avgLoneliness;
+            room.style.background = `radial-gradient(ellipse at 30% 20%, rgba(26, 31, 46, ${lightIntensity/100}) 0%, #0a0a0a 60%)`;
+        }
+        
+        // Add event listeners
+        romanticSlider.addEventListener('input', updateFrequencies);
+        socialSlider.addEventListener('input', updateFrequencies);
+        existentialSlider.addEventListener('input', updateFrequencies);
+        
+        // Visualization
+        function visualize() {
+            if (!isPlaying) return;
+            
+            requestAnimationFrame(visualize);
+            
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            analyser.getByteTimeDomainData(dataArray);
+            
+            ctx.fillStyle = 'rgba(26, 31, 46, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#63b3ed';
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#63b3ed';
+            
+            ctx.beginPath();
+            
+            const sliceWidth = canvas.width / bufferLength;
+            let x = 0;
+            
+            for (let i = 0; i < bufferLength; i++) {
+                const v = dataArray[i] / 128.0;
+                const y = v * canvas.height / 2;
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+                
+                x += sliceWidth;
+            }
+            
+            ctx.lineTo(canvas.width, canvas.height / 2);
+            ctx.stroke();
+        }
+        
+        // Show random messages
+        function showRandomMessage() {
+            if (!isPlaying) return;
+            
+            const message = lonelinessMessages[Math.floor(Math.random() * lonelinessMessages.length)];
+            const messageEl = document.getElementById('message');
+            
+            messageEl.textContent = message;
+            messageEl.style.opacity = '1';
+            
+            setTimeout(() => {
+                messageEl.style.opacity = '0';
+            }, 4000);
+        }
+        
+        // Prevent page from closing without cleanup
+        window.addEventListener('beforeunload', () => {
+            if (audioContext) {
+                audioContext.close();
+            }
+        });
+    </script>
+</body>
+</html>

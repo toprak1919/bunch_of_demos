@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heartbreak Memorial - Where Love Goes to Die</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Crimson+Text:ital@0;1&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            color: #ccc;
+            font-family: 'Crimson Text', serif;
+            overflow-x: hidden;
+            position: relative;
+            height: 100vh;
+        }
+        
+        /* Rose Petals Animation */
+        .petal {
+            position: fixed;
+            top: -50px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50"><path d="M25 10 Q10 25 25 40 Q40 25 25 10" fill="%23800020" opacity="0.8"/></svg>') no-repeat center;
+            background-size: contain;
+            width: 30px;
+            height: 30px;
+            animation: fall linear infinite;
+            opacity: 0.7;
+        }
+        
+        @keyframes fall {
+            to {
+                transform: translateY(110vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Breaking Text Effect */
+        .breaking-text {
+            font-family: 'Cinzel', serif;
+            font-size: 4rem;
+            text-align: center;
+            margin: 2rem 0;
+            transition: all 0.5s;
+            cursor: default;
+            text-shadow: 0 0 20px rgba(128, 0, 0, 0.5);
+        }
+        
+        .breaking-text:hover {
+            animation: crack 0.5s forwards;
+        }
+        
+        @keyframes crack {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-5px); letter-spacing: 5px; }
+            100% { 
+                transform: translateY(10px); 
+                letter-spacing: 20px; 
+                opacity: 0.3;
+                filter: blur(2px);
+            }
+        }
+        
+        /* Main Container */
+        .memorial-container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        /* Input Section */
+        .input-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .name-input {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #444;
+            color: #ccc;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            font-family: 'Crimson Text', serif;
+            text-align: center;
+            transition: all 0.3s;
+            width: 300px;
+        }
+        
+        .name-input:focus {
+            outline: none;
+            border-color: #800020;
+            box-shadow: 0 0 20px rgba(128, 0, 32, 0.5);
+        }
+        
+        /* Gravestone */
+        .gravestone {
+            background: linear-gradient(135deg, #444 0%, #666 50%, #444 100%);
+            width: 250px;
+            height: 350px;
+            border-radius: 150px 150px 0 0;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            animation: rise 2s ease-out;
+            text-align: center;
+        }
+        
+        @keyframes rise {
+            from {
+                transform: translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .gravestone h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+        
+        .epitaph {
+            font-style: italic;
+            font-size: 1rem;
+            line-height: 1.5;
+            opacity: 0;
+            animation: fadeIn 3s forwards 1s;
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        
+        /* Candles */
+        .candle-container {
+            position: fixed;
+            bottom: 100px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            z-index: 5;
+        }
+        
+        .candle {
+            cursor: pointer;
+            position: relative;
+            width: 30px;
+            height: 100px;
+            background: linear-gradient(to bottom, #333 0%, #666 100%);
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .flame {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 30px;
+            background: radial-gradient(circle, #ffcc00 0%, #ff6600 70%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            display: none;
+            animation: flicker 0.5s infinite alternate;
+        }
+        
+        @keyframes flicker {
+            0% { transform: translateX(-50%) scale(1) rotate(-2deg); }
+            100% { transform: translateX(-50%) scale(1.1) rotate(2deg); }
+        }
+        
+        .candle.lit .flame {
+            display: block;
+        }
+        
+        /* Fog Effect */
+        .fog {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: linear-gradient(to top, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+            animation: drift 20s infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes drift {
+            0%, 100% { transform: translateX(-50px); }
+            50% { transform: translateX(50px); }
+        }
+        
+        /* Rain Effect */
+        .rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: none;
+            pointer-events: none;
+        }
+        
+        .rain.active {
+            display: block;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px),
+                linear-gradient(rgba(255,255,255,0.05) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(255,255,255,0.05) 2px, transparent 2px);
+            background-size: 50px 50px, 50px 50px, 100px 100px, 100px 100px;
+            animation: rain 0.5s linear infinite;
+        }
+        
+        @keyframes rain {
+            0% { background-position: 0 0, 0 0, 0 0, 0 0; }
+            100% { background-position: 50px 50px, -50px 50px, -100px 100px, 100px -100px; }
+        }
+        
+        /* Floating Messages */
+        .message {
+            position: fixed;
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            color: rgba(128, 0, 32, 0.8);
+            text-shadow: 0 0 20px rgba(128, 0, 32, 0.5);
+            animation: float 10s forwards;
+            pointer-events: none;
+        }
+        
+        @keyframes float {
+            0% {
+                opacity: 0;
+                transform: translateY(0);
+            }
+            20% {
+                opacity: 1;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px);
+            }
+        }
+        
+        /* Ghost Messages */
+        .ghost-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.3);
+            font-family: 'Crimson Text', serif;
+            font-style: italic;
+            animation: ghostAppear 5s forwards;
+            pointer-events: none;
+            text-align: center;
+            width: 80%;
+            max-width: 600px;
+        }
+        
+        @keyframes ghostAppear {
+            0% {
+                opacity: 0;
+                filter: blur(10px);
+            }
+            50% {
+                opacity: 0.5;
+                filter: blur(2px);
+            }
+            100% {
+                opacity: 0;
+                filter: blur(10px);
+            }
+        }
+        
+        /* Quotes */
+        .quote {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-style: italic;
+            font-size: 1.2rem;
+            color: rgba(200, 200, 200, 0.5);
+            text-align: center;
+            max-width: 80%;
+        }
+        
+        /* Heartbeat */
+        .heartbeat {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 30px;
+            height: 30px;
+            background: #800020;
+            transform: rotate(45deg);
+            animation: heartbeat 2s infinite;
+        }
+        
+        .heartbeat::before,
+        .heartbeat::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: #800020;
+            border-radius: 50%;
+        }
+        
+        .heartbeat::before {
+            top: -15px;
+            left: 0;
+        }
+        
+        .heartbeat::after {
+            top: 0;
+            left: -15px;
+        }
+        
+        @keyframes heartbeat {
+            0%, 20%, 40%, 60%, 80%, 100% {
+                transform: rotate(45deg) scale(1);
+            }
+            10%, 30%, 50%, 70%, 90% {
+                transform: rotate(45deg) scale(1.1);
+            }
+        }
+        
+        .heartbeat.dying {
+            animation: dying 5s forwards;
+        }
+        
+        @keyframes dying {
+            0% {
+                transform: rotate(45deg) scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: rotate(45deg) scale(0.8);
+                opacity: 0.5;
+            }
+            100% {
+                transform: rotate(45deg) scale(0.5);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="memorial-container">
+        <h1 class="breaking-text">HEARTBREAK MEMORIAL</h1>
+        <p style="text-align: center; font-size: 1.2rem; margin-bottom: 2rem;">Where love goes to die</p>
+        
+        <div class="input-section">
+            <input type="text" class="name-input" placeholder="Type their name..." id="nameInput">
+        </div>
+        
+        <div class="gravestone" id="gravestone">
+            <h3 id="gravestoneName"></h3>
+            <p class="epitaph" id="epitaph"></p>
+        </div>
+    </div>
+    
+    <div class="candle-container">
+        <div class="candle" onclick="lightCandle(this)">
+            <div class="flame"></div>
+        </div>
+        <div class="candle" onclick="lightCandle(this)">
+            <div class="flame"></div>
+        </div>
+        <div class="candle" onclick="lightCandle(this)">
+            <div class="flame"></div>
+        </div>
+        <div class="candle" onclick="lightCandle(this)">
+            <div class="flame"></div>
+        </div>
+        <div class="candle" onclick="lightCandle(this)">
+            <div class="flame"></div>
+        </div>
+    </div>
+    
+    <div class="fog"></div>
+    <div class="rain" id="rain"></div>
+    <div class="heartbeat" id="heartbeat"></div>
+    
+    <div class="quote">
+        "The heart was made to be broken." - Oscar Wilde
+    </div>
+    
+    <audio id="pianoSound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBi14yO7YjjsjBRadyuzcjzshBRmcyu3bkDsiBB2dzuzZlT0jBiCYyuzbljwgBh6Yyu3blDwfBduTyuzZkz8gBheVyOzblTwfBB2Sy+vbljwfBBuUyuvblDsiB1+PUAoIF3zJ79qROg0HGRlDPBkTrZEjCg4TCkjeXBEMDQYNEBUQDg0V4Ud1UgMAjdRgGg4TDBAPEBMRDQ8TYL78hhEGEwwSDhEQEA0UGbDzfxELEAkOEBETDRAUEaLvdhMJEwwPEA8SDRIUEaLsdRUJFAoRDxIQEBUTGLPmaxYKEwsSDxAREBUTG7PlYxsLFwwTEBEQEhYVH7rhYRwNGQ4VEBETEhYYHLvfWyAOHA8XEREQEB0ZHb/bWCMPHBEWEBMRExgZHsHYVSYOHRMWERQSEhodGcPUUSUQHRMYEhUSEhoaHMXPTyUSHhQZExUSExwbH8nJTCYUHxQaExgTFhwaIMfFSSgVHhUbFBkUFR4ZIsfCRywWHhYcFBkVFx4aJMi/RC4YHhYdFRoWFx8cJ8q8QzAXHxgdFxoWGCAdKMq6QTEZHxgdFxwXGiAeKcy4PzQaHxkeGBwZGiAfLM+1PTYaIBkfGR0aGiIeLM+yOzkaIBsfGx0cHCMfL9GuOTocIBwgGx8dHyQfMNOqODwcIh0gHB8eICQhMdWmNz8dIx0hHSAeIiUiMtejNkAdIx4hHiEfIiUiMtuhNUIfJB4iHiIfIiYiNNuhNUEeJB8jICMgIychNtyeMkIeJB8jICMhJychN92dMUMfJSEjISMhJychON2cMkEfJSEkISQhKCQpOd2aMkEgJSElISYjKSUqO92YMkEhJCElIycjKyYrPd2YMUMhJCMmJCgjKigrPd2XM0MhJCMnJSkjLCgsP9yVMkUiJiMoJiojLCgtQNuVMkUjJyQpJisjLS4uQdqUMkYjJyUqJywkLi4uQtiVMkYlJyUqKC0mLi4wRNiUMkclJyYrKC4mLy4wRdiTMkclKCcrKS0nLy8wRteTMkclKCcsKi4nMDAxR9OUMUcmKSYsKi4nMDAxR9GUMUcnKScsKy8oMDEySNGTMUcnKSctLC8pMDEySNCTMUcnKSgtLC8pMDEySM+TMEcnKCgtLC8qMDEzSc6TMEcnKCktLS8qMDAzSc2UMEcnKyktLS8rMDEzTMyTMEcpKyktLS8rMDEzTMyTMEcpKyktLS8rMDEzTMyTMEcpKyktLS8rMDEzTMyTMEcpKyktLS8rMDEzTMyTMEcpKyktLS8rMDEzTMyTMEcpKyktLS8rMDEzTMuTMEcpKyktLS8rMDEzTMuTMEgpKyktLS8rMDEzTMuTMEgpKyktLS8rMDEzTMuTMEgpKyktLS8rMDEzTMuTMEgpKyktLS8rMDEzTMuTMEgpKyktLS8rMDEzTMuTMEgpKyktLS8rMDEzTMuTMEgpKyktLS8rMDEzTMuTMEgpKyktLS8rMDEzTMuTMEgpKyktLS8rMDEzTMuTMEgpKyktLS8rMDEzTMuTMEgpKyktLS8rMDEzTMuTL0gpKyktLS8rMDEzTMuTL0gpKyktLS8rMDEzTMuTL0gpKyktLS8rMDEzTMuTL0gpKyktLS8rMDEzTMuTL0gpKyktLS8rMDEzTMuTL0gpKyktLS8rMDEzTMuTL0gpKyktLS8rMDEzTMuTL0gpKyktLS8rMDEzTMuTL0gpKyktLS8rMDEzTMuTL0gpKyktLS8rMDEzTMuTL0gpKyktLS8rMDEzTMuTL0gpKyktLS8rMDEzTMuTL0gpKyktLS8rMDEzTMuTL0gpKyktLS8rMDEzTMuTL0gpKyktLS8rMDEzTMuTL0gpKyktLS8rMDEzTMuTL0gpKyktLS8rMDEzTA==" type="audio/wav">
+    </audio>
+    
+    <audio id="heartbeatSound" loop>
+        <source src="data:audio/wav;base64,UklGRoQFAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YWAFAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" type="audio/wav">
+    </audio>
+    
+    <script>
+        // Epitaphs for gravestones
+        const epitaphs = [
+            "HERE LIES WHAT COULD HAVE BEEN",
+            "DIED OF A THOUSAND UNSPOKEN WORDS",
+            "BURIED WITH ALL THE PROMISES BROKEN",
+            "REST IN PIECES OF MY SHATTERED HEART",
+            "GONE BUT NEVER FORGOTTEN, UNFORTUNATELY",
+            "DEATH BY A THOUSAND MEMORIES",
+            "HERE LIES LOVE, MURDERED BY TIME",
+            "ETERNALLY MOURNED, NEVER RETURNED",
+            "KILLED BY SILENCE AND DISTANCE",
+            "DIED WAITING FOR A TEXT BACK"
+        ];
+        
+        // Special names that trigger ghost messages
+        const ghostMessages = {
+            "sarah": "She never loved you the way you loved her...",
+            "john": "He was thinking of someone else...",
+            "alex": "They found someone better...",
+            "emma": "She's happier without you...",
+            "michael": "He never really cared...",
+            "love": "Love is just a chemical reaction that fades...",
+            "forever": "Forever was just eleven letters..."
+        };
+        
+        // Floating messages
+        const floatingMessages = [
+            "LOVE IS DEAD",
+            "FOREVER MEANT NOTHING",
+            "PROMISES TURN TO DUST",
+            "MEMORIES HAUNT FOREVER",
+            "THE HEART REMEMBERS",
+            "GHOSTS OF WHAT WE WERE",
+            "ASHES OF ROMANCE",
+            "DEATH OF INNOCENCE"
+        ];
+        
+        // Create falling rose petals
+        function createPetal() {
+            const petal = document.createElement('div');
+            petal.className = 'petal';
+            petal.style.left = Math.random() * window.innerWidth + 'px';
+            petal.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            petal.style.animationDelay = Math.random() * 5 + 's';
+            document.body.appendChild(petal);
+            
+            setTimeout(() => petal.remove(), 20000);
+        }
+        
+        // Create petals periodically
+        setInterval(createPetal, 2000);
+        
+        // Initial petals
+        for (let i = 0; i < 10; i++) {
+            setTimeout(createPetal, i * 200);
+        }
+        
+        // Handle name input
+        const nameInput = document.getElementById('nameInput');
+        const gravestone = document.getElementById('gravestone');
+        const gravestoneName = document.getElementById('gravestoneName');
+        const epitaph = document.getElementById('epitaph');
+        
+        nameInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && this.value.trim()) {
+                createGravestone(this.value.trim());
+                playPianoSound();
+            }
+        });
+        
+        function createGravestone(name) {
+            gravestoneName.textContent = name.toUpperCase();
+            epitaph.textContent = epitaphs[Math.floor(Math.random() * epitaphs.length)];
+            gravestone.style.display = 'flex';
+            
+            // Check for ghost messages
+            const lowerName = name.toLowerCase();
+            if (ghostMessages[lowerName]) {
+                setTimeout(() => showGhostMessage(ghostMessages[lowerName]), 3000);
+            }
+            
+            // Start heartbeat dying animation
+            setTimeout(() => {
+                document.getElementById('heartbeat').classList.add('dying');
+            }, 2000);
+        }
+        
+        function showGhostMessage(message) {
+            const ghost = document.createElement('div');
+            ghost.className = 'ghost-message';
+            ghost.textContent = message;
+            document.body.appendChild(ghost);
+            
+            setTimeout(() => ghost.remove(), 5000);
+        }
+        
+        // Light candles
+        function lightCandle(candle) {
+            candle.classList.add('lit');
+            
+            // Candle burns down after time
+            setTimeout(() => {
+                candle.style.height = '50px';
+                setTimeout(() => {
+                    candle.classList.remove('lit');
+                    candle.style.height = '100px';
+                }, 10000);
+            }, 20000);
+        }
+        
+        // Play piano sound
+        function playPianoSound() {
+            const audio = document.getElementById('pianoSound');
+            audio.volume = 0.3;
+            audio.play().catch(() => {});
+        }
+        
+        // Start rain after 30 seconds
+        setTimeout(() => {
+            document.getElementById('rain').classList.add('active');
+        }, 30000);
+        
+        // Floating messages
+        function createFloatingMessage() {
+            const message = document.createElement('div');
+            message.className = 'message';
+            message.textContent = floatingMessages[Math.floor(Math.random() * floatingMessages.length)];
+            message.style.left = (Math.random() * 80 + 10) + '%';
+            message.style.top = (Math.random() * 60 + 20) + '%';
+            document.body.appendChild(message);
+            
+            setTimeout(() => message.remove(), 10000);
+        }
+        
+        // Create floating messages periodically
+        setInterval(createFloatingMessage, 15000);
+        
+        // Rotating quotes
+        const quotes = [
+            '"The heart was made to be broken." - Oscar Wilde',
+            '"Ever has it been that love knows not its own depth until the hour of separation." - Kahlil Gibran',
+            '"The saddest thing about love is that not only that it cannot last forever, but that heartbreak is soon forgotten." - William Faulkner',
+            '"Sometimes good things fall apart so better things can fall together." - Marilyn Monroe',
+            '"The hottest love has the coldest end." - Socrates',
+            '"\'Tis better to have loved and lost than never to have loved at all." - Alfred Lord Tennyson',
+            '"Hearts will never be practical until they are made unbreakable." - The Wizard of Oz',
+            '"The emotion that can break your heart is sometimes the very one that heals it." - Nicholas Sparks'
+        ];
+        
+        let currentQuote = 0;
+        const quoteElement = document.querySelector('.quote');
+        
+        setInterval(() => {
+            currentQuote = (currentQuote + 1) % quotes.length;
+            quoteElement.style.opacity = '0';
+            setTimeout(() => {
+                quoteElement.textContent = quotes[currentQuote];
+                quoteElement.style.opacity = '0.5';
+            }, 500);
+        }, 10000);
+        
+        // Heartbeat sound (optional - browsers may block autoplay)
+        const heartbeatSound = document.getElementById('heartbeatSound');
+        heartbeatSound.volume = 0.1;
+        
+        // Try to play heartbeat on user interaction
+        document.addEventListener('click', function() {
+            heartbeatSound.play().catch(() => {});
+        }, { once: true });
+    </script>
+</body>
+</html>

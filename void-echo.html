@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>void echo</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-weight: 300;
+            overflow: hidden;
+            position: relative;
+            height: 100vh;
+            animation: breathe 8s ease-in-out infinite;
+        }
+        
+        @keyframes breathe {
+            0%, 100% { background: #000; }
+            50% { background: #0a0a0a; }
+        }
+        
+        #container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        #input {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            font-size: 24px;
+            font-weight: 100;
+            padding: 10px;
+            width: 80%;
+            text-align: center;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        #input:focus {
+            border-bottom-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        #input::placeholder {
+            color: rgba(255, 255, 255, 0.2);
+            font-style: italic;
+        }
+        
+        .echo {
+            position: absolute;
+            font-size: 24px;
+            animation: fall 8s ease-out forwards;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        
+        @keyframes fall {
+            0% {
+                opacity: 0.8;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(200px) scale(0.8);
+            }
+        }
+        
+        .glitch {
+            animation: glitch 0.3s ease-in-out infinite;
+        }
+        
+        @keyframes glitch {
+            0%, 100% { 
+                text-shadow: 
+                    2px 0 #ff0000,
+                    -2px 0 #00ffff,
+                    0 0 10px rgba(255, 255, 255, 0.2);
+            }
+            50% {
+                text-shadow: 
+                    -2px 0 #ff0000,
+                    2px 0 #00ffff,
+                    0 0 20px rgba(255, 255, 255, 0.1);
+            }
+        }
+        
+        #no-one-listening {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-weight: 100;
+            letter-spacing: 10px;
+            opacity: 0;
+            animation: fadeIn 3s ease-in forwards;
+            display: none;
+        }
+        
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 0.8; }
+        }
+        
+        #void-remembers {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            letter-spacing: 5px;
+            opacity: 0;
+            color: rgba(255, 255, 255, 0.3);
+            display: none;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        #input:not(:focus) {
+            animation: blink 1s infinite;
+        }
+        
+        .special-effect {
+            animation: specialGlitch 0.5s ease-in-out infinite, shake 0.5s ease-in-out infinite;
+        }
+        
+        @keyframes specialGlitch {
+            0%, 100% { 
+                text-shadow: 
+                    5px 0 #ff0000,
+                    -5px 0 #00ffff,
+                    0 0 30px rgba(255, 0, 0, 0.5);
+                filter: blur(0);
+            }
+            50% {
+                text-shadow: 
+                    -5px 0 #ff0000,
+                    5px 0 #00ffff,
+                    0 0 50px rgba(0, 255, 255, 0.5);
+                filter: blur(1px);
+            }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(-2px, 2px); }
+            50% { transform: translate(2px, -2px); }
+            75% { transform: translate(-2px, -2px); }
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <input type="text" id="input" placeholder="speak into the void..." autocomplete="off">
+    </div>
+    <div id="no-one-listening">NO ONE IS LISTENING</div>
+    <div id="void-remembers">THE VOID REMEMBERS EVERYTHING</div>
+    
+    <script>
+        const input = document.getElementById('input');
+        const noOneListening = document.getElementById('no-one-listening');
+        const voidRemembers = document.getElementById('void-remembers');
+        let echoCount = 0;
+        let lastActivity = Date.now();
+        let silenceTimer;
+        
+        // Initialize speech synthesis
+        const synth = window.speechSynthesis;
+        
+        // Glitch text function
+        function glitchText(text, level) {
+            const glitchChars = '!@#$%^&*()_+-=[]{}|;:,.<>?/~`';
+            let glitched = '';
+            
+            for (let i = 0; i < text.length; i++) {
+                if (Math.random() < level * 0.1) {
+                    glitched += glitchChars[Math.floor(Math.random() * glitchChars.length)];
+                } else {
+                    glitched += text[i];
+                }
+            }
+            
+            return glitched;
+        }
+        
+        // Create echo
+        function createEcho(text, index) {
+            const echo = document.createElement('div');
+            echo.className = 'echo';
+            
+            // Progressive distortion
+            const distortedText = glitchText(text, index);
+            echo.textContent = distortedText;
+            
+            // Color fade
+            const opacity = Math.max(0.1, 1 - (index * 0.1));
+            const grayValue = Math.max(50, 255 - (index * 20));
+            echo.style.color = `rgba(${grayValue}, ${grayValue}, ${grayValue}, ${opacity})`;
+            
+            // Random position
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * window.innerHeight * 0.5;
+            echo.style.left = x + 'px';
+            echo.style.top = y + 'px';
+            
+            // Add glitch effect for later echoes
+            if (index > 5) {
+                echo.classList.add('glitch');
+            }
+            
+            // Special effect for "I AM ALONE"
+            if (text.toUpperCase() === 'I AM ALONE') {
+                echo.classList.add('special-effect');
+            }
+            
+            document.body.appendChild(echo);
+            
+            // Whisper echo with Web Speech API
+            if (synth.speaking) {
+                synth.cancel();
+            }
+            
+            const utterance = new SpeechSynthesisUtterance(distortedText);
+            utterance.rate = Math.max(0.3, 1 - (index * 0.08));
+            utterance.pitch = Math.max(0.1, 1 - (index * 0.1));
+            utterance.volume = Math.max(0.05, 0.5 - (index * 0.05));
+            
+            // Add delay before speaking
+            setTimeout(() => {
+                synth.speak(utterance);
+            }, index * 300);
+            
+            // Remove echo after animation
+            setTimeout(() => {
+                echo.remove();
+            }, 8000);
+        }
+        
+        // Handle input
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && input.value.trim()) {
+                const text = input.value.trim();
+                echoCount = 0;
+                
+                // Clear any existing messages
+                noOneListening.style.display = 'none';
+                voidRemembers.style.display = 'none';
+                
+                // Create echoes
+                for (let i = 0; i < 10; i++) {
+                    setTimeout(() => {
+                        createEcho(text, i + 1);
+                        echoCount++;
+                        
+                        // Show "NO ONE IS LISTENING" after 10 echoes
+                        if (echoCount === 10) {
+                            setTimeout(() => {
+                                noOneListening.style.display = 'block';
+                                setTimeout(() => {
+                                    noOneListening.style.display = 'none';
+                                }, 5000);
+                            }, 2000);
+                        }
+                    }, i * 500);
+                }
+                
+                input.value = '';
+                lastActivity = Date.now();
+                
+                // Reset silence timer
+                clearTimeout(silenceTimer);
+                silenceTimer = setTimeout(showVoidRemembers, 15000);
+            }
+        });
+        
+        // Show "THE VOID REMEMBERS EVERYTHING" after silence
+        function showVoidRemembers() {
+            voidRemembers.style.display = 'block';
+            voidRemembers.style.animation = 'fadeIn 5s ease-in forwards';
+            
+            setTimeout(() => {
+                voidRemembers.style.animation = 'fadeIn 5s ease-in reverse forwards';
+                setTimeout(() => {
+                    voidRemembers.style.display = 'none';
+                }, 5000);
+            }, 5000);
+        }
+        
+        // Track activity
+        input.addEventListener('input', () => {
+            lastActivity = Date.now();
+            clearTimeout(silenceTimer);
+        });
+        
+        // Initial silence timer
+        silenceTimer = setTimeout(showVoidRemembers, 15000);
+    </script>
+</body>
+</html>

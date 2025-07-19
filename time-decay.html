@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TIME DECAY - Everything Turns to Digital Dust</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Courier Prime', monospace;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        
+        #filmGrain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            z-index: 2;
+            pointer-events: none;
+            mix-blend-mode: screen;
+        }
+        
+        .upload-zone {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            text-align: center;
+            transition: all 0.5s ease;
+        }
+        
+        .upload-zone.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        #dropZone {
+            width: 400px;
+            height: 300px;
+            border: 3px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+        
+        #dropZone:hover {
+            border-color: rgba(255, 255, 255, 0.6);
+            background: rgba(0, 0, 0, 0.7);
+        }
+        
+        #dropZone.dragover {
+            border-color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .upload-text {
+            font-size: 18px;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+        
+        .upload-subtext {
+            font-size: 14px;
+            opacity: 0.5;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px 40px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .controls.visible {
+            opacity: 1;
+        }
+        
+        .time-display {
+            font-size: 20px;
+            font-weight: bold;
+            min-width: 200px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        
+        .speed-control {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .speed-label {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        
+        .speed-slider {
+            width: 200px;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        .speed-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .speed-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+        
+        .speed-display {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-weight: bold;
+            text-align: center;
+            opacity: 0;
+            z-index: 50;
+            pointer-events: none;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+            letter-spacing: 10px;
+            transition: opacity 2s ease;
+        }
+        
+        .message.show {
+            opacity: 1;
+        }
+        
+        .reset-btn {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            z-index: 100;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0;
+        }
+        
+        .reset-btn.visible {
+            opacity: 1;
+        }
+        
+        .reset-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .dust-particle {
+            position: fixed;
+            width: 2px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 3;
+        }
+        
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) translateX(var(--drift));
+                opacity: 0;
+            }
+        }
+        
+        .text-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 16px;
+            margin-top: 20px;
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .text-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .text-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <canvas id="filmGrain"></canvas>
+    
+    <div class="upload-zone" id="uploadZone">
+        <div id="dropZone">
+            <div class="upload-text">DROP YOUR MEMORIES HERE</div>
+            <div class="upload-subtext">Images or text to watch decay</div>
+            <textarea class="text-input" placeholder="Or type your text here..." id="textInput"></textarea>
+            <input type="file" id="fileInput" accept="image/*">
+        </div>
+    </div>
+    
+    <div class="controls" id="controls">
+        <div class="time-display" id="timeDisplay">0 YEARS PASSED</div>
+        <div class="speed-control">
+            <div class="speed-label">TIME ACCELERATION</div>
+            <input type="range" class="speed-slider" id="speedSlider" min="0" max="3" step="0.1" value="0">
+            <div class="speed-display" id="speedDisplay">1x</div>
+        </div>
+    </div>
+    
+    <div class="message" id="message"></div>
+    
+    <button class="reset-btn" id="resetBtn">RESET TIME</button>
+    
+    <audio id="tickSound" loop>
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYmNkZWZnaGlqaWZmZmVkY4+Dg4SFhYaGhoWFhYWFhISEg4GBgICAgICBgYGBgYGCgoKCgoKCgoODg4ODg4ODg4SFhYWFhYWFhYaGhoaGhoaGhoaGhoaGhoaGhoaGhoaHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoWFhYWFhYWFhYWFhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4OEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4ODg4OEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhISEhYWFhYWFhYWFhYaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaGhoaFhYWFhYWFhYWFhISEhISEhISEhISEhISEhISEg4ODg4ODg4ODg4ODgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgQ==" type="audio/wav">
+    </audio>
+    
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const filmGrainCanvas = document.getElementById('filmGrain');
+        const filmGrainCtx = filmGrainCanvas.getContext('2d');
+        const uploadZone = document.getElementById('uploadZone');
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const textInput = document.getElementById('textInput');
+        const controls = document.getElementById('controls');
+        const timeDisplay = document.getElementById('timeDisplay');
+        const speedSlider = document.getElementById('speedSlider');
+        const speedDisplay = document.getElementById('speedDisplay');
+        const message = document.getElementById('message');
+        const resetBtn = document.getElementById('resetBtn');
+        const tickSound = document.getElementById('tickSound');
+        
+        let originalImageData = null;
+        let currentImageData = null;
+        let decayProgress = 0;
+        let speedMultiplier = 1;
+        let isDecaying = false;
+        let particles = [];
+        let resistantPixels = new Set();
+        let messageShown = false;
+        let finalMessageShown = false;
+        
+        // Resize canvases
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            filmGrainCanvas.width = window.innerWidth;
+            filmGrainCanvas.height = window.innerHeight;
+        }
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Film grain effect
+        function renderFilmGrain() {
+            const imageData = filmGrainCtx.createImageData(filmGrainCanvas.width, filmGrainCanvas.height);
+            const data = imageData.data;
+            
+            for (let i = 0; i < data.length; i += 4) {
+                const noise = Math.random() * 255;
+                data[i] = noise;
+                data[i + 1] = noise;
+                data[i + 2] = noise;
+                data[i + 3] = 255;
+            }
+            
+            filmGrainCtx.putImageData(imageData, 0, 0);
+        }
+        
+        // Drag and drop
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                loadImage(file);
+            }
+        });
+        
+        dropZone.addEventListener('click', () => {
+            if (!textInput.value) {
+                fileInput.click();
+            }
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                loadImage(file);
+            }
+        });
+        
+        textInput.addEventListener('input', (e) => {
+            if (e.target.value) {
+                renderText(e.target.value);
+            }
+        });
+        
+        // Load and display image
+        function loadImage(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    startDecay(img);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Render text as image
+        function renderText(text) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 48px Courier Prime';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            const lines = text.split('\n');
+            const lineHeight = 60;
+            const startY = canvas.height / 2 - (lines.length * lineHeight) / 2;
+            
+            lines.forEach((line, index) => {
+                ctx.fillText(line, canvas.width / 2, startY + index * lineHeight);
+            });
+            
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            startDecayFromImageData(imageData);
+        }
+        
+        // Start decay process
+        function startDecay(img) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Scale image to fit canvas
+            const scale = Math.min(canvas.width / img.width, canvas.height / img.height) * 0.8;
+            const width = img.width * scale;
+            const height = img.height * scale;
+            const x = (canvas.width - width) / 2;
+            const y = (canvas.height - height) / 2;
+            
+            ctx.drawImage(img, x, y, width, height);
+            
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            startDecayFromImageData(imageData);
+        }
+        
+        function startDecayFromImageData(imageData) {
+            originalImageData = imageData;
+            currentImageData = ctx.createImageData(imageData);
+            currentImageData.data.set(imageData.data);
+            
+            // Select random pixels to resist decay
+            resistantPixels.clear();
+            const totalPixels = canvas.width * canvas.height;
+            const resistantCount = Math.floor(totalPixels * 0.001); // 0.1% of pixels resist
+            
+            for (let i = 0; i < resistantCount; i++) {
+                const x = Math.floor(Math.random() * canvas.width);
+                const y = Math.floor(Math.random() * canvas.height);
+                resistantPixels.add(`${x},${y}`);
+            }
+            
+            uploadZone.classList.add('hidden');
+            controls.classList.add('visible');
+            resetBtn.classList.add('visible');
+            isDecaying = true;
+            decayProgress = 0;
+            messageShown = false;
+            finalMessageShown = false;
+            
+            // Start ticking sound
+            tickSound.volume = 0.3;
+            tickSound.play();
+            
+            animate();
+        }
+        
+        // Speed control
+        speedSlider.addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value);
+            speedMultiplier = Math.pow(10, value);
+            speedDisplay.textContent = speedMultiplier.toFixed(0) + 'x';
+            
+            // Adjust tick sound playback rate
+            tickSound.playbackRate = Math.min(2, 0.5 + value / 3);
+        });
+        
+        // Reset
+        resetBtn.addEventListener('click', () => {
+            isDecaying = false;
+            decayProgress = 0;
+            particles = [];
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            uploadZone.classList.remove('hidden');
+            controls.classList.remove('visible');
+            resetBtn.classList.remove('visible');
+            message.classList.remove('show');
+            textInput.value = '';
+            tickSound.pause();
+            tickSound.currentTime = 0;
+        });
+        
+        // Decay algorithm
+        function applyDecay() {
+            const data = currentImageData.data;
+            const originalData = originalImageData.data;
+            const decayRate = 0.001 * speedMultiplier;
+            
+            decayProgress += decayRate;
+            
+            // Update time display
+            const years = Math.floor(decayProgress * 100);
+            timeDisplay.textContent = `${years} YEARS PASSED`;
+            
+            // Show messages at certain points
+            if (decayProgress > 0.3 && !messageShown) {
+                showMessage('NOTHING ESCAPES TIME');
+                messageShown = true;
+            }
+            
+            if (decayProgress > 0.8 && !finalMessageShown) {
+                showMessage('ENTROPY WINS');
+                finalMessageShown = true;
+            }
+            
+            // Apply decay effects
+            for (let y = 0; y < canvas.height; y++) {
+                for (let x = 0; x < canvas.width; x++) {
+                    const index = (y * canvas.width + x) * 4;
+                    
+                    if (data[index + 3] === 0) continue; // Skip transparent pixels
+                    
+                    // Check if this pixel resists decay
+                    const pixelKey = `${x},${y}`;
+                    if (resistantPixels.has(pixelKey) && decayProgress < 0.9) {
+                        continue;
+                    }
+                    
+                    // Pixel erosion
+                    if (Math.random() < decayProgress * 0.1) {
+                        data[index + 3] = 0; // Make pixel transparent
+                        
+                        // Create dust particle
+                        if (Math.random() < 0.05) {
+                            createDustParticle(x, y, data[index], data[index + 1], data[index + 2]);
+                        }
+                        continue;
+                    }
+                    
+                    // Color desaturation and fade
+                    const gray = (data[index] + data[index + 1] + data[index + 2]) / 3;
+                    const saturationLoss = Math.min(1, decayProgress * 1.5);
+                    
+                    data[index] = data[index] * (1 - saturationLoss) + gray * saturationLoss;
+                    data[index + 1] = data[index + 1] * (1 - saturationLoss) + gray * saturationLoss;
+                    data[index + 2] = data[index + 2] * (1 - saturationLoss) + gray * saturationLoss;
+                    
+                    // Sepia effect
+                    if (decayProgress > 0.3) {
+                        const sepiaStrength = Math.min(1, (decayProgress - 0.3) * 2);
+                        const tr = 0.393 * data[index] + 0.769 * data[index + 1] + 0.189 * data[index + 2];
+                        const tg = 0.349 * data[index] + 0.686 * data[index + 1] + 0.168 * data[index + 2];
+                        const tb = 0.272 * data[index] + 0.534 * data[index + 1] + 0.131 * data[index + 2];
+                        
+                        data[index] = data[index] * (1 - sepiaStrength) + tr * sepiaStrength;
+                        data[index + 1] = data[index + 1] * (1 - sepiaStrength) + tg * sepiaStrength;
+                        data[index + 2] = data[index + 2] * (1 - sepiaStrength) + tb * sepiaStrength;
+                    }
+                    
+                    // Fade to black
+                    if (decayProgress > 0.6) {
+                        const fadeStrength = Math.min(1, (decayProgress - 0.6) * 2.5);
+                        data[index] *= (1 - fadeStrength);
+                        data[index + 1] *= (1 - fadeStrength);
+                        data[index + 2] *= (1 - fadeStrength);
+                    }
+                    
+                    // Digital rust (random color distortion)
+                    if (Math.random() < decayProgress * 0.05) {
+                        data[index] = Math.max(0, data[index] - Math.random() * 50);
+                        data[index + 1] = Math.max(0, data[index + 1] - Math.random() * 30);
+                        data[index + 2] = Math.max(0, data[index + 2] - Math.random() * 20);
+                    }
+                    
+                    // Cracking effect
+                    if (decayProgress > 0.4 && Math.random() < 0.001) {
+                        for (let i = 0; i < 10; i++) {
+                            const crackX = x + Math.floor(Math.random() * 5 - 2);
+                            const crackY = y + Math.floor(Math.random() * 5 - 2);
+                            if (crackX >= 0 && crackX < canvas.width && crackY >= 0 && crackY < canvas.height) {
+                                const crackIndex = (crackY * canvas.width + crackX) * 4;
+                                data[crackIndex + 3] = 0;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Intensify film grain
+            filmGrainCanvas.style.opacity = Math.min(0.5, 0.1 + decayProgress * 0.4);
+            
+            // Distort tick sound as time progresses
+            if (decayProgress > 0.7) {
+                tickSound.volume = Math.max(0.05, 0.3 * (1 - (decayProgress - 0.7) * 3));
+            }
+            
+            ctx.putImageData(currentImageData, 0, 0);
+        }
+        
+        // Create dust particles
+        function createDustParticle(x, y, r, g, b) {
+            const particle = document.createElement('div');
+            particle.className = 'dust-particle';
+            particle.style.left = x + 'px';
+            particle.style.top = y + 'px';
+            particle.style.background = `rgba(${r}, ${g}, ${b}, 0.6)`;
+            particle.style.setProperty('--drift', (Math.random() - 0.5) * 100 + 'px');
+            particle.style.animation = `fall ${3 + Math.random() * 2}s linear`;
+            
+            document.body.appendChild(particle);
+            particles.push(particle);
+            
+            particle.addEventListener('animationend', () => {
+                particle.remove();
+                particles = particles.filter(p => p !== particle);
+            });
+        }
+        
+        // Show messages
+        function showMessage(text) {
+            message.textContent = text;
+            message.classList.add('show');
+            
+            setTimeout(() => {
+                message.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Animation loop
+        function animate() {
+            if (!isDecaying) return;
+            
+            renderFilmGrain();
+            
+            if (decayProgress < 1) {
+                applyDecay();
+            } else {
+                // Final state - swirling dust
+                ctx.globalAlpha = 0.98;
+                ctx.fillStyle = 'black';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.globalAlpha = 1;
+                
+                // Create swirling dust effect
+                if (Math.random() < 0.3) {
+                    for (let i = 0; i < 5; i++) {
+                        createDustParticle(
+                            Math.random() * canvas.width,
+                            Math.random() * canvas.height / 2,
+                            100 + Math.random() * 155,
+                            100 + Math.random() * 155,
+                            100 + Math.random() * 155
+                        );
+                    }
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        }
+        
+        // Initial film grain
+        setInterval(renderFilmGrain, 100);
+    </script>
+</body>
+</html>

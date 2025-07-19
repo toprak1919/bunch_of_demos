@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Consciousness Astro-Chart Generator</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Righteous&family=Orbitron:wght@400;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Orbitron', monospace;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Animated Nebula Background */
+        #nebula-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(ellipse at 20% 30%, rgba(255, 0, 255, 0.3) 0%, transparent 40%),
+                radial-gradient(ellipse at 60% 70%, rgba(138, 43, 226, 0.3) 0%, transparent 40%),
+                radial-gradient(ellipse at 80% 20%, rgba(255, 20, 147, 0.2) 0%, transparent 50%),
+                linear-gradient(0deg, #000 0%, #0a0a0a 100%);
+            animation: nebula-drift 60s ease-in-out infinite;
+        }
+        
+        @keyframes nebula-drift {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-10%, -5%) scale(1.1); }
+            66% { transform: translate(5%, -10%) scale(1.05); }
+        }
+        
+        /* Scan Lines Effect */
+        .scan-lines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(255, 255, 255, 0.03) 2px,
+                rgba(255, 255, 255, 0.03) 4px
+            );
+            pointer-events: none;
+            z-index: 999;
+        }
+        
+        /* Chrome Text Effect */
+        .chrome-text {
+            background: linear-gradient(
+                to bottom,
+                #eee 0%,
+                #999 50%,
+                #777 51%,
+                #555 100%
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 
+                0 1px 0 #ccc,
+                0 2px 0 #c9c9c9,
+                0 3px 0 #bbb,
+                0 4px 0 #b9b9b9,
+                0 5px 0 #aaa,
+                0 6px 1px rgba(0,0,0,.1),
+                0 0 5px rgba(255,255,255,.1),
+                0 1px 3px rgba(255,255,255,.3),
+                0 3px 5px rgba(255,255,255,.2),
+                0 5px 10px rgba(255,255,255,.25);
+        }
+        
+        /* Main Container */
+        .container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        
+        /* Title */
+        h1 {
+            font-family: 'Righteous', cursive;
+            font-size: 4rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            animation: glow-pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes glow-pulse {
+            0%, 100% { 
+                text-shadow: 
+                    0 0 10px #ff00ff,
+                    0 0 20px #ff00ff,
+                    0 0 30px #ff00ff,
+                    0 0 40px #ff00ff;
+            }
+            50% { 
+                text-shadow: 
+                    0 0 20px #ff00ff,
+                    0 0 30px #ff00ff,
+                    0 0 40px #ff00ff,
+                    0 0 50px #ff00ff,
+                    0 0 60px #ff00ff;
+            }
+        }
+        
+        /* Input Form */
+        .input-panel {
+            background: rgba(10, 10, 10, 0.8);
+            border: 2px solid #ff00ff;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 
+                0 0 20px rgba(255, 0, 255, 0.5),
+                inset 0 0 20px rgba(255, 0, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .input-group {
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            color: #ff00ff;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+        }
+        
+        input {
+            background: rgba(255, 0, 255, 0.1);
+            border: 1px solid #ff00ff;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            font-family: 'Orbitron', monospace;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 10px #ff00ff;
+            background: rgba(255, 0, 255, 0.2);
+        }
+        
+        button {
+            background: linear-gradient(45deg, #ff00ff, #8a2be2);
+            border: none;
+            color: #fff;
+            padding: 1rem 3rem;
+            font-family: 'Righteous', cursive;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            transition: all 0.3s;
+            margin-top: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.8);
+        }
+        
+        button:active {
+            transform: scale(0.95);
+        }
+        
+        /* Chart Container */
+        .chart-container {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            display: none;
+            animation: chart-appear 1s ease-out;
+        }
+        
+        @keyframes chart-appear {
+            from {
+                opacity: 0;
+                transform: scale(0.5) rotate(-180deg);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+        
+        /* Astrology Chart */
+        #astro-chart {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 20px rgba(255, 0, 255, 0.5));
+        }
+        
+        /* Planet Info Panel */
+        .planet-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(10, 10, 10, 0.9);
+            border: 1px solid #ff00ff;
+            border-radius: 10px;
+            padding: 1rem;
+            min-width: 200px;
+            display: none;
+            font-size: 0.9rem;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+        }
+        
+        .planet-info h3 {
+            color: #ff00ff;
+            margin-bottom: 0.5rem;
+        }
+        
+        .planet-detail {
+            margin: 0.3rem 0;
+            color: #fff;
+        }
+        
+        /* Chromatic Aberration */
+        .chromatic {
+            animation: chromatic-shift 4s ease-in-out infinite;
+        }
+        
+        @keyframes chromatic-shift {
+            0%, 100% {
+                text-shadow: 
+                    -2px 0 #ff00ff,
+                    2px 0 #00ffff;
+            }
+            50% {
+                text-shadow: 
+                    -4px 0 #ff00ff,
+                    4px 0 #00ffff;
+            }
+        }
+        
+        /* Sound Toggle */
+        .sound-toggle {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 0, 255, 0.2);
+            border: 1px solid #ff00ff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .sound-toggle:hover {
+            background: rgba(255, 0, 255, 0.4);
+            transform: scale(1.1);
+        }
+        
+        .sound-toggle.muted {
+            opacity: 0.5;
+        }
+        
+        /* Glitch Effect for Retrograde */
+        @keyframes glitch {
+            0%, 100% {
+                transform: translate(0);
+                filter: hue-rotate(0deg);
+            }
+            20% {
+                transform: translate(-2px, 2px);
+                filter: hue-rotate(90deg);
+            }
+            40% {
+                transform: translate(-2px, -2px);
+                filter: hue-rotate(180deg);
+            }
+            60% {
+                transform: translate(2px, 2px);
+                filter: hue-rotate(270deg);
+            }
+            80% {
+                transform: translate(2px, -2px);
+                filter: hue-rotate(360deg);
+            }
+        }
+        
+        .retrograde {
+            animation: glitch 0.3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div id="nebula-bg"></div>
+    <div class="scan-lines"></div>
+    
+    <div class="container">
+        <h1 class="chrome-text chromatic">COSMIC CONSCIOUSNESS</h1>
+        
+        <div class="input-panel" id="inputPanel">
+            <div class="input-group">
+                <label>Name</label>
+                <input type="text" id="name" placeholder="Enter your cosmic name">
+            </div>
+            <div class="input-group">
+                <label>Birth Date</label>
+                <input type="date" id="birthDate">
+            </div>
+            <div class="input-group">
+                <label>Birth Time</label>
+                <input type="time" id="birthTime">
+            </div>
+            <div class="input-group">
+                <label>Birth Location</label>
+                <input type="text" id="birthLocation" placeholder="City, Country">
+            </div>
+            <button onclick="generateChart()">ACTIVATE COSMIC CHART</button>
+        </div>
+        
+        <div class="chart-container" id="chartContainer">
+            <canvas id="astro-chart"></canvas>
+        </div>
+    </div>
+    
+    <div class="sound-toggle" id="soundToggle" onclick="toggleSound()">
+        <span>🔊</span>
+    </div>
+    
+    <div class="planet-info" id="planetInfo">
+        <h3>PLANETARY ALIGNMENT</h3>
+        <div id="planetDetails"></div>
+    </div>
+
+    <script>
+        // Audio Context for Synthesizer Sounds
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let soundEnabled = true;
+        const oscillators = {};
+        
+        // Planet configurations
+        const planets = [
+            { name: 'Sun', color: '#FFD700', radius: 25, orbit: 0, frequency: 261.63, symbol: '☉' },
+            { name: 'Moon', color: '#C0C0C0', radius: 20, orbit: 80, frequency: 293.66, symbol: '☽' },
+            { name: 'Mercury', color: '#FFA500', radius: 15, orbit: 120, frequency: 329.63, symbol: '☿' },
+            { name: 'Venus', color: '#FF69B4', radius: 18, orbit: 160, frequency: 349.23, symbol: '♀' },
+            { name: 'Mars', color: '#FF4500', radius: 17, orbit: 200, frequency: 392.00, symbol: '♂' },
+            { name: 'Jupiter', color: '#FFB6C1', radius: 22, orbit: 240, frequency: 440.00, symbol: '♃' },
+            { name: 'Saturn', color: '#DDA0DD', radius: 21, orbit: 280, frequency: 493.88, symbol: '♄' }
+        ];
+        
+        let animationId;
+        let planetPositions = {};
+        
+        // Initialize planet positions with random angles
+        planets.forEach(planet => {
+            planetPositions[planet.name] = {
+                angle: Math.random() * Math.PI * 2,
+                speed: (Math.random() * 0.005 + 0.002) * (Math.random() > 0.3 ? 1 : -1), // Some retrograde
+                retrograde: Math.random() > 0.7
+            };
+        });
+        
+        function generateChart() {
+            const name = document.getElementById('name').value;
+            const birthDate = document.getElementById('birthDate').value;
+            const birthTime = document.getElementById('birthTime').value;
+            const birthLocation = document.getElementById('birthLocation').value;
+            
+            if (!name || !birthDate || !birthTime || !birthLocation) {
+                alert('Please fill in all cosmic coordinates!');
+                return;
+            }
+            
+            document.getElementById('inputPanel').style.display = 'none';
+            document.getElementById('chartContainer').style.display = 'block';
+            document.getElementById('planetInfo').style.display = 'block';
+            
+            initializeChart();
+            startPlanetarySounds();
+            updatePlanetInfo();
+        }
+        
+        function initializeChart() {
+            const canvas = document.getElementById('astro-chart');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 600;
+            canvas.height = 600;
+            
+            // Start animation
+            animate();
+        }
+        
+        function animate() {
+            const canvas = document.getElementById('astro-chart');
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            // Clear canvas with fade effect for trails
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw zodiac wheel
+            drawZodiacWheel(ctx, centerX, centerY);
+            
+            // Draw and update planets
+            planets.forEach(planet => {
+                const pos = planetPositions[planet.name];
+                
+                // Update angle
+                pos.angle += pos.speed;
+                
+                // Calculate position
+                const x = centerX + Math.cos(pos.angle) * planet.orbit;
+                const y = centerY + Math.sin(pos.angle) * planet.orbit;
+                
+                // Draw light trail
+                ctx.beginPath();
+                ctx.strokeStyle = planet.color + '40';
+                ctx.lineWidth = 3;
+                ctx.moveTo(
+                    centerX + Math.cos(pos.angle - 0.1) * planet.orbit,
+                    centerY + Math.sin(pos.angle - 0.1) * planet.orbit
+                );
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                
+                // Draw planet with glow
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = planet.color;
+                ctx.fillStyle = planet.color;
+                ctx.beginPath();
+                ctx.arc(x, y, planet.radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Draw planet symbol
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#000';
+                ctx.font = `bold ${planet.radius}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(planet.symbol, x, y);
+                
+                // Add glitch effect for retrograde planets
+                if (pos.retrograde) {
+                    ctx.save();
+                    ctx.globalCompositeOperation = 'screen';
+                    ctx.fillStyle = '#ff00ff40';
+                    ctx.beginPath();
+                    ctx.arc(x + Math.random() * 4 - 2, y + Math.random() * 4 - 2, planet.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            });
+            
+            // Draw lens flare effect
+            drawLensFlare(ctx, centerX, centerY);
+            
+            animationId = requestAnimationFrame(animate);
+        }
+        
+        function drawZodiacWheel(ctx, centerX, centerY) {
+            // Outer circle
+            ctx.strokeStyle = '#ff00ff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 290, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Inner circles
+            for (let i = 1; i <= 3; i++) {
+                ctx.strokeStyle = `rgba(255, 0, 255, ${0.3 / i})`;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, 90 * i, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            
+            // Zodiac divisions
+            ctx.strokeStyle = '#ff00ff40';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < 12; i++) {
+                const angle = (i * 30) * Math.PI / 180;
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(
+                    centerX + Math.cos(angle) * 290,
+                    centerY + Math.sin(angle) * 290
+                );
+                ctx.stroke();
+            }
+        }
+        
+        function drawLensFlare(ctx, centerX, centerY) {
+            const time = Date.now() * 0.001;
+            const flareX = centerX + Math.cos(time * 0.5) * 50;
+            const flareY = centerY + Math.sin(time * 0.3) * 50;
+            
+            // Main flare
+            const gradient = ctx.createRadialGradient(flareX, flareY, 0, flareX, flareY, 100);
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 0.3)');
+            gradient.addColorStop(0.5, 'rgba(255, 0, 255, 0.1)');
+            gradient.addColorStop(1, 'rgba(255, 0, 255, 0)');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        }
+        
+        function startPlanetarySounds() {
+            if (!soundEnabled) return;
+            
+            planets.forEach(planet => {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(planet.frequency, audioContext.currentTime);
+                gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.start();
+                oscillators[planet.name] = { oscillator, gainNode };
+                
+                // Modulate volume based on planet position
+                setInterval(() => {
+                    if (soundEnabled && oscillators[planet.name]) {
+                        const pos = planetPositions[planet.name];
+                        const volume = (Math.sin(pos.angle) + 1) * 0.025 + 0.01;
+                        oscillators[planet.name].gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+                    }
+                }, 100);
+            });
+        }
+        
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const toggle = document.getElementById('soundToggle');
+            toggle.classList.toggle('muted', !soundEnabled);
+            toggle.innerHTML = soundEnabled ? '<span>🔊</span>' : '<span>🔇</span>';
+            
+            if (!soundEnabled) {
+                // Stop all oscillators
+                Object.values(oscillators).forEach(({ oscillator }) => {
+                    oscillator.stop();
+                });
+                Object.keys(oscillators).forEach(key => delete oscillators[key]);
+            } else {
+                startPlanetarySounds();
+            }
+        }
+        
+        function updatePlanetInfo() {
+            const details = document.getElementById('planetDetails');
+            let html = '';
+            
+            planets.forEach(planet => {
+                const pos = planetPositions[planet.name];
+                const degree = ((pos.angle * 180 / Math.PI) % 360 + 360) % 360;
+                const sign = getZodiacSign(degree);
+                
+                html += `
+                    <div class="planet-detail ${pos.retrograde ? 'retrograde' : ''}">
+                        <strong style="color: ${planet.color}">${planet.symbol} ${planet.name}</strong>: 
+                        ${Math.floor(degree)}° ${sign} ${pos.retrograde ? '℞' : ''}
+                    </div>
+                `;
+            });
+            
+            details.innerHTML = html;
+            
+            // Update every second
+            setTimeout(updatePlanetInfo, 1000);
+        }
+        
+        function getZodiacSign(degree) {
+            const signs = ['Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo', 
+                          'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'];
+            return signs[Math.floor(degree / 30)];
+        }
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+            Object.values(oscillators).forEach(({ oscillator }) => {
+                oscillator.stop();
+            });
+        });
+    </script>
+</body>
+</html>

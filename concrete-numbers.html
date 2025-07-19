@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONCRETE NUMBERS - BRUTALIST NUMEROLOGY</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial Black', Impact, sans-serif;
+            background-color: #333;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,.1) 2px, rgba(0,0,0,.1) 4px),
+                repeating-linear-gradient(-45deg, transparent, transparent 2px, rgba(0,0,0,.1) 2px, rgba(0,0,0,.1) 4px),
+                linear-gradient(180deg, #333 0%, #444 50%, #333 100%);
+            background-size: 50px 50px, 50px 50px, 100% 100%;
+            min-height: 100vh;
+            color: #999;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, transparent 50%, rgba(0,0,0,0.4) 50.5%),
+                radial-gradient(circle at 80% 20%, transparent 50%, rgba(0,0,0,0.4) 50.5%),
+                radial-gradient(circle at 40% 40%, transparent 50%, rgba(0,0,0,0.3) 50.5%);
+            pointer-events: none;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .title-block {
+            background: #666;
+            padding: 60px 40px;
+            margin-bottom: 40px;
+            position: relative;
+            box-shadow: 
+                0 20px 0 #333,
+                0 40px 0 #222,
+                0 60px 40px rgba(0,0,0,0.8);
+            transform: perspective(400px) rotateX(2deg);
+        }
+        
+        .title-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 10px,
+                rgba(0,0,0,0.1) 10px,
+                rgba(0,0,0,0.1) 11px
+            );
+        }
+        
+        h1 {
+            font-family: 'Bebas Neue', Impact, sans-serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            letter-spacing: 0.2em;
+            color: #333;
+            text-shadow: 
+                2px 2px 0 #999,
+                4px 4px 0 #666,
+                6px 6px 10px rgba(0,0,0,0.8);
+            text-align: center;
+            font-weight: 900;
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            letter-spacing: 0.5em;
+            color: #8B0000;
+            margin-top: 20px;
+            text-transform: uppercase;
+        }
+        
+        .input-block {
+            background: #444;
+            padding: 40px;
+            margin-bottom: 40px;
+            position: relative;
+            box-shadow: 
+                inset 0 0 50px rgba(0,0,0,0.5),
+                0 10px 0 #222,
+                0 20px 20px rgba(0,0,0,0.6);
+        }
+        
+        .input-block::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 3px solid #333;
+            pointer-events: none;
+        }
+        
+        label {
+            display: block;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: #999;
+        }
+        
+        input[type="date"] {
+            width: 100%;
+            padding: 30px;
+            font-size: 2rem;
+            font-family: 'Arial Black', sans-serif;
+            background: #333;
+            border: none;
+            color: #999;
+            box-shadow: 
+                inset 0 0 20px rgba(0,0,0,0.8),
+                inset 0 -5px 0 #222;
+            cursor: pointer;
+            text-align: center;
+            letter-spacing: 0.1em;
+        }
+        
+        input[type="date"]:focus {
+            outline: 3px solid #8B0000;
+            outline-offset: 3px;
+        }
+        
+        .calculate-btn {
+            display: block;
+            width: 100%;
+            padding: 40px;
+            margin-top: 40px;
+            font-size: 2rem;
+            font-family: 'Bebas Neue', Impact, sans-serif;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            background: #666;
+            border: none;
+            color: #333;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 
+                0 10px 0 #333,
+                0 20px 30px rgba(0,0,0,0.8);
+            transition: none;
+        }
+        
+        .calculate-btn:hover {
+            background: #8B0000;
+            color: #fff;
+        }
+        
+        .calculate-btn:active {
+            transform: translateY(10px);
+            box-shadow: 
+                0 0 0 #333,
+                0 10px 20px rgba(0,0,0,0.8);
+        }
+        
+        .result-block {
+            background: #222;
+            padding: 60px 40px;
+            margin-top: 60px;
+            position: relative;
+            display: none;
+            box-shadow: 
+                inset 0 0 100px rgba(0,0,0,0.8),
+                0 0 50px rgba(0,0,0,0.9);
+            animation: revealResult 0.5s steps(5);
+        }
+        
+        @keyframes revealResult {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .result-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 10px,
+                    rgba(255,255,255,0.02) 10px,
+                    rgba(255,255,255,0.02) 20px
+                );
+        }
+        
+        .life-path-number {
+            font-size: 8rem;
+            font-family: 'Bebas Neue', Impact, sans-serif;
+            text-align: center;
+            color: #8B0000;
+            text-shadow: 
+                0 0 20px rgba(139,0,0,0.5),
+                2px 2px 0 #333,
+                4px 4px 0 #222,
+                6px 6px 20px rgba(0,0,0,0.9);
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .interpretation {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            text-transform: uppercase;
+            text-align: center;
+            color: #666;
+            padding: 40px;
+            background: rgba(0,0,0,0.5);
+            border-left: 10px solid #8B0000;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .crack {
+            position: fixed;
+            width: 2px;
+            height: 100vh;
+            background: linear-gradient(to bottom, 
+                transparent 0%, 
+                rgba(0,0,0,0.3) 20%,
+                rgba(0,0,0,0.5) 50%,
+                rgba(0,0,0,0.3) 80%,
+                transparent 100%);
+            transform: rotate(-15deg);
+            pointer-events: none;
+        }
+        
+        .crack1 { left: 20%; }
+        .crack2 { left: 70%; transform: rotate(10deg); }
+        .crack3 { left: 45%; transform: rotate(-25deg); }
+        
+        .warning {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 20px;
+            background: #8B0000;
+            color: #fff;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            opacity: 0.7;
+            max-width: 300px;
+            box-shadow: 0 0 20px rgba(139,0,0,0.5);
+        }
+        
+        audio {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="crack crack1"></div>
+    <div class="crack crack2"></div>
+    <div class="crack crack3"></div>
+    
+    <div class="container">
+        <div class="title-block">
+            <h1>CONCRETE NUMBERS</h1>
+            <div class="subtitle">Brutalist Numerology Engine</div>
+        </div>
+        
+        <div class="input-block">
+            <label for="birthdate">Enter Birth Data</label>
+            <input type="date" id="birthdate" required>
+            <button class="calculate-btn" onclick="calculateLifePath()">CALCULATE FATE</button>
+        </div>
+        
+        <div class="result-block" id="result">
+            <div class="life-path-number" id="lifePathNumber"></div>
+            <div class="interpretation" id="interpretation"></div>
+        </div>
+    </div>
+    
+    <div class="warning">
+        WARNING: Numbers carved in stone cannot be uncarved. Proceed with caution.
+    </div>
+    
+    <audio id="clankSound">
+        <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=" type="audio/wav">
+    </audio>
+    
+    <script>
+        const interpretations = {
+            1: "THE MONOLITH. You stand alone, a concrete pillar in the wasteland. Leadership through isolation. Power through solitude. Your path is carved by your own hands, each step echoing in empty corridors.",
+            2: "THE DIVIDED WALL. Forever split between two worlds, you seek unity in the fractures. Partnership is your burden and salvation. In the shadows of others, you find your form.",
+            3: "THE TRINITY OF STONE. Three corners of an impossible structure. Creation springs from your industrial mind. Art bleeds from concrete pores. Expression is your only escape from the gray.",
+            4: "THE FOUNDATION. Four walls, no windows. Stability built on rigid discipline. Order is your religion, routine your prayer. In the endless repetition, you find meaning.",
+            5: "THE BROKEN PENTAGON. Five sides struggling against conformity. Freedom calls from beyond the walls. Adventure awaits in the ruins. Change is the only constant in your bunker.",
+            6: "THE HEXAGONAL CELL. Six walls of responsibility closing in. Service to others defines your existence. In sacrifice, you find purpose. The weight of the world rests on your shoulders.",
+            7: "THE SEVENTH SEAL. Mystery dwells in your concrete heart. Knowledge hidden in the cracks. Solitude brings revelation. In darkness, you see clearly.",
+            8: "THE OCTAGON OF POWER. Eight angles of ambition. Material mastery through brutal force. Success carved from stone. Power flows through industrial veins.",
+            9: "THE FINAL FORM. Nine lives lived in one. Completion and new beginning. Wisdom earned through suffering. In the end, all returns to dust and concrete."
+        };
+        
+        function playClank() {
+            // Create a more impactful sound effect
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.frequency.setValueAtTime(80, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(40, audioContext.currentTime + 0.1);
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.1);
+        }
+        
+        function calculateLifePath() {
+            const birthdate = document.getElementById('birthdate').value;
+            if (!birthdate) {
+                alert('ENTER YOUR DATA');
+                return;
+            }
+            
+            playClank();
+            
+            // Calculate life path number
+            const digits = birthdate.replace(/-/g, '').split('').map(Number);
+            let sum = digits.reduce((a, b) => a + b, 0);
+            
+            // Reduce to single digit (except 11, 22, 33)
+            while (sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
+                sum = sum.toString().split('').map(Number).reduce((a, b) => a + b, 0);
+            }
+            
+            // Display result
+            const resultBlock = document.getElementById('result');
+            const lifePathNumber = document.getElementById('lifePathNumber');
+            const interpretation = document.getElementById('interpretation');
+            
+            lifePathNumber.textContent = sum;
+            interpretation.textContent = interpretations[sum > 9 ? sum : sum] || interpretations[sum.toString().split('').map(Number).reduce((a, b) => a + b, 0)];
+            
+            resultBlock.style.display = 'block';
+            
+            // Add dramatic effect
+            setTimeout(() => {
+                lifePathNumber.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    lifePathNumber.style.transform = 'scale(1)';
+                }, 100);
+            }, 100);
+        }
+        
+        // Add click sound to all interactive elements
+        document.addEventListener('click', function(e) {
+            if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') {
+                playClank();
+            }
+        });
+    </script>
+</body>
+</html>

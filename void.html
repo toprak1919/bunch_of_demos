@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>∅</title>
+<style>
+body {
+  margin: 0;
+  background: #000000;
+  overflow: hidden;
+  cursor: none;
+  user-select: none;
+}
+#glyph {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #010101;
+  font-size: 72px;
+  opacity: 0.05;
+  transition: opacity 3s;
+}
+#message {
+  position: fixed;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #010101;
+  opacity: 0;
+  transition: opacity 13s;
+  font-family: monospace;
+  font-size: 9px;
+}
+</style>
+</head>
+<body>
+<div id="glyph">◉</div>
+<div id="message">you are already here</div>
+<script>
+const g = document.getElementById('glyph');
+const m = document.getElementById('message');
+let t, s = 0;
+document.onmousemove = e => {
+  clearTimeout(t);
+  s = 0;
+  g.style.opacity = Math.abs(e.clientX - innerWidth/2) / innerWidth * 0.2;
+  t = setTimeout(() => { s = 1; setTimeout(() => { if(s) m.style.opacity = 0.01; }, 33000); }, 100);
+};
+document.onclick = () => new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQoGAACBhYmNkZW

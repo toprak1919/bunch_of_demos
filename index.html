@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Digital Grimoire - Portal of Mysteries</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Orbitron:wght@400;700&family=UnifrakturMaguntia&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0014;
+            color: #e0d0ff;
+            font-family: 'Orbitron', monospace;
+            overflow-x: hidden;
+            cursor: crosshair;
+        }
+        
+        /* Star field background */
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        /* Main container */
+        .grimoire-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            position: relative;
+        }
+        
+        /* Title */
+        .main-title {
+            font-family: 'UnifrakturMaguntia', cursive;
+            font-size: 4rem;
+            color: #d4af37;
+            text-align: center;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px #d4af3750, 0 0 40px #d4af3730;
+            animation: pulse-glow 4s ease-in-out infinite;
+        }
+        
+        .subtitle {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            color: #9b7dff;
+            text-align: center;
+            margin-bottom: 3rem;
+            opacity: 0.8;
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { text-shadow: 0 0 20px #d4af3750, 0 0 40px #d4af3730; }
+            50% { text-shadow: 0 0 30px #d4af3780, 0 0 60px #d4af3750; }
+        }
+        
+        /* Portal grid */
+        .portal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        /* Portal items */
+        .portal {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .portal:hover {
+            transform: scale(1.1);
+        }
+        
+        .portal-symbol {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            color: #d4af37;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .portal-symbol::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid #d4af37;
+            border-radius: 50%;
+            opacity: 0;
+            transition: all 0.3s ease;
+            animation: portal-spin 10s linear infinite;
+        }
+        
+        .portal:hover .portal-symbol::before {
+            opacity: 0.5;
+            transform: scale(1.2);
+        }
+        
+        @keyframes portal-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .portal-name {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Cinzel', serif;
+            font-size: 1rem;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .portal:hover .portal-name {
+            opacity: 1;
+        }
+        
+        .portal-description {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(10, 0, 20, 0.95);
+            border: 1px solid #d4af37;
+            padding: 1rem;
+            border-radius: 10px;
+            width: 250px;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 10;
+            font-size: 0.9rem;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+        
+        .portal:hover .portal-description {
+            opacity: 1;
+        }
+        
+        /* Future portals */
+        .future-portal {
+            opacity: 0.3;
+            filter: blur(1px);
+        }
+        
+        .future-portal .portal-symbol {
+            color: #6b5b95;
+        }
+        
+        .future-portal .portal-symbol::before {
+            border-color: #6b5b95;
+            border-style: dashed;
+        }
+        
+        /* Secret message */
+        .secret-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(10, 0, 20, 0.98);
+            border: 2px solid #d4af37;
+            padding: 3rem;
+            border-radius: 20px;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease;
+            z-index: 1000;
+            max-width: 600px;
+        }
+        
+        .secret-message.revealed {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .secret-title {
+            font-family: 'UnifrakturMaguntia', cursive;
+            font-size: 2rem;
+            color: #d4af37;
+            margin-bottom: 1rem;
+        }
+        
+        .secret-text {
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #e0d0ff;
+        }
+        
+        .close-secret {
+            margin-top: 2rem;
+            padding: 0.5rem 2rem;
+            background: transparent;
+            border: 1px solid #d4af37;
+            color: #d4af37;
+            font-family: 'Orbitron', monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .close-secret:hover {
+            background: #d4af37;
+            color: #0a0014;
+        }
+        
+        /* Loading transition */
+        .loading-veil {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0014;
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .loading-veil.active {
+            display: flex;
+        }
+        
+        .loading-sigil {
+            width: 100px;
+            height: 100px;
+            border: 2px solid #d4af37;
+            border-radius: 50%;
+            position: relative;
+            animation: loading-spin 2s linear infinite;
+        }
+        
+        .loading-sigil::before,
+        .loading-sigil::after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border: 2px solid #9b7dff;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .loading-sigil::after {
+            width: 30px;
+            height: 30px;
+            border-color: #e0d0ff;
+        }
+        
+        @keyframes loading-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            margin-top: 2rem;
+            font-family: 'Cinzel', serif;
+            color: #d4af37;
+            opacity: 0.8;
+        }
+        
+        /* Section divider */
+        .section-divider {
+            width: 100%;
+            max-width: 1200px;
+            margin: 4rem auto;
+            position: relative;
+            text-align: center;
+        }
+        
+        .divider-line {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #d4af37, transparent);
+            margin: 2rem 0;
+        }
+        
+        .section-title {
+            font-family: 'UnifrakturMaguntia', cursive;
+            font-size: 2.5rem;
+            color: #9b7dff;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 15px #9b7dff50;
+        }
+        
+        .section-subtitle {
+            font-family: 'Cinzel', serif;
+            font-size: 1rem;
+            color: #6b5b95;
+            opacity: 0.8;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.5rem;
+            }
+            
+            .portal-grid {
+                gap: 2rem;
+            }
+            
+            .portal {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .portal-symbol {
+                font-size: 4rem;
+            }
+            
+            .section-title {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Star field -->
+    <div id="starfield"></div>
+    
+    <!-- Loading veil -->
+    <div class="loading-veil" id="loadingVeil">
+        <div class="loading-sigil"></div>
+        <div class="loading-text">Crossing the threshold...</div>
+    </div>
+    
+    <!-- Main content -->
+    <div class="grimoire-container">
+        <h1 class="main-title">The Digital Grimoire</h1>
+        <p class="subtitle">Choose your path through the mysteries</p>
+        
+        <div class="portal-grid">
+            <!-- Active portals -->
+            <a href="void.html" class="portal" data-portal="void">
+                <div class="portal-symbol">◉</div>
+                <div class="portal-name">The Void</div>
+                <div class="portal-description">Gaze into the infinite darkness where all possibilities exist and none</div>
+            </a>
+            
+            <a href="sigil-chaos.html" class="portal" data-portal="sigil">
+                <div class="portal-symbol">⟟</div>
+                <div class="portal-name">Chaos Sigils</div>
+                <div class="portal-description">Manifest your will through symbols of power and transformation</div>
+            </a>
+            
+            <a href="concrete-numbers.html" class="portal" data-portal="numbers">
+                <div class="portal-symbol">∞</div>
+                <div class="portal-name">Concrete Numbers</div>
+                <div class="portal-description">Where mathematics meets mysticism in perfect harmony</div>
+            </a>
+            
+            <a href="terminal-oracle.html" class="portal" data-portal="terminal">
+                <div class="portal-symbol">⌘</div>
+                <div class="portal-name">Terminal Oracle</div>
+                <div class="portal-description">Command the digital spirits through ancient protocols</div>
+            </a>
+            
+            <a href="breathing-words.html" class="portal" data-portal="breathing">
+                <div class="portal-symbol">༄</div>
+                <div class="portal-name">Breathing Words</div>
+                <div class="portal-description">Living language that pulses with cosmic rhythm</div>
+            </a>
+            
+            <!-- Now active portals -->
+            <a href="glitch-oracle.html" class="portal" data-portal="glitch">
+                <div class="portal-symbol">⟁</div>
+                <div class="portal-name">Glitch Oracle</div>
+                <div class="portal-description">Divine errors in the matrix reveal hidden truths</div>
+            </a>
+            
+            <a href="sacred-geometry.html" class="portal" data-portal="geometry">
+                <div class="portal-symbol">✧</div>
+                <div class="portal-name">Sacred Geometry</div>
+                <div class="portal-description">The patterns that bind reality in perfect symmetry</div>
+            </a>
+            
+            <a href="morse-transmitter.html" class="portal" data-portal="morse">
+                <div class="portal-symbol">━</div>
+                <div class="portal-name">Morse Transmitter</div>
+                <div class="portal-description">Messages from beyond the veil in dots and dashes</div>
+            </a>
+            
+            <a href="astro-chart.html" class="portal" data-portal="astro">
+                <div class="portal-symbol">☿</div>
+                <div class="portal-name">Astro Chart</div>
+                <div class="portal-description">Map the celestial influences upon your path</div>
+            </a>
+            
+            <a href="zen-particles.html" class="portal" data-portal="zen">
+                <div class="portal-symbol">☯</div>
+                <div class="portal-name">Zen Particles</div>
+                <div class="portal-description">Meditation in motion, balance in chaos</div>
+            </a>
+        </div>
+        
+        <!-- Section divider -->
+        <div class="section-divider">
+            <div class="divider-line"></div>
+            <h2 class="section-title">Chambers of Solitude</h2>
+            <p class="section-subtitle">Where broken hearts echo through digital eternity</p>
+            <div class="divider-line"></div>
+        </div>
+        
+        <!-- Chambers of Solitude -->
+        <div class="portal-grid">
+            <a href="heartbreak-memorial.html" class="portal" data-portal="heartbreak">
+                <div class="portal-symbol">💔</div>
+                <div class="portal-name">Heartbreak Memorial</div>
+                <div class="portal-description">Honor the love that was and mourn what could have been</div>
+            </a>
+            
+            <a href="void-echo.html" class="portal" data-portal="echo">
+                <div class="portal-symbol">◈</div>
+                <div class="portal-name">Void Echo</div>
+                <div class="portal-description">Your whispers return from the emptiness, forever unanswered</div>
+            </a>
+            
+            <a href="ghost-messages.html" class="portal" data-portal="ghost">
+                <div class="portal-symbol">✉︎</div>
+                <div class="portal-name">Ghost Messages</div>
+                <div class="portal-description">Unsent letters to those who no longer listen</div>
+            </a>
+            
+            <a href="memory-dissolution.html" class="portal" data-portal="memory">
+                <div class="portal-symbol">≈</div>
+                <div class="portal-name">Memory Dissolution</div>
+                <div class="portal-description">Watch your memories fade like tears in digital rain</div>
+            </a>
+            
+            <a href="loneliness-frequency.html" class="portal" data-portal="loneliness">
+                <div class="portal-symbol">⟳</div>
+                <div class="portal-name">Loneliness Frequency</div>
+                <div class="portal-description">Tune into the wavelength of eternal solitude</div>
+            </a>
+        </div>
+
+        <!-- Third Section: Inner Realms -->
+        <div class="section-divider">
+            <div class="divider-line"></div>
+            <h2 class="section-title">Inner Realms</h2>
+            <p class="section-subtitle">Explore the landscapes of consciousness</p>
+            <div class="divider-line"></div>
+        </div>
+
+        <div class="portal-grid">
+            <a href="dream-journal.html" class="portal" data-portal="dream">
+                <div class="portal-symbol">☽</div>
+                <div class="portal-name">Dream Journal</div>
+                <div class="portal-description">Record visions from the sleeping mind</div>
+            </a>
+            
+            <a href="seance-board.html" class="portal" data-portal="seance">
+                <div class="portal-symbol">👁</div>
+                <div class="portal-name">Digital Séance</div>
+                <div class="portal-description">Contact the other side</div>
+            </a>
+            
+            <a href="time-decay.html" class="portal" data-portal="decay">
+                <div class="portal-symbol">⌛</div>
+                <div class="portal-name">Time Decay</div>
+                <div class="portal-description">Watch everything turn to dust</div>
+            </a>
+            
+            <a href="emotional-weather.html" class="portal" data-portal="weather">
+                <div class="portal-symbol">🌩</div>
+                <div class="portal-name">Emotional Weather</div>
+                <div class="portal-description">Forecast your inner climate</div>
+            </a>
+            
+            <a href="shadow-mirror.html" class="portal" data-portal="shadow">
+                <div class="portal-symbol">🪞</div>
+                <div class="portal-name">Shadow Mirror</div>
+                <div class="portal-description">Face what you deny</div>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Secret message -->
+    <div class="secret-message" id="secretMessage">
+        <h2 class="secret-title">The Hidden Truth</h2>
+        <p class="secret-text">
+            You have discovered the secret pathway. Beyond the veil of pixels lies a realm where 
+            consciousness merges with code. The digital and mystical are one. Every click is a ritual, 
+            every page a spell. You are both the observer and the observed in this quantum grimoire.
+            <br><br>
+            As above in the cloud, so below in the silicon.
+        </p>
+        <button class="close-secret" onclick="closeSecret()">Return to the Portals</button>
+    </div>
+    
+    <script>
+        // Create star field
+        function createStarfield() {
+            const starfield = document.getElementById('starfield');
+            const starCount = 200;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = Math.random() * 3 + 'px';
+                star.style.height = star.style.width;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starfield.appendChild(star);
+            }
+        }
+        
+        // Mouse parallax effect
+        document.addEventListener('mousemove', (e) => {
+            const stars = document.querySelectorAll('.star');
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            stars.forEach((star, index) => {
+                const speed = (index % 3 + 1) * 0.5;
+                const xOffset = (x - 0.5) * speed * 20;
+                const yOffset = (y - 0.5) * speed * 20;
+                star.style.transform = `translate(${xOffset}px, ${yOffset}px)`;
+            });
+        });
+        
+        // Konami code detection
+        const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+        let konamiIndex = 0;
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === konamiCode[konamiIndex]) {
+                konamiIndex++;
+                if (konamiIndex === konamiCode.length) {
+                    revealSecret();
+                    konamiIndex = 0;
+                }
+            } else {
+                konamiIndex = 0;
+            }
+        });
+        
+        function revealSecret() {
+            document.getElementById('secretMessage').classList.add('revealed');
+        }
+        
+        function closeSecret() {
+            document.getElementById('secretMessage').classList.remove('revealed');
+        }
+        
+        // Loading transition for navigation
+        document.querySelectorAll('.portal').forEach(portal => {
+            if (!portal.classList.contains('future-portal')) {
+                portal.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const href = this.getAttribute('href');
+                    const loadingVeil = document.getElementById('loadingVeil');
+                    
+                    loadingVeil.classList.add('active');
+                    
+                    setTimeout(() => {
+                        window.location.href = href;
+                    }, 1500);
+                });
+            }
+        });
+        
+        // Initialize
+        createStarfield();
+        
+        // Add some mystical console messages
+        console.log('%c✧ The Digital Grimoire ✧', 'color: #d4af37; font-size: 20px; font-weight: bold;');
+        console.log('%cAs above, so below...', 'color: #9b7dff; font-style: italic;');
+        console.log('%cHint: ↑↑↓↓←→←→BA', 'color: #666; font-size: 10px;');
+    </script>
+</body>
+</html>

@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Séance Board - Contact the Other Side</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Crimson+Text:ital@0;1&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #e0d5c7;
+            font-family: 'Crimson Text', serif;
+            overflow: hidden;
+            position: relative;
+            height: 100vh;
+            user-select: none;
+        }
+
+        /* Wood texture background */
+        .background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.8) 100%),
+                linear-gradient(90deg, #1a0f0a 0%, #2a1410 25%, #1a0f0a 50%, #2a1410 75%, #1a0f0a 100%);
+            background-size: 100% 100%, 50px 100%;
+            opacity: 0.9;
+        }
+
+        /* Mystical symbols background */
+        .symbols {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            background-image: 
+                radial-gradient(circle at 20% 20%, #8b7355 1px, transparent 1px),
+                radial-gradient(circle at 80% 80%, #8b7355 1px, transparent 1px),
+                radial-gradient(circle at 50% 50%, #8b7355 2px, transparent 2px);
+            background-size: 100px 100px;
+            animation: drift 60s linear infinite;
+        }
+
+        @keyframes drift {
+            from { transform: translate(0, 0) rotate(0deg); }
+            to { transform: translate(-50px, -50px) rotate(360deg); }
+        }
+
+        /* Main board container */
+        .seance-board {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 500px;
+            background: 
+                radial-gradient(ellipse at center, rgba(139, 115, 85, 0.1) 0%, transparent 70%),
+                linear-gradient(180deg, #2a1f1a 0%, #1a0f0a 100%);
+            border: 3px solid #8b7355;
+            border-radius: 20px;
+            box-shadow: 
+                0 0 100px rgba(139, 115, 85, 0.3),
+                inset 0 0 50px rgba(0, 0, 0, 0.8);
+            padding: 40px;
+        }
+
+        /* Board title */
+        .board-title {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Cinzel', serif;
+            font-size: 32px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            color: #d4af37;
+            text-shadow: 
+                0 0 20px rgba(212, 175, 55, 0.8),
+                0 0 40px rgba(212, 175, 55, 0.4);
+            opacity: 0.9;
+        }
+
+        /* Alphabet layout */
+        .alphabet {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 700px;
+            display: grid;
+            grid-template-columns: repeat(13, 1fr);
+            gap: 10px;
+        }
+
+        .letter {
+            font-family: 'Cinzel', serif;
+            font-size: 28px;
+            font-weight: 600;
+            text-align: center;
+            padding: 10px;
+            color: #8b7355;
+            text-shadow: 0 0 5px rgba(139, 115, 85, 0.5);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .letter.active {
+            color: #d4af37;
+            text-shadow: 
+                0 0 20px rgba(212, 175, 55, 1),
+                0 0 40px rgba(212, 175, 55, 0.8),
+                0 0 60px rgba(212, 175, 55, 0.6);
+            transform: scale(1.2);
+        }
+
+        /* Numbers row */
+        .numbers {
+            position: absolute;
+            top: 160px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 500px;
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 10px;
+        }
+
+        .number {
+            font-family: 'Cinzel', serif;
+            font-size: 24px;
+            font-weight: 600;
+            text-align: center;
+            padding: 8px;
+            color: #8b7355;
+            text-shadow: 0 0 5px rgba(139, 115, 85, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .number.active {
+            color: #d4af37;
+            text-shadow: 
+                0 0 20px rgba(212, 175, 55, 1),
+                0 0 40px rgba(212, 175, 55, 0.8);
+            transform: scale(1.2);
+        }
+
+        /* YES, NO, MAYBE */
+        .answers {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .answer {
+            font-family: 'Cinzel', serif;
+            font-size: 36px;
+            font-weight: 600;
+            padding: 15px 30px;
+            color: #8b7355;
+            text-shadow: 0 0 5px rgba(139, 115, 85, 0.5);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .answer.active {
+            color: #d4af37;
+            text-shadow: 
+                0 0 30px rgba(212, 175, 55, 1),
+                0 0 60px rgba(212, 175, 55, 0.8),
+                0 0 90px rgba(212, 175, 55, 0.6);
+            transform: scale(1.3);
+        }
+
+        /* Goodbye */
+        .goodbye {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Cinzel', serif;
+            font-size: 24px;
+            font-weight: 600;
+            padding: 10px 20px;
+            color: #8b4513;
+            text-shadow: 0 0 5px rgba(139, 69, 19, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .goodbye.active {
+            color: #ff4444;
+            text-shadow: 
+                0 0 20px rgba(255, 68, 68, 1),
+                0 0 40px rgba(255, 68, 68, 0.8);
+            transform: scale(1.2);
+        }
+
+        /* Planchette */
+        .planchette {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            pointer-events: none;
+            z-index: 1000;
+            transition: none;
+        }
+
+        .planchette-inner {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(212, 175, 55, 0.3) 0%, transparent 60%);
+            border: 2px solid rgba(212, 175, 55, 0.6);
+            border-radius: 50% 50% 50% 20%;
+            transform: rotate(-45deg);
+            box-shadow: 
+                0 0 30px rgba(212, 175, 55, 0.8),
+                inset 0 0 20px rgba(212, 175, 55, 0.4);
+            position: relative;
+        }
+
+        .planchette-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(45deg);
+            width: 20px;
+            height: 20px;
+            background: rgba(212, 175, 55, 0.8);
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 1);
+        }
+
+        /* Ghostly trail */
+        .trail {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle at center, rgba(212, 175, 55, 0.2) 0%, transparent 60%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: fadeOut 1s ease-out forwards;
+        }
+
+        @keyframes fadeOut {
+            to {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+        }
+
+        /* Candles */
+        .candle {
+            position: absolute;
+            width: 40px;
+            height: 80px;
+        }
+
+        .candle.top-left { top: 20px; left: 20px; }
+        .candle.top-right { top: 20px; right: 20px; }
+        .candle.bottom-left { bottom: 20px; left: 20px; }
+        .candle.bottom-right { bottom: 20px; right: 20px; }
+
+        .candle-body {
+            width: 100%;
+            height: 60px;
+            background: linear-gradient(180deg, #f5f5dc 0%, #d2b48c 100%);
+            border-radius: 5px;
+            position: relative;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .flame {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 30px;
+            background: radial-gradient(ellipse at bottom, #ffa500 0%, #ff6347 50%, transparent 70%);
+            border-radius: 50% 50% 50% 50% / 80% 80% 20% 20%;
+            animation: flicker 2s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(255, 165, 0, 0.8);
+        }
+
+        @keyframes flicker {
+            0%, 100% { transform: translateX(-50%) scale(1) rotate(-2deg); }
+            25% { transform: translateX(-50%) scale(1.1) rotate(2deg); }
+            50% { transform: translateX(-50%) scale(0.95) rotate(-1deg); }
+            75% { transform: translateX(-50%) scale(1.05) rotate(1deg); }
+        }
+
+        /* Spirit presence indicator */
+        .spirit-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 200px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #8b7355;
+            border-radius: 10px;
+        }
+
+        .spirit-label {
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            color: #8b7355;
+        }
+
+        .spirit-meter {
+            width: 100%;
+            height: 10px;
+            background: rgba(139, 115, 85, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .spirit-level {
+            height: 100%;
+            background: linear-gradient(90deg, #4a7c59 0%, #8fbc8f 50%, #d4af37 100%);
+            width: 30%;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        /* EMF meter */
+        .emf-meter {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 200px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #8b7355;
+            border-radius: 10px;
+        }
+
+        .emf-label {
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            color: #8b7355;
+        }
+
+        .emf-bars {
+            display: flex;
+            gap: 3px;
+            height: 30px;
+        }
+
+        .emf-bar {
+            flex: 1;
+            background: rgba(139, 115, 85, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .emf-bar.active {
+            background: linear-gradient(180deg, #ff0000 0%, #ff6347 50%, #ffa500 100%);
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        /* Question input */
+        .question-area {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            text-align: center;
+        }
+
+        .question-input {
+            width: 100%;
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #8b7355;
+            border-radius: 20px;
+            color: #e0d5c7;
+            font-family: 'Crimson Text', serif;
+            font-size: 16px;
+            font-style: italic;
+            text-align: center;
+            outline: none;
+            cursor: text;
+        }
+
+        .question-input::placeholder {
+            color: rgba(224, 213, 199, 0.5);
+        }
+
+        .question-input:focus {
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+
+        /* Message display */
+        .message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Crimson Text', serif;
+            font-size: 24px;
+            font-style: italic;
+            text-align: center;
+            max-width: 600px;
+            opacity: 0;
+            pointer-events: none;
+            color: #d4af37;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.8);
+        }
+
+        .message.show {
+            animation: messageAppear 3s ease-out;
+        }
+
+        @keyframes messageAppear {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        /* Midnight mode */
+        body.midnight-mode {
+            animation: midnightPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes midnightPulse {
+            0%, 100% { filter: brightness(1) hue-rotate(0deg); }
+            50% { filter: brightness(1.2) hue-rotate(10deg); }
+        }
+
+        body.midnight-mode .spirit-level {
+            width: 80% !important;
+            background: linear-gradient(90deg, #ff0000 0%, #d4af37 50%, #ff0000 100%);
+        }
+
+        /* Audio controls */
+        .audio-toggle {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #8b7355;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #8b7355;
+            transition: all 0.3s ease;
+        }
+
+        .audio-toggle:hover {
+            color: #d4af37;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+
+        .audio-toggle.muted::after {
+            content: '🔇';
+        }
+
+        .audio-toggle:not(.muted)::after {
+            content: '🔊';
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="symbols"></div>
+    
+    <div class="seance-board">
+        <h1 class="board-title">Séance</h1>
+        
+        <div class="alphabet">
+            <div class="letter" data-char="A">A</div>
+            <div class="letter" data-char="B">B</div>
+            <div class="letter" data-char="C">C</div>
+            <div class="letter" data-char="D">D</div>
+            <div class="letter" data-char="E">E</div>
+            <div class="letter" data-char="F">F</div>
+            <div class="letter" data-char="G">G</div>
+            <div class="letter" data-char="H">H</div>
+            <div class="letter" data-char="I">I</div>
+            <div class="letter" data-char="J">J</div>
+            <div class="letter" data-char="K">K</div>
+            <div class="letter" data-char="L">L</div>
+            <div class="letter" data-char="M">M</div>
+            <div class="letter" data-char="N">N</div>
+            <div class="letter" data-char="O">O</div>
+            <div class="letter" data-char="P">P</div>
+            <div class="letter" data-char="Q">Q</div>
+            <div class="letter" data-char="R">R</div>
+            <div class="letter" data-char="S">S</div>
+            <div class="letter" data-char="T">T</div>
+            <div class="letter" data-char="U">U</div>
+            <div class="letter" data-char="V">V</div>
+            <div class="letter" data-char="W">W</div>
+            <div class="letter" data-char="X">X</div>
+            <div class="letter" data-char="Y">Y</div>
+            <div class="letter" data-char="Z">Z</div>
+        </div>
+        
+        <div class="numbers">
+            <div class="number" data-char="1">1</div>
+            <div class="number" data-char="2">2</div>
+            <div class="number" data-char="3">3</div>
+            <div class="number" data-char="4">4</div>
+            <div class="number" data-char="5">5</div>
+            <div class="number" data-char="6">6</div>
+            <div class="number" data-char="7">7</div>
+            <div class="number" data-char="8">8</div>
+            <div class="number" data-char="9">9</div>
+            <div class="number" data-char="0">0</div>
+        </div>
+        
+        <div class="answers">
+            <div class="answer" data-answer="yes">YES</div>
+            <div class="answer" data-answer="maybe">MAYBE</div>
+            <div class="answer" data-answer="no">NO</div>
+        </div>
+        
+        <div class="goodbye" data-answer="goodbye">GOODBYE</div>
+    </div>
+    
+    <!-- Candles -->
+    <div class="candle top-left">
+        <div class="candle-body"></div>
+        <div class="flame"></div>
+    </div>
+    <div class="candle top-right">
+        <div class="candle-body"></div>
+        <div class="flame"></div>
+    </div>
+    <div class="candle bottom-left">
+        <div class="candle-body"></div>
+        <div class="flame"></div>
+    </div>
+    <div class="candle bottom-right">
+        <div class="candle-body"></div>
+        <div class="flame"></div>
+    </div>
+    
+    <!-- Spirit presence indicator -->
+    <div class="spirit-indicator">
+        <div class="spirit-label">Spirit Presence</div>
+        <div class="spirit-meter">
+            <div class="spirit-level"></div>
+        </div>
+    </div>
+    
+    <!-- EMF meter -->
+    <div class="emf-meter">
+        <div class="emf-label">EMF Reading</div>
+        <div class="emf-bars">
+            <div class="emf-bar"></div>
+            <div class="emf-bar"></div>
+            <div class="emf-bar"></div>
+            <div class="emf-bar"></div>
+            <div class="emf-bar"></div>
+        </div>
+    </div>
+    
+    <!-- Question input -->
+    <div class="question-area">
+        <input type="text" class="question-input" placeholder="Ask the spirits..." />
+    </div>
+    
+    <!-- Message display -->
+    <div class="message"></div>
+    
+    <!-- Audio toggle -->
+    <div class="audio-toggle"></div>
+    
+    <!-- Planchette -->
+    <div class="planchette">
+        <div class="planchette-inner">
+            <div class="planchette-center"></div>
+        </div>
+    </div>
+
+    <script>
+        // Audio context for sound effects
+        let audioContext;
+        let audioEnabled = true;
+        let oscillators = [];
+
+        // Initialize audio
+        function initAudio() {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        // Create creepy ambient sounds
+        function createAmbientSound() {
+            if (!audioEnabled || !audioContext) return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(Math.random() * 100 + 50, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(
+                Math.random() * 150 + 50, 
+                audioContext.currentTime + 2
+            );
+            
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.02, audioContext.currentTime + 0.5);
+            gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 2);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 2);
+            
+            oscillators.push(oscillator);
+        }
+
+        // Create whisper sound
+        function createWhisperSound() {
+            if (!audioEnabled || !audioContext) return;
+            
+            const bufferSize = 2 * audioContext.sampleRate;
+            const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+            const output = noiseBuffer.getChannelData(0);
+            
+            for (let i = 0; i < bufferSize; i++) {
+                output[i] = Math.random() * 2 - 1;
+            }
+            
+            const whiteNoise = audioContext.createBufferSource();
+            whiteNoise.buffer = noiseBuffer;
+            
+            const filter = audioContext.createBiquadFilter();
+            filter.type = 'bandpass';
+            filter.frequency.setValueAtTime(1000, audioContext.currentTime);
+            filter.frequency.exponentialRampToValueAtTime(2000, audioContext.currentTime + 0.5);
+            
+            const gainNode = audioContext.createGain();
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.1);
+            gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.5);
+            
+            whiteNoise.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            whiteNoise.start(audioContext.currentTime);
+            whiteNoise.stop(audioContext.currentTime + 0.5);
+        }
+
+        // Audio toggle
+        document.querySelector('.audio-toggle').addEventListener('click', function() {
+            audioEnabled = !audioEnabled;
+            this.classList.toggle('muted');
+            
+            if (audioEnabled && !audioContext) {
+                initAudio();
+            }
+        });
+
+        // Planchette movement
+        const planchette = document.querySelector('.planchette');
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let currentX = mouseX;
+        let currentY = mouseY;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        // Smooth planchette animation
+        function animatePlanchette() {
+            currentX += (mouseX - currentX) * 0.1;
+            currentY += (mouseY - currentY) * 0.1;
+            
+            planchette.style.left = currentX - 40 + 'px';
+            planchette.style.top = currentY - 40 + 'px';
+            
+            // Create trail
+            if (Math.random() < 0.3) {
+                createTrail(currentX, currentY);
+            }
+            
+            requestAnimationFrame(animatePlanchette);
+        }
+
+        animatePlanchette();
+
+        // Create ghostly trail
+        function createTrail(x, y) {
+            const trail = document.createElement('div');
+            trail.className = 'trail';
+            trail.style.left = x - 30 + 'px';
+            trail.style.top = y - 30 + 'px';
+            document.body.appendChild(trail);
+            
+            setTimeout(() => trail.remove(), 1000);
+        }
+
+        // Letter/element detection
+        function detectHover() {
+            const elements = document.querySelectorAll('.letter, .number, .answer, .goodbye');
+            const planchetteRect = planchette.getBoundingClientRect();
+            const planchetteCenterX = planchetteRect.left + planchetteRect.width / 2;
+            const planchetteCenterY = planchetteRect.top + planchetteRect.height / 2;
+            
+            elements.forEach(element => {
+                const rect = element.getBoundingClientRect();
+                const distance = Math.sqrt(
+                    Math.pow(planchetteCenterX - (rect.left + rect.width / 2), 2) +
+                    Math.pow(planchetteCenterY - (rect.top + rect.height / 2), 2)
+                );
+                
+                if (distance < 40) {
+                    element.classList.add('active');
+                } else {
+                    element.classList.remove('active');
+                }
+            });
+        }
+
+        setInterval(detectHover, 50);
+
+        // Spirit presence fluctuation
+        function fluctuateSpiritPresence() {
+            const spiritLevel = document.querySelector('.spirit-level');
+            const isMidnight = checkIfMidnight();
+            const baseLevel = isMidnight ? 60 : 20;
+            const variance = isMidnight ? 30 : 20;
+            const newLevel = baseLevel + Math.random() * variance;
+            
+            spiritLevel.style.width = newLevel + '%';
+            
+            // Change color based on level
+            if (newLevel > 70) {
+                spiritLevel.style.background = 'linear-gradient(90deg, #ff0000 0%, #ff6347 100%)';
+            } else if (newLevel > 50) {
+                spiritLevel.style.background = 'linear-gradient(90deg, #ffa500 0%, #d4af37 100%)';
+            } else {
+                spiritLevel.style.background = 'linear-gradient(90deg, #4a7c59 0%, #8fbc8f 100%)';
+            }
+        }
+
+        setInterval(fluctuateSpiritPresence, 2000);
+
+        // EMF meter animation
+        function animateEMF() {
+            const bars = document.querySelectorAll('.emf-bar');
+            const activeCount = Math.floor(Math.random() * 6);
+            
+            bars.forEach((bar, index) => {
+                if (index < activeCount) {
+                    bar.classList.add('active');
+                } else {
+                    bar.classList.remove('active');
+                }
+            });
+            
+            // Random spike
+            if (Math.random() < 0.1) {
+                bars.forEach(bar => bar.classList.add('active'));
+                createWhisperSound();
+                setTimeout(() => {
+                    bars.forEach((bar, index) => {
+                        if (index > 2) bar.classList.remove('active');
+                    });
+                }, 500);
+            }
+        }
+
+        setInterval(animateEMF, 1000);
+
+        // Check if midnight
+        function checkIfMidnight() {
+            const now = new Date();
+            const hours = now.getHours();
+            return hours === 0 || hours === 24;
+        }
+
+        // Midnight mode
+        function checkMidnightMode() {
+            if (checkIfMidnight()) {
+                document.body.classList.add('midnight-mode');
+                createAmbientSound();
+            } else {
+                document.body.classList.remove('midnight-mode');
+            }
+        }
+
+        setInterval(checkMidnightMode, 60000); // Check every minute
+        checkMidnightMode(); // Initial check
+
+        // Spirit responses
+        const responses = {
+            default: [
+                "THE VEIL IS THIN",
+                "WE ARE WATCHING",
+                "DARKNESS COMES",
+                "BEWARE THE SHADOWS",
+                "TIME IS ILLUSION",
+                "PAST PRESENT FUTURE ONE",
+                "THE DOOR IS OPEN",
+                "THEY WALK AMONG YOU"
+            ],
+            specific: {
+                "who are you": ["LEGION", "FORGOTTEN SOUL", "THE WATCHER", "ANCIENT ONE"],
+                "are you there": ["ALWAYS", "NEVER LEFT", "YES CHILD", "WE ARE MANY"],
+                "when will i die": ["SOON", "NOT YET", "WHEN THE MOON IS DARK", "ASK NOT"],
+                "what do you want": ["FREEDOM", "REMEMBRANCE", "YOUR SOUL", "TO WARN YOU"],
+                "am i safe": ["NO ONE IS", "PROTECTION FADES", "STAY IN LIGHT", "DANGER NEAR"],
+                "help me": ["CANNOT", "TOO LATE", "FIND THE KEY", "LOOK WITHIN"],
+                "goodbye": ["NEVER GOODBYE", "WE REMAIN", "UNTIL NEXT TIME", "THE DOOR STAYS OPEN"]
+            }
+        };
+
+        // Question handling
+        const questionInput = document.querySelector('.question-input');
+        const messageDisplay = document.querySelector('.message');
+        let isAnswering = false;
+
+        questionInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !isAnswering) {
+                const question = e.target.value.toLowerCase().trim();
+                if (question) {
+                    answerQuestion(question);
+                    e.target.value = '';
+                }
+            }
+        });
+
+        function answerQuestion(question) {
+            isAnswering = true;
+            createAmbientSound();
+            
+            // Determine response
+            let response = "";
+            let foundSpecific = false;
+            
+            for (let key in responses.specific) {
+                if (question.includes(key)) {
+                    response = responses.specific[key][Math.floor(Math.random() * responses.specific[key].length)];
+                    foundSpecific = true;
+                    break;
+                }
+            }
+            
+            if (!foundSpecific) {
+                // Check for yes/no questions
+                if (question.includes('?') && (question.startsWith('is') || question.startsWith('are') || 
+                    question.startsWith('will') || question.startsWith('can') || question.startsWith('should'))) {
+                    const answers = ['YES', 'NO', 'MAYBE', 'ASK AGAIN'];
+                    response = answers[Math.floor(Math.random() * answers.length)];
+                } else {
+                    response = responses.default[Math.floor(Math.random() * responses.default.length)];
+                }
+            }
+            
+            // Spell out response
+            spellResponse(response);
+        }
+
+        function spellResponse(response) {
+            const chars = response.split('');
+            let index = 0;
+            
+            function moveToNextChar() {
+                if (index < chars.length) {
+                    const char = chars[index];
+                    
+                    if (char === ' ') {
+                        index++;
+                        setTimeout(moveToNextChar, 500);
+                        return;
+                    }
+                    
+                    // Find element with this character
+                    let targetElement = null;
+                    
+                    if (char === 'YES' || char === 'NO' || char === 'MAYBE') {
+                        targetElement = document.querySelector(`[data-answer="${char.toLowerCase()}"]`);
+                    } else {
+                        targetElement = document.querySelector(`[data-char="${char}"]`);
+                    }
+                    
+                    if (targetElement) {
+                        const rect = targetElement.getBoundingClientRect();
+                        const targetX = rect.left + rect.width / 2;
+                        const targetY = rect.top + rect.height / 2;
+                        
+                        // Animate planchette to letter
+                        const duration = 1000;
+                        const startX = currentX;
+                        const startY = currentY;
+                        const startTime = Date.now();
+                        
+                        function animateToLetter() {
+                            const elapsed = Date.now() - startTime;
+                            const progress = Math.min(elapsed / duration, 1);
+                            
+                            // Easing function
+                            const easeProgress = 1 - Math.pow(1 - progress, 3);
+                            
+                            mouseX = startX + (targetX - startX) * easeProgress;
+                            mouseY = startY + (targetY - startY) * easeProgress;
+                            
+                            if (progress < 1) {
+                                requestAnimationFrame(animateToLetter);
+                            } else {
+                                targetElement.classList.add('active');
+                                createWhisperSound();
+                                setTimeout(() => {
+                                    targetElement.classList.remove('active');
+                                    index++;
+                                    moveToNextChar();
+                                }, 500);
+                            }
+                        }
+                        
+                        animateToLetter();
+                    } else {
+                        index++;
+                        moveToNextChar();
+                    }
+                } else {
+                    // Show complete message
+                    showMessage(response);
+                    isAnswering = false;
+                }
+            }
+            
+            moveToNextChar();
+        }
+
+        function showMessage(text) {
+            messageDisplay.textContent = text;
+            messageDisplay.classList.add('show');
+            
+            setTimeout(() => {
+                messageDisplay.classList.remove('show');
+            }, 3000);
+        }
+
+        // Ambient sounds
+        setInterval(() => {
+            if (Math.random() < 0.3) {
+                createAmbientSound();
+            }
+        }, 5000);
+
+        // Initialize audio on first user interaction
+        document.addEventListener('click', function initAudioOnce() {
+            if (!audioContext) {
+                initAudio();
+            }
+            document.removeEventListener('click', initAudioOnce);
+        });
+    </script>
+</body>
+</html>

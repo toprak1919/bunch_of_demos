@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sacred Geometry Generator</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 300;
+            background: #000;
+            color: #ffd700;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+        
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: #000;
+        }
+        
+        #gridCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            opacity: 0.1;
+        }
+        
+        .controls {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            padding: 20px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            width: 300px;
+            z-index: 1000;
+        }
+        
+        h1 {
+            font-size: 24px;
+            font-weight: 300;
+            margin-bottom: 20px;
+            text-align: center;
+            letter-spacing: 3px;
+        }
+        
+        .control-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            opacity: 0.8;
+        }
+        
+        .value-display {
+            float: right;
+            font-size: 11px;
+            opacity: 0.6;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 2px;
+            background: rgba(255, 215, 0, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+            margin: 10px 0;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: #ffd700;
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            background: #ffd700;
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        select {
+            width: 100%;
+            background: transparent;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: #ffd700;
+            padding: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+        }
+        
+        select option {
+            background: #000;
+        }
+        
+        button {
+            width: 100%;
+            background: transparent;
+            border: 1px solid #ffd700;
+            color: #ffd700;
+            padding: 10px;
+            font-family: inherit;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+            margin-top: 5px;
+        }
+        
+        button:hover {
+            background: rgba(255, 215, 0, 0.1);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+        
+        .frequency-display {
+            text-align: center;
+            font-size: 11px;
+            opacity: 0.6;
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+        
+        .hidden-message {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 14px;
+            letter-spacing: 3px;
+            opacity: 0;
+            transition: opacity 1s;
+            pointer-events: none;
+        }
+        
+        .hidden-message.show {
+            opacity: 1;
+        }
+        
+        .prismatic {
+            animation: prismatic 8s linear infinite;
+        }
+        
+        @keyframes prismatic {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+        
+        .info {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            font-size: 11px;
+            opacity: 0.5;
+            letter-spacing: 1px;
+        }
+        
+        #audioToggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: transparent;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: #ffd700;
+            padding: 8px 16px;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 20px;
+            z-index: 1000;
+        }
+        
+        #audioToggle:hover {
+            background: rgba(255, 215, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gridCanvas"></canvas>
+    <canvas id="canvas"></canvas>
+    
+    <button id="audioToggle">♪ SOUND OFF</button>
+    
+    <div class="controls">
+        <h1>SACRED GEOMETRY</h1>
+        
+        <div class="control-group">
+            <label>
+                PATTERN
+            </label>
+            <select id="patternType">
+                <option value="flower">Flower of Life</option>
+                <option value="metatron">Metatron's Cube</option>
+                <option value="sri">Sri Yantra</option>
+                <option value="fibonacci">Fibonacci Spiral</option>
+                <option value="platonic">Platonic Solids</option>
+                <option value="seed">Seed of Life</option>
+                <option value="torus">Torus</option>
+            </select>
+        </div>
+        
+        <div class="control-group">
+            <label>
+                COMPLEXITY
+                <span class="value-display" id="complexityValue">7</span>
+            </label>
+            <input type="range" id="complexity" min="1" max="13" value="7" step="1">
+        </div>
+        
+        <div class="control-group">
+            <label>
+                SYMMETRY
+                <span class="value-display" id="symmetryValue">6</span>
+            </label>
+            <input type="range" id="symmetry" min="3" max="12" value="6" step="1">
+        </div>
+        
+        <div class="control-group">
+            <label>
+                SACRED RATIO
+                <span class="value-display" id="ratioValue">1.618</span>
+            </label>
+            <input type="range" id="ratio" min="1" max="3.14159" value="1.618" step="0.001">
+        </div>
+        
+        <div class="control-group">
+            <label>
+                FREQUENCY
+                <span class="value-display" id="frequencyValue">432 Hz</span>
+            </label>
+            <input type="range" id="frequency" min="111" max="963" value="432" step="1">
+        </div>
+        
+        <div class="control-group">
+            <label>
+                ANIMATION SPEED
+                <span class="value-display" id="speedValue">1.0</span>
+            </label>
+            <input type="range" id="speed" min="0.1" max="3" value="1" step="0.1">
+        </div>
+        
+        <button id="generateBtn">GENERATE</button>
+        <button id="downloadBtn">DOWNLOAD</button>
+        <button id="prismaticBtn">PRISMATIC MODE</button>
+        
+        <div class="frequency-display" id="sacredNumbers">
+            φ = 1.618... | π = 3.14159...
+        </div>
+    </div>
+    
+    <div class="info">
+        CLICK TO PLACE CENTER | SCROLL TO ZOOM
+    </div>
+    
+    <div class="hidden-message" id="hiddenMessage"></div>
+    
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const gridCanvas = document.getElementById('gridCanvas');
+        const gridCtx = gridCanvas.getContext('2d');
+        
+        // Audio context
+        let audioContext;
+        let oscillator;
+        let gainNode;
+        let audioEnabled = false;
+        
+        // Constants
+        const PHI = (1 + Math.sqrt(5)) / 2; // Golden ratio
+        const PI = Math.PI;
+        
+        // State
+        let centerX, centerY;
+        let scale = 1;
+        let animationProgress = 0;
+        let isAnimating = false;
+        let animationSpeed = 1;
+        let isPrismatic = false;
+        let currentPattern = 'flower';
+        let mouseX = 0, mouseY = 0;
+        
+        // Sacred combinations for hidden symbols
+        const sacredCombinations = {
+            '7-6-1.618-432': 'ANKH UNLOCKED',
+            '13-12-3.14159-528': 'METATRON ACTIVATED',
+            '9-9-2.718-639': 'ENNEAGRAM REVEALED',
+            '5-5-1.618-396': 'PENTAGRAM PERFECTED'
+        };
+        
+        // Resize canvases
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            gridCanvas.width = window.innerWidth;
+            gridCanvas.height = window.innerHeight;
+            centerX = canvas.width / 2;
+            centerY = canvas.height / 2;
+            drawGrid();
+        }
+        
+        // Draw golden ratio grid
+        function drawGrid() {
+            gridCtx.clearRect(0, 0, gridCanvas.width, gridCanvas.height);
+            gridCtx.strokeStyle = '#ffd700';
+            gridCtx.lineWidth = 0.5;
+            
+            // Golden ratio grid
+            const goldenWidth = gridCanvas.width / PHI;
+            const goldenHeight = gridCanvas.height / PHI;
+            
+            // Vertical lines
+            gridCtx.beginPath();
+            gridCtx.moveTo(goldenWidth, 0);
+            gridCtx.lineTo(goldenWidth, gridCanvas.height);
+            gridCtx.moveTo(gridCanvas.width - goldenWidth, 0);
+            gridCtx.lineTo(gridCanvas.width - goldenWidth, gridCanvas.height);
+            
+            // Horizontal lines
+            gridCtx.moveTo(0, goldenHeight);
+            gridCtx.lineTo(gridCanvas.width, goldenHeight);
+            gridCtx.moveTo(0, gridCanvas.height - goldenHeight);
+            gridCtx.lineTo(gridCanvas.width, gridCanvas.height - goldenHeight);
+            
+            // Center lines
+            gridCtx.moveTo(gridCanvas.width / 2, 0);
+            gridCtx.lineTo(gridCanvas.width / 2, gridCanvas.height);
+            gridCtx.moveTo(0, gridCanvas.height / 2);
+            gridCtx.lineTo(gridCanvas.width, gridCanvas.height / 2);
+            
+            gridCtx.stroke();
+        }
+        
+        // Initialize audio
+        function initAudio() {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            oscillator = audioContext.createOscillator();
+            gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.type = 'sine';
+            gainNode.gain.value = 0;
+            oscillator.start();
+        }
+        
+        // Update audio frequency
+        function updateAudioFrequency(freq) {
+            if (oscillator && audioEnabled) {
+                oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+                gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
+            }
+        }
+        
+        // Drawing functions for different patterns
+        function drawFlowerOfLife(x, y, radius, circles, progress) {
+            const step = (2 * PI) / circles;
+            
+            ctx.strokeStyle = isPrismatic ? `hsl(${Date.now() / 50 % 360}, 70%, 50%)` : '#ffd700';
+            ctx.lineWidth = 1;
+            
+            // Center circle
+            if (progress > 0) {
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, 2 * PI * Math.min(progress, 1));
+                ctx.stroke();
+            }
+            
+            // Surrounding circles
+            for (let i = 0; i < circles; i++) {
+                if (progress > (i + 1) / (circles + 1)) {
+                    const angle = i * step;
+                    const cx = x + radius * Math.cos(angle);
+                    const cy = y + radius * Math.sin(angle);
+                    
+                    ctx.beginPath();
+                    const circleProgress = (progress - (i + 1) / (circles + 1)) * (circles + 1);
+                    ctx.arc(cx, cy, radius, 0, 2 * PI * Math.min(circleProgress, 1));
+                    ctx.stroke();
+                }
+            }
+        }
+        
+        function drawMetatronsCube(x, y, radius, progress) {
+            ctx.strokeStyle = isPrismatic ? `hsl(${Date.now() / 50 % 360}, 70%, 50%)` : '#ffd700';
+            ctx.lineWidth = 1;
+            
+            // Draw circles
+            const positions = [];
+            const hexRadius = radius;
+            
+            // Center
+            positions.push({x: x, y: y});
+            
+            // Hexagon vertices
+            for (let i = 0; i < 6; i++) {
+                const angle = (i * PI * 2) / 6;
+                positions.push({
+                    x: x + hexRadius * Math.cos(angle),
+                    y: y + hexRadius * Math.sin(angle)
+                });
+            }
+            
+            // Draw circles with animation
+            positions.forEach((pos, i) => {
+                if (progress > i / positions.length) {
+                    ctx.beginPath();
+                    const circleProgress = (progress - i / positions.length) * positions.length;
+                    ctx.arc(pos.x, pos.y, radius / 2, 0, 2 * PI * Math.min(circleProgress, 1));
+                    ctx.stroke();
+                }
+            });
+            
+            // Draw connections
+            if (progress > 0.5) {
+                const lineProgress = (progress - 0.5) * 2;
+                ctx.globalAlpha = 0.5;
+                
+                for (let i = 0; i < positions.length; i++) {
+                    for (let j = i + 1; j < positions.length; j++) {
+                        if (lineProgress > (i * positions.length + j) / (positions.length * positions.length)) {
+                            ctx.beginPath();
+                            ctx.moveTo(positions[i].x, positions[i].y);
+                            ctx.lineTo(positions[j].x, positions[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+                
+                ctx.globalAlpha = 1;
+            }
+        }
+        
+        function drawSriYantra(x, y, size, progress) {
+            ctx.strokeStyle = isPrismatic ? `hsl(${Date.now() / 50 % 360}, 70%, 50%)` : '#ffd700';
+            ctx.lineWidth = 1;
+            
+            // Draw interlocking triangles
+            const triangles = 9;
+            const baseSize = size;
+            
+            for (let i = 0; i < triangles; i++) {
+                if (progress > i / triangles) {
+                    const triProgress = (progress - i / triangles) * triangles;
+                    const triSize = baseSize * (1 - i * 0.1);
+                    const rotation = (i % 2) * PI;
+                    
+                    ctx.save();
+                    ctx.translate(x, y);
+                    ctx.rotate(rotation);
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(0, -triSize);
+                    
+                    const angle1 = -triSize + triSize * 2 * triProgress;
+                    const angle2 = Math.min(triProgress - 0.5, 0.5) * 2;
+                    
+                    if (triProgress > 0.5) {
+                        ctx.lineTo(-triSize * 0.866, triSize * 0.5);
+                    }
+                    if (triProgress >= 1) {
+                        ctx.lineTo(triSize * 0.866, triSize * 0.5);
+                        ctx.closePath();
+                    }
+                    
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            }
+            
+            // Outer circles
+            if (progress > 0.8) {
+                const circleProgress = (progress - 0.8) * 5;
+                ctx.beginPath();
+                ctx.arc(x, y, size * 1.2, 0, 2 * PI * circleProgress);
+                ctx.stroke();
+            }
+        }
+        
+        function drawFibonacciSpiral(x, y, scale, progress) {
+            ctx.strokeStyle = isPrismatic ? `hsl(${Date.now() / 50 % 360}, 70%, 50%)` : '#ffd700';
+            ctx.lineWidth = 1;
+            
+            let a = 0;
+            let b = 1;
+            let angle = 0;
+            
+            ctx.save();
+            ctx.translate(x, y);
+            
+            for (let i = 0; i < 15; i++) {
+                if (progress > i / 15) {
+                    const arcProgress = (progress - i / 15) * 15;
+                    
+                    ctx.beginPath();
+                    ctx.arc(0, 0, b * scale, angle, angle + (PI / 2) * arcProgress);
+                    ctx.stroke();
+                    
+                    // Move to next position
+                    const nextAngle = angle + PI / 2;
+                    ctx.translate(
+                        b * scale * Math.cos(angle),
+                        b * scale * Math.sin(angle)
+                    );
+                    
+                    angle = nextAngle;
+                    const temp = b;
+                    b = a + b;
+                    a = temp;
+                }
+            }
+            
+            ctx.restore();
+        }
+        
+        function drawPlatonicSolids(x, y, size, symmetry, progress) {
+            ctx.strokeStyle = isPrismatic ? `hsl(${Date.now() / 50 % 360}, 70%, 50%)` : '#ffd700';
+            ctx.lineWidth = 1;
+            
+            // Tetrahedron projection
+            const vertices = [];
+            const edges = [];
+            
+            // Generate vertices based on symmetry
+            for (let i = 0; i < symmetry; i++) {
+                const angle = (i * 2 * PI) / symmetry;
+                const r = size * (i % 2 === 0 ? 1 : 0.6);
+                vertices.push({
+                    x: x + r * Math.cos(angle),
+                    y: y + r * Math.sin(angle)
+                });
+            }
+            
+            // Connect vertices
+            for (let i = 0; i < vertices.length; i++) {
+                for (let j = i + 1; j < vertices.length; j++) {
+                    if ((j - i) <= 2 || (i === 0 && j === vertices.length - 1)) {
+                        edges.push([i, j]);
+                    }
+                }
+            }
+            
+            // Draw edges with animation
+            edges.forEach((edge, index) => {
+                if (progress > index / edges.length) {
+                    const edgeProgress = (progress - index / edges.length) * edges.length;
+                    const [i, j] = edge;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(vertices[i].x, vertices[i].y);
+                    
+                    const dx = vertices[j].x - vertices[i].x;
+                    const dy = vertices[j].y - vertices[i].y;
+                    
+                    ctx.lineTo(
+                        vertices[i].x + dx * edgeProgress,
+                        vertices[i].y + dy * edgeProgress
+                    );
+                    ctx.stroke();
+                }
+            });
+        }
+        
+        function drawSeedOfLife(x, y, radius, progress) {
+            ctx.strokeStyle = isPrismatic ? `hsl(${Date.now() / 50 % 360}, 70%, 50%)` : '#ffd700';
+            ctx.lineWidth = 1;
+            
+            // Center circle
+            if (progress > 0) {
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, 2 * PI * Math.min(progress * 7, 1));
+                ctx.stroke();
+            }
+            
+            // Six surrounding circles
+            for (let i = 0; i < 6; i++) {
+                if (progress > (i + 1) / 7) {
+                    const angle = (i * 2 * PI) / 6;
+                    const cx = x + radius * Math.cos(angle);
+                    const cy = y + radius * Math.sin(angle);
+                    
+                    ctx.beginPath();
+                    const circleProgress = (progress - (i + 1) / 7) * 7;
+                    ctx.arc(cx, cy, radius, 0, 2 * PI * Math.min(circleProgress, 1));
+                    ctx.stroke();
+                }
+            }
+        }
+        
+        function drawTorus(x, y, outerRadius, innerRadius, segments, progress) {
+            ctx.strokeStyle = isPrismatic ? `hsl(${Date.now() / 50 % 360}, 70%, 50%)` : '#ffd700';
+            ctx.lineWidth = 1;
+            
+            const maxU = progress * 2 * PI;
+            const stepU = maxU / segments;
+            const stepV = (2 * PI) / segments;
+            
+            for (let u = 0; u < maxU; u += stepU) {
+                for (let v = 0; v < 2 * PI; v += stepV) {
+                    const x1 = (outerRadius + innerRadius * Math.cos(v)) * Math.cos(u);
+                    const y1 = (outerRadius + innerRadius * Math.cos(v)) * Math.sin(u);
+                    const z1 = innerRadius * Math.sin(v);
+                    
+                    const x2 = (outerRadius + innerRadius * Math.cos(v + stepV)) * Math.cos(u);
+                    const y2 = (outerRadius + innerRadius * Math.cos(v + stepV)) * Math.sin(u);
+                    
+                    // 2D projection
+                    const px1 = x + x1 * 0.7 - y1 * 0.3;
+                    const py1 = y + y1 * 0.7 + z1;
+                    const px2 = x + x2 * 0.7 - y2 * 0.3;
+                    const py2 = y + y2 * 0.7 + z1;
+                    
+                    ctx.globalAlpha = 0.3 + 0.7 * (1 - Math.abs(z1) / innerRadius);
+                    ctx.beginPath();
+                    ctx.moveTo(px1, py1);
+                    ctx.lineTo(px2, py2);
+                    ctx.stroke();
+                }
+            }
+            
+            ctx.globalAlpha = 1;
+        }
+        
+        // Main draw function
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            const complexity = parseInt(document.getElementById('complexity').value);
+            const symmetry = parseInt(document.getElementById('symmetry').value);
+            const ratio = parseFloat(document.getElementById('ratio').value);
+            const baseSize = 100 * scale;
+            
+            ctx.save();
+            
+            switch (currentPattern) {
+                case 'flower':
+                    drawFlowerOfLife(centerX, centerY, baseSize, complexity, animationProgress);
+                    break;
+                case 'metatron':
+                    drawMetatronsCube(centerX, centerY, baseSize * 1.5, animationProgress);
+                    break;
+                case 'sri':
+                    drawSriYantra(centerX, centerY, baseSize * 1.5, animationProgress);
+                    break;
+                case 'fibonacci':
+                    drawFibonacciSpiral(centerX, centerY, baseSize * 0.1, animationProgress);
+                    break;
+                case 'platonic':
+                    drawPlatonicSolids(centerX, centerY, baseSize, symmetry, animationProgress);
+                    break;
+                case 'seed':
+                    drawSeedOfLife(centerX, centerY, baseSize * 0.8, animationProgress);
+                    break;
+                case 'torus':
+                    drawTorus(centerX, centerY, baseSize, baseSize * 0.3, 20, animationProgress);
+                    break;
+            }
+            
+            ctx.restore();
+            
+            // Update animation
+            if (isAnimating && animationProgress < 1) {
+                animationProgress += 0.01 * animationSpeed;
+                requestAnimationFrame(draw);
+            } else if (animationProgress >= 1) {
+                isAnimating = false;
+            }
+        }
+        
+        // Generate pattern
+        function generatePattern() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            animationProgress = 0;
+            isAnimating = true;
+            currentPattern = document.getElementById('patternType').value;
+            
+            // Check for sacred combinations
+            const complexity = document.getElementById('complexity').value;
+            const symmetry = document.getElementById('symmetry').value;
+            const ratio = document.getElementById('ratio').value;
+            const frequency = document.getElementById('frequency').value;
+            const combo = `${complexity}-${symmetry}-${ratio}-${frequency}`;
+            
+            if (sacredCombinations[combo]) {
+                showHiddenMessage(sacredCombinations[combo]);
+            }
+            
+            draw();
+        }
+        
+        // Show hidden message
+        function showHiddenMessage(message) {
+            const messageEl = document.getElementById('hiddenMessage');
+            messageEl.textContent = message;
+            messageEl.classList.add('show');
+            setTimeout(() => {
+                messageEl.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Event listeners
+        window.addEventListener('resize', resizeCanvas);
+        
+        canvas.addEventListener('click', (e) => {
+            centerX = e.clientX;
+            centerY = e.clientY;
+            generatePattern();
+        });
+        
+        canvas.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+        
+        canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            scale *= e.deltaY > 0 ? 0.9 : 1.1;
+            scale = Math.max(0.1, Math.min(scale, 5));
+            if (!isAnimating) {
+                animationProgress = 1;
+                draw();
+            }
+        });
+        
+        // Control event listeners
+        document.getElementById('generateBtn').addEventListener('click', generatePattern);
+        
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = 'sacred-geometry.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+        
+        document.getElementById('prismaticBtn').addEventListener('click', () => {
+            isPrismatic = !isPrismatic;
+            document.getElementById('prismaticBtn').textContent = isPrismatic ? 'STATIC MODE' : 'PRISMATIC MODE';
+            if (isPrismatic) {
+                canvas.classList.add('prismatic');
+            } else {
+                canvas.classList.remove('prismatic');
+            }
+            if (!isAnimating) {
+                animationProgress = 1;
+                draw();
+            }
+        });
+        
+        document.getElementById('audioToggle').addEventListener('click', function() {
+            if (!audioContext) {
+                initAudio();
+            }
+            
+            audioEnabled = !audioEnabled;
+            this.textContent = audioEnabled ? '♪ SOUND ON' : '♪ SOUND OFF';
+            
+            if (audioEnabled) {
+                const freq = parseInt(document.getElementById('frequency').value);
+                updateAudioFrequency(freq);
+            } else {
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            }
+        });
+        
+        // Update value displays
+        document.getElementById('complexity').addEventListener('input', function() {
+            document.getElementById('complexityValue').textContent = this.value;
+        });
+        
+        document.getElementById('symmetry').addEventListener('input', function() {
+            document.getElementById('symmetryValue').textContent = this.value;
+        });
+        
+        document.getElementById('ratio').addEventListener('input', function() {
+            document.getElementById('ratioValue').textContent = parseFloat(this.value).toFixed(3);
+        });
+        
+        document.getElementById('frequency').addEventListener('input', function() {
+            document.getElementById('frequencyValue').textContent = this.value + ' Hz';
+            if (audioEnabled) {
+                updateAudioFrequency(parseInt(this.value));
+            }
+        });
+        
+        document.getElementById('speed').addEventListener('input', function() {
+            animationSpeed = parseFloat(this.value);
+            document.getElementById('speedValue').textContent = this.value;
+        });
+        
+        // Initialize
+        resizeCanvas();
+        generatePattern();
+    </script>
+</body>
+</html>
