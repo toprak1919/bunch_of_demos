@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heartbeat Desynchronization Monitor</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a0a;
+            color: #00ff41;
+            font-family: 'Share Tech Mono', monospace;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .monitor-container {
+            display: flex;
+            height: 100vh;
+            position: relative;
+        }
+        
+        .heart-monitor {
+            flex: 1;
+            position: relative;
+            border: 1px solid #00ff41;
+            background: #000;
+            overflow: hidden;
+        }
+        
+        .heart-monitor.yours {
+            border-right: none;
+        }
+        
+        .heart-monitor.theirs {
+            border-left: 1px solid #00ff41;
+        }
+        
+        .monitor-label {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 14px;
+            color: #00ff41;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .heart-rate {
+            position: absolute;
+            top: 50px;
+            left: 20px;
+            font-size: 36px;
+            color: #00ff41;
+            font-weight: bold;
+        }
+        
+        .heart-rate::after {
+            content: ' BPM';
+            font-size: 16px;
+            color: #00ff4180;
+        }
+        
+        .ekg-container {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+            height: 200px;
+        }
+        
+        .ekg-line {
+            stroke: #00ff41;
+            stroke-width: 2;
+            fill: none;
+            filter: drop-shadow(0 0 10px #00ff41);
+        }
+        
+        .flatline {
+            stroke: #ff0000;
+            filter: drop-shadow(0 0 20px #ff0000);
+        }
+        
+        .sync-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 40px;
+            border: 2px solid #00ff41;
+            z-index: 10;
+        }
+        
+        .sync-percentage {
+            font-size: 72px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px currentColor;
+        }
+        
+        .sync-status {
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 30px;
+        }
+        
+        .warning {
+            color: #ff6b6b;
+            animation: blink 0.5s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+        
+        .trigger-event {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid #ff0000;
+            color: #ff6b6b;
+            font-size: 14px;
+            text-transform: uppercase;
+            animation: slideDown 3s ease-out forwards;
+            z-index: 20;
+        }
+        
+        @keyframes slideDown {
+            0% {
+                top: -50px;
+                opacity: 0;
+            }
+            10% {
+                top: 100px;
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+        
+        .sync-button {
+            background: transparent;
+            border: 2px solid #00ff41;
+            color: #00ff41;
+            padding: 15px 30px;
+            font-family: inherit;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .sync-button:hover {
+            background: #00ff41;
+            color: #000;
+            box-shadow: 0 0 20px #00ff41;
+        }
+        
+        .sync-button.failed {
+            border-color: #ff0000;
+            color: #ff0000;
+            animation: shake 0.5s;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        .medical-readout {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            font-size: 12px;
+            color: #00ff4180;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .final-message {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        
+        .final-message.show {
+            display: flex;
+        }
+        
+        .death-certificate {
+            text-align: center;
+            border: 2px solid #ff0000;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.9);
+        }
+        
+        .death-certificate h2 {
+            color: #ff0000;
+            font-size: 36px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+        
+        .death-certificate p {
+            color: #ff6b6b;
+            font-size: 18px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .milestone-input {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 15;
+        }
+        
+        .milestone-input input {
+            background: transparent;
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            padding: 10px 20px;
+            font-family: inherit;
+            font-size: 14px;
+            text-align: center;
+            width: 300px;
+        }
+        
+        .milestone-input input::placeholder {
+            color: #00ff4160;
+        }
+        
+        .treatment-log {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            color: #ff6b6b60;
+            text-align: right;
+            line-height: 1.8;
+        }
+        
+        .heart-visual {
+            position: absolute;
+            top: 20%;
+            font-size: 40px;
+            transition: all 2s ease-out;
+        }
+        
+        .heart-visual.yours {
+            left: 45%;
+        }
+        
+        .heart-visual.theirs {
+            right: 45%;
+        }
+        
+        .heart-visual.separated {
+            filter: grayscale(100%);
+        }
+        
+        .heart-visual.yours.separated {
+            left: 10%;
+        }
+        
+        .heart-visual.theirs.separated {
+            right: 10%;
+        }
+    </style>
+</head>
+<body>
+    <div class="monitor-container">
+        <div class="heart-monitor yours">
+            <div class="monitor-label">YOUR HEART</div>
+            <div class="heart-rate" id="yourRate">72</div>
+            <div class="heart-visual yours" id="yourHeart">❤️</div>
+            <svg class="ekg-container">
+                <path class="ekg-line" id="yourEkg"></path>
+            </svg>
+        </div>
+        
+        <div class="heart-monitor theirs">
+            <div class="monitor-label">THEIR HEART</div>
+            <div class="heart-rate" id="theirRate">72</div>
+            <div class="heart-visual theirs" id="theirHeart">❤️</div>
+            <svg class="ekg-container">
+                <path class="ekg-line" id="theirEkg"></path>
+            </svg>
+        </div>
+    </div>
+    
+    <div class="sync-display" id="syncDisplay">
+        <div class="sync-percentage" id="syncPercentage">100%</div>
+        <div class="sync-status" id="syncStatus">SYNCHRONIZED - Two hearts beating as one</div>
+        <button class="sync-button" id="syncButton">ATTEMPT RESYNC</button>
+    </div>
+    
+    <div class="milestone-input">
+        <input type="text" id="milestoneInput" placeholder="Enter relationship milestone..." />
+    </div>
+    
+    <div class="treatment-log" id="treatmentLog"></div>
+    
+    <div class="medical-readout" id="medicalReadout">
+        Prognosis: Monitoring cardiac coupling...
+    </div>
+    
+    <div class="final-message" id="finalMessage">
+        <div class="death-certificate">
+            <h2>CARDIAC COUPLING FAILURE</h2>
+            <p>Cause: Chronic heartbeat incompatibility</p>
+            <p>Time of death: <span id="timeOfDeath"></span></p>
+            <p>SOME HEARTS WERE NEVER MEANT TO BEAT TOGETHER</p>
+            <p class="warning">WARNING: DESYNCHRONIZATION IRREVERSIBLE</p>
+        </div>
+    </div>
+    
+    <audio id="heartbeat1" loop>
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYmLjo+UmJmbnJ2en6ChpKWmp6ipqqusra6vr7CwsLGxsbKysrOzs7S0tLS1tbW1tba2tra3t7e3t7i4uLi4uLm5ubm5ubq6urq6urm5ubm5uba2tbSysa+tapeTkIyHg4B9eXVxbGhjXldSTUhDPTgyLCcjHxsYFRMRDw4NDAwLCwoKCQkJCAgIBwcHBwcGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBwcHBwcIBwgICAkJCQoKCwsMDA0NDg8PERITFRYYGRwdHyEkJikrLjE0Nzo9QEJE" type="audio/wav">
+    </audio>
+    <audio id="heartbeat2" loop>
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYmLjo+UmJmbnJ2en6ChpKWmp6ipqqusra6vr7CwsLGxsbKysrOzs7S0tLS1tbW1tba2tra3t7e3t7i4uLi4uLm5ubm5ubq6urq6urm5ubm5uba2tbSysa+tapeTkIyHg4B9eXVxbGhjXldSTUhDPTgyLCcjHxsYFRMRDw4NDAwLCwoKCQkJCAgIBwcHBwcGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBwcHBwcIBwgICAkJCQoKCwsMDA0NDg8PERITFRYYGRwdHyEkJikrLjE0Nzo9QUJE" type="audio/wav">
+    </audio>
+    
+    <script>
+        let syncPercentage = 100;
+        let yourHeartRate = 72;
+        let theirHeartRate = 72;
+        let desyncSpeed = 0.1;
+        let isFlatlining = false;
+        let separated = false;
+        
+        const triggers = [
+            "LIE DETECTED",
+            "TRUST BROKEN",
+            "DISTANCE INCREASED",
+            "COMMUNICATION FAILED",
+            "EMOTIONAL DISCONNECT",
+            "INTIMACY LOST",
+            "PROMISES BROKEN",
+            "LOVE FADING"
+        ];
+        
+        const treatments = [
+            "Couples therapy: FAILED",
+            "Space given: WORSENED",
+            "Communication attempt: REJECTED",
+            "Trust rebuild: UNSUCCESSFUL",
+            "Emotional reconnection: DENIED",
+            "Physical proximity: INEFFECTIVE"
+        ];
+        
+        const statusMessages = {
+            100: "SYNCHRONIZED - Two hearts beating as one",
+            90: "MINOR DESYNCHRONIZATION DETECTED",
+            80: "CARDIAC COUPLING WEAKENING",
+            70: "EMOTIONAL ARRHYTHMIA DETECTED",
+            60: "SEVERE DESYNCHRONIZATION",
+            50: "CRITICAL DISCONNECT WARNING",
+            40: "CARDIAC COUPLING FAILURE IMMINENT",
+            30: "TERMINAL DISCONNECTION APPROACHING",
+            20: "FLATLINE RISK: EXTREME",
+            10: "FINAL STAGES OF SEPARATION",
+            0: "COMPLETE DESYNCHRONIZATION",
+            "-17": "OPPOSING RHYTHMS - INCOMPATIBLE"
+        };
+        
+        // Create heartbeat pattern
+        function createHeartbeatPath(rate, offset = 0) {
+            let path = "M 0,100 ";
+            const width = window.innerWidth / 2;
+            const baseSpeed = rate / 60;
+            
+            for (let x = 0; x < width; x += 2) {
+                const t = (x + offset) * baseSpeed * 0.05;
+                let y = 100;
+                
+                // Create heartbeat pattern
+                const beat = (t % 1);
+                if (beat < 0.1) {
+                    y = 100 - Math.sin(beat * 10 * Math.PI) * 30;
+                } else if (beat < 0.2) {
+                    y = 100 + Math.sin((beat - 0.1) * 10 * Math.PI) * 50;
+                } else if (beat < 0.3) {
+                    y = 100 - Math.sin((beat - 0.2) * 10 * Math.PI) * 20;
+                }
+                
+                path += `L ${x},${y} `;
+            }
+            
+            return path;
+        }
+        
+        // Update EKG displays
+        let offset = 0;
+        function updateEKG() {
+            offset += 2;
+            
+            if (!isFlatlining) {
+                document.getElementById('yourEkg').setAttribute('d', createHeartbeatPath(yourHeartRate, offset));
+                document.getElementById('theirEkg').setAttribute('d', createHeartbeatPath(theirHeartRate, offset));
+            } else {
+                // Flatline for one heart
+                const flatline = `M 0,100 L ${window.innerWidth / 2},100`;
+                if (Math.random() > 0.5) {
+                    document.getElementById('yourEkg').setAttribute('d', flatline);
+                    document.getElementById('yourEkg').classList.add('flatline');
+                } else {
+                    document.getElementById('theirEkg').setAttribute('d', flatline);
+                    document.getElementById('theirEkg').classList.add('flatline');
+                }
+                
+                setTimeout(() => {
+                    document.getElementById('yourEkg').classList.remove('flatline');
+                    document.getElementById('theirEkg').classList.remove('flatline');
+                    isFlatlining = false;
+                }, 2000);
+            }
+            
+            requestAnimationFrame(updateEKG);
+        }
+        
+        // Update heart rates
+        function updateHeartRates() {
+            if (syncPercentage > 0) {
+                // Your heart speeds up with anxiety
+                yourHeartRate = Math.min(72 + (100 - syncPercentage) * 0.8, 140);
+                // Their heart slows with indifference
+                theirHeartRate = Math.max(72 - (100 - syncPercentage) * 0.3, 45);
+            } else {
+                // Erratic patterns
+                yourHeartRate = 72 + Math.sin(Date.now() * 0.001) * 40;
+                theirHeartRate = 72 + Math.cos(Date.now() * 0.0007) * 30;
+            }
+            
+            document.getElementById('yourRate').textContent = Math.round(yourHeartRate);
+            document.getElementById('theirRate').textContent = Math.round(theirHeartRate);
+            
+            // Update heartbeat sounds
+            if (document.getElementById('heartbeat1').playbackRate) {
+                document.getElementById('heartbeat1').playbackRate = yourHeartRate / 72;
+                document.getElementById('heartbeat2').playbackRate = theirHeartRate / 72;
+            }
+        }
+        
+        // Desynchronization process
+        function desynchronize() {
+            if (syncPercentage > -17) {
+                syncPercentage -= desyncSpeed;
+                
+                // Update display
+                document.getElementById('syncPercentage').textContent = 
+                    syncPercentage > 0 ? Math.round(syncPercentage) + '%' : syncPercentage.toFixed(0) + '%';
+                
+                // Update status message
+                let statusKey = Math.round(syncPercentage / 10) * 10;
+                if (syncPercentage <= 0) statusKey = syncPercentage <= -17 ? "-17" : "0";
+                
+                if (statusMessages[statusKey]) {
+                    document.getElementById('syncStatus').textContent = statusMessages[statusKey];
+                }
+                
+                // Color changes
+                const color = syncPercentage > 50 ? '#00ff41' : 
+                             syncPercentage > 20 ? '#ffaa00' : '#ff0000';
+                document.getElementById('syncPercentage').style.color = color;
+                
+                // Add warnings
+                if (syncPercentage < 30) {
+                    document.getElementById('syncStatus').classList.add('warning');
+                }
+                
+                // Random triggers
+                if (Math.random() < 0.005 && syncPercentage > 20) {
+                    showTrigger();
+                }
+                
+                // Random flatline
+                if (syncPercentage < 50 && Math.random() < 0.001 && !isFlatlining) {
+                    isFlatlining = true;
+                }
+                
+                // Separate hearts visually
+                if (syncPercentage < 50 && !separated) {
+                    separated = true;
+                    document.getElementById('yourHeart').classList.add('separated');
+                    document.getElementById('theirHeart').classList.add('separated');
+                }
+                
+                // Update medical readout
+                if (syncPercentage < 70) {
+                    document.getElementById('medicalReadout').textContent = 
+                        "Prognosis: Terminal disconnection";
+                }
+                
+                updateHeartRates();
+            } else {
+                // Final state
+                showFinalMessage();
+            }
+        }
+        
+        // Show trigger events
+        function showTrigger() {
+            const trigger = triggers[Math.floor(Math.random() * triggers.length)];
+            const triggerEl = document.createElement('div');
+            triggerEl.className = 'trigger-event';
+            triggerEl.textContent = trigger;
+            triggerEl.style.top = Math.random() * 200 + 'px';
+            document.body.appendChild(triggerEl);
+            
+            setTimeout(() => triggerEl.remove(), 3000);
+            
+            // Accelerate desync
+            desyncSpeed += 0.05;
+            
+            // Add treatment attempt
+            if (Math.random() < 0.3) {
+                const treatment = treatments[Math.floor(Math.random() * treatments.length)];
+                const log = document.getElementById('treatmentLog');
+                log.innerHTML = treatment + '<br>' + log.innerHTML;
+                if (log.children.length > 5) {
+                    log.removeChild(log.lastChild);
+                }
+            }
+        }
+        
+        // Sync button
+        document.getElementById('syncButton').addEventListener('click', function() {
+            this.classList.add('failed');
+            setTimeout(() => this.classList.remove('failed'), 500);
+            
+            // Make it worse
+            desyncSpeed += 0.2;
+            showTrigger();
+        });
+        
+        // Milestone input
+        document.getElementById('milestoneInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && this.value) {
+                const milestone = this.value;
+                this.value = '';
+                
+                // Create custom trigger
+                const triggerEl = document.createElement('div');
+                triggerEl.className = 'trigger-event';
+                triggerEl.textContent = `MILESTONE: ${milestone.toUpperCase()} - SYNC DAMAGED`;
+                document.body.appendChild(triggerEl);
+                
+                setTimeout(() => triggerEl.remove(), 3000);
+                
+                // Significant desync
+                syncPercentage -= 5 + Math.random() * 10;
+                desyncSpeed += 0.1;
+            }
+        });
+        
+        // Final message
+        function showFinalMessage() {
+            const now = new Date();
+            document.getElementById('timeOfDeath').textContent = 
+                now.toLocaleTimeString();
+            document.getElementById('finalMessage').classList.add('show');
+            
+            // Stop all animations
+            clearInterval(desyncInterval);
+        }
+        
+        // Start the experience
+        updateEKG();
+        const desyncInterval = setInterval(desynchronize, 100);
+        
+        // Start heartbeat sounds
+        document.addEventListener('click', function() {
+            document.getElementById('heartbeat1').play();
+            document.getElementById('heartbeat2').play();
+        }, { once: true });
+    </script>
+</body>
+</html>

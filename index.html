@@ -656,6 +656,154 @@
                 <div class="portal-description" style="border-color: #0d0d0d; background: rgba(0, 0, 0, 0.95);">Delete the dreams you built together - watch tomorrow dissolve into the void of never</div>
             </a>
         </div>
+
+        <!-- The Final Torment Section -->
+        <div class="section-divider">
+            <div class="divider-line" style="background: linear-gradient(90deg, transparent, #8b0000 20%, #000000 50%, #8b0000 80%, transparent); height: 3px;"></div>
+            <div style="position: relative; height: 150px; display: flex; align-items: center; justify-content: center; margin: 2rem 0;">
+                <div style="position: absolute; width: 300px; height: 100px; background: radial-gradient(ellipse, #8b0000 0%, #000000 40%, transparent 70%); filter: blur(20px); animation: torment-breathe 3s ease-in-out infinite;"></div>
+                <div style="position: absolute; width: 200px; height: 200px; border: 2px solid #8b0000; border-radius: 50%; opacity: 0.3; animation: torment-rotate 20s linear infinite;"></div>
+                <div style="position: absolute; width: 150px; height: 150px; border: 1px solid #000000; border-radius: 50%; opacity: 0.5; animation: torment-rotate-reverse 15s linear infinite;"></div>
+                <h2 class="section-title" style="color: #8b0000; text-shadow: 0 0 40px #8b0000, 0 0 80px #000000, 0 0 120px #8b0000; font-size: 3rem; position: relative; z-index: 1; animation: torment-flicker 2s ease-in-out infinite;">The Final Torment</h2>
+            </div>
+            <p class="section-subtitle" style="color: #8b0000; text-shadow: 0 0 20px #000000; font-size: 1.1rem;">Abandon all hope, ye who enter the ninth circle of heartbreak hell</p>
+            <p class="section-subtitle" style="color: #4a0000; font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.8;">Where love's corpse rots eternal and souls scream in digital silence</p>
+            <p class="section-subtitle" style="color: #2d0000; font-size: 0.8rem; margin-top: 0.3rem; opacity: 0.6;">The final descent into relationship oblivion - there is no return</p>
+            <div class="divider-line" style="background: linear-gradient(90deg, transparent, #8b0000 20%, #000000 50%, #8b0000 80%, transparent); height: 3px;"></div>
+        </div>
+
+        <style>
+            @keyframes torment-breathe {
+                0%, 100% { 
+                    transform: scale(1) translateY(0); 
+                    opacity: 0.4;
+                }
+                50% { 
+                    transform: scale(1.3) translateY(-10px); 
+                    opacity: 0.7;
+                }
+            }
+            
+            @keyframes torment-rotate {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+            
+            @keyframes torment-rotate-reverse {
+                from { transform: rotate(360deg); }
+                to { transform: rotate(0deg); }
+            }
+            
+            @keyframes torment-flicker {
+                0%, 100% { opacity: 1; filter: brightness(1); }
+                10% { opacity: 0.9; filter: brightness(0.8); }
+                20% { opacity: 1; filter: brightness(1.2); }
+                30% { opacity: 0.95; filter: brightness(0.9); }
+                40% { opacity: 1; filter: brightness(1.1); }
+                50% { opacity: 0.9; filter: brightness(0.7); }
+                60% { opacity: 1; filter: brightness(1); }
+                70% { opacity: 0.95; filter: brightness(0.85); }
+                80% { opacity: 1; filter: brightness(1.15); }
+                90% { opacity: 0.9; filter: brightness(0.8); }
+            }
+            
+            .portal[data-portal^="torment-"] .portal-symbol {
+                animation: torment-pulse 4s ease-in-out infinite;
+                filter: drop-shadow(0 0 10px currentColor);
+            }
+            
+            @keyframes torment-pulse {
+                0%, 100% { 
+                    transform: scale(1); 
+                    filter: drop-shadow(0 0 10px currentColor) brightness(0.8);
+                }
+                25% { 
+                    transform: scale(1.05); 
+                    filter: drop-shadow(0 0 20px currentColor) brightness(1);
+                }
+                50% { 
+                    transform: scale(0.95); 
+                    filter: drop-shadow(0 0 5px currentColor) brightness(0.6);
+                }
+                75% { 
+                    transform: scale(1.02); 
+                    filter: drop-shadow(0 0 15px currentColor) brightness(0.9);
+                }
+            }
+            
+            .portal[data-portal^="torment-"]:hover .portal-symbol {
+                animation: torment-agony 0.5s ease-in-out infinite;
+            }
+            
+            @keyframes torment-agony {
+                0%, 100% { transform: scale(1) rotate(0deg); }
+                25% { transform: scale(1.1) rotate(-5deg); }
+                50% { transform: scale(0.9) rotate(5deg); }
+                75% { transform: scale(1.05) rotate(-3deg); }
+            }
+        </style>
+
+        <div class="portal-grid">
+            <a href="scent-memories.html" class="portal" data-portal="torment-scent" style="--portal-color: #8b0000;">
+                <div class="portal-symbol" style="color: #8b0000; text-shadow: 0 0 30px #8b0000, 0 0 60px #000000;">👃</div>
+                <div class="portal-name" style="color: #8b0000;">Scent Memories</div>
+                <div class="portal-description" style="border-color: #8b0000; background: rgba(139, 0, 0, 0.1); box-shadow: 0 0 30px rgba(139, 0, 0, 0.5);">Their perfume still haunts every breath - phantom fragrances that trigger cascading agony with each inhalation of cursed air</div>
+            </a>
+            
+            <a href="voicemail-purgatory.html" class="portal" data-portal="torment-voicemail" style="--portal-color: #4a0000;">
+                <div class="portal-symbol" style="color: #4a0000; text-shadow: 0 0 30px #4a0000, 0 0 60px #000000;">📞</div>
+                <div class="portal-name" style="color: #4a0000;">Voicemail Purgatory</div>
+                <div class="portal-description" style="border-color: #4a0000; background: rgba(74, 0, 0, 0.1); box-shadow: 0 0 30px rgba(74, 0, 0, 0.5);">Listen to their voice on repeat for eternity - "please leave a message" becomes your infinite loop of damnation</div>
+            </a>
+            
+            <a href="intimacy-graveyard.html" class="portal" data-portal="torment-intimacy" style="--portal-color: #2d0000;">
+                <div class="portal-symbol" style="color: #2d0000; text-shadow: 0 0 30px #2d0000, 0 0 60px #000000;">🗺️</div>
+                <div class="portal-name" style="color: #2d0000;">Intimacy Graveyard</div>
+                <div class="portal-description" style="border-color: #2d0000; background: rgba(45, 0, 0, 0.1); box-shadow: 0 0 30px rgba(45, 0, 0, 0.5);">Map the sacred places where bodies once intertwined - now tombstones marking where passion died screaming</div>
+            </a>
+            
+            <a href="promise-decomposer.html" class="portal" data-portal="torment-promise" style="--portal-color: #000000;">
+                <div class="portal-symbol" style="color: #000000; text-shadow: 0 0 30px #8b0000, 0 0 60px #000000;">📜</div>
+                <div class="portal-name" style="color: #000000;">Promise Decomposer</div>
+                <div class="portal-description" style="border-color: #000000; background: rgba(0, 0, 0, 0.95); box-shadow: 0 0 30px rgba(139, 0, 0, 0.5);">Watch "forever" rot into lies - witness vows decay into maggots feeding on the corpse of commitment</div>
+            </a>
+            
+            <a href="last-dance-hologram.html" class="portal" data-portal="torment-dance" style="--portal-color: #1a0000;">
+                <div class="portal-symbol" style="color: #1a0000; text-shadow: 0 0 30px #1a0000, 0 0 60px #000000;">💃</div>
+                <div class="portal-name" style="color: #1a0000;">Last Dance Hologram</div>
+                <div class="portal-description" style="border-color: #1a0000; background: rgba(26, 0, 0, 0.1); box-shadow: 0 0 30px rgba(26, 0, 0, 0.5);">Dance with their ghost projection forever - your arms pass through where flesh once pressed against yours</div>
+            </a>
+            
+            <a href="relationship-autopsy.html" class="portal" data-portal="torment-autopsy" style="--portal-color: #330000;">
+                <div class="portal-symbol" style="color: #330000; text-shadow: 0 0 30px #330000, 0 0 60px #000000;">🏥</div>
+                <div class="portal-name" style="color: #330000;">Relationship Autopsy</div>
+                <div class="portal-description" style="border-color: #330000; background: rgba(51, 0, 0, 0.1); box-shadow: 0 0 30px rgba(51, 0, 0, 0.5);">Dissect the corpse of your love - examine each organ of affection to determine exact cause of death</div>
+            </a>
+            
+            <a href="love-withdrawal.html" class="portal" data-portal="torment-withdrawal" style="--portal-color: #0d0000;">
+                <div class="portal-symbol" style="color: #0d0000; text-shadow: 0 0 30px #8b0000, 0 0 60px #000000;">💊</div>
+                <div class="portal-name" style="color: #0d0000;">Love Withdrawal</div>
+                <div class="portal-description" style="border-color: #0d0000; background: rgba(13, 0, 0, 0.95); box-shadow: 0 0 30px rgba(139, 0, 0, 0.5);">Experience the physical agony of emotional detox - your body screams for the drug of their presence</div>
+            </a>
+            
+            <a href="ghost-wedding.html" class="portal" data-portal="torment-wedding" style="--portal-color: #660000;">
+                <div class="portal-symbol" style="color: #660000; text-shadow: 0 0 30px #660000, 0 0 60px #000000;">👰</div>
+                <div class="portal-name" style="color: #660000;">Ghost Wedding</div>
+                <div class="portal-description" style="border-color: #660000; background: rgba(102, 0, 0, 0.1); box-shadow: 0 0 30px rgba(102, 0, 0, 0.5);">Marry their absence in unholy ceremony - exchange rings with shadows, kiss the void where lips once were</div>
+            </a>
+            
+            <a href="memory-virus.html" class="portal" data-portal="torment-virus" style="--portal-color: #400000;">
+                <div class="portal-symbol" style="color: #400000; text-shadow: 0 0 30px #400000, 0 0 60px #000000;">🦠</div>
+                <div class="portal-name" style="color: #400000;">Memory Virus</div>
+                <div class="portal-description" style="border-color: #400000; background: rgba(64, 0, 0, 0.1); box-shadow: 0 0 30px rgba(64, 0, 0, 0.5);">Their memories infect every thought - spreading through your mind, corrupting all joy with their toxic presence</div>
+            </a>
+            
+            <a href="heartbeat-desync.html" class="portal" data-portal="torment-heartbeat" style="--portal-color: #800000;">
+                <div class="portal-symbol" style="color: #800000; text-shadow: 0 0 30px #800000, 0 0 60px #000000;">💔</div>
+                <div class="portal-name" style="color: #800000;">Heartbeat Desync</div>
+                <div class="portal-description" style="border-color: #800000; background: rgba(128, 0, 0, 0.1); box-shadow: 0 0 30px rgba(128, 0, 0, 0.5);">Feel your heart forget its rhythm - once synchronized with theirs, now it stutters alone in broken meter forever</div>
+            </a>
+        </div>
     </div>
     
     <!-- Secret message -->

@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promise Decomposer - Watch Every Vow Rot</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Cinzel:wght@400;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a0a;
+            color: #fff;
+            font-family: 'Cinzel', serif;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text x="10" y="50" font-family="serif" font-size="8" fill="%23111" opacity="0.1" transform="rotate(-45 50 50)">VOID VOID VOID</text></svg>') repeat;
+            pointer-events: none;
+            animation: drift 20s linear infinite;
+        }
+        
+        @keyframes drift {
+            from { transform: translateX(0) translateY(0); }
+            to { transform: translateX(-100px) translateY(-100px); }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .title {
+            font-size: 3rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            background: linear-gradient(45deg, #8B0000, #DC143C);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.5rem;
+            color: #666;
+        }
+        
+        .promise-input-section {
+            background: rgba(20, 20, 20, 0.8);
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .promise-input {
+            width: 100%;
+            padding: 1rem;
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.5rem;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+        
+        .promise-input::placeholder {
+            color: #666;
+        }
+        
+        .decompose-btn {
+            background: linear-gradient(45deg, #8B0000, #DC143C);
+            color: #fff;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.3s ease;
+        }
+        
+        .decompose-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(220, 20, 60, 0.5);
+        }
+        
+        .authenticity-meter {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(139, 0, 0, 0.2);
+            border: 1px solid #8B0000;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 1.2rem;
+            color: #ff4444;
+            display: none;
+        }
+        
+        .promise-display {
+            min-height: 400px;
+            margin-bottom: 3rem;
+        }
+        
+        .promise-parchment {
+            background: linear-gradient(to bottom, #f4e8d0, #e8dcc0);
+            color: #2c1810;
+            padding: 3rem;
+            margin: 2rem auto;
+            max-width: 800px;
+            font-family: 'Dancing Script', cursive;
+            font-size: 2rem;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            transition: all 2s ease;
+        }
+        
+        .promise-parchment::before,
+        .promise-parchment::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+        
+        .promise-parchment.stage-fresh {
+            transform: rotate(-2deg);
+        }
+        
+        .promise-parchment.stage-stale {
+            background: linear-gradient(to bottom, #e8dcc0, #d4c0a0);
+            color: #3c2820;
+            filter: sepia(0.3);
+        }
+        
+        .promise-parchment.stage-rotten {
+            background: linear-gradient(to bottom, #d4c0a0, #b09070);
+            color: #4c3830;
+            filter: sepia(0.6) contrast(1.2);
+            transform: rotate(1deg) scale(0.98);
+        }
+        
+        .promise-parchment.stage-rotten::before {
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="3" fill="%23654321" opacity="0.3"/><circle cx="80" cy="40" r="4" fill="%23654321" opacity="0.3"/><circle cx="50" cy="70" r="3" fill="%23654321" opacity="0.3"/></svg>');
+            opacity: 0.5;
+        }
+        
+        .promise-parchment.stage-putrid {
+            background: linear-gradient(to bottom, #907050, #604030);
+            color: #5c4840;
+            filter: sepia(0.8) contrast(1.5) brightness(0.7);
+            transform: rotate(-3deg) scale(0.95);
+        }
+        
+        .promise-parchment.stage-putrid::after {
+            background: radial-gradient(circle at 30% 40%, transparent 20%, rgba(0,0,0,0.3) 50%);
+        }
+        
+        .promise-parchment.stage-dust {
+            animation: crumble 2s ease-out forwards;
+            opacity: 0.3;
+        }
+        
+        @keyframes crumble {
+            0% { transform: rotate(-3deg) scale(0.95); }
+            50% { transform: rotate(5deg) scale(0.9) translateY(20px); }
+            100% { 
+                transform: rotate(0) scale(0.8) translateY(100px); 
+                opacity: 0;
+                filter: blur(5px);
+            }
+        }
+        
+        .decay-info {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 1rem;
+            color: #888;
+        }
+        
+        .expiration-date {
+            color: #ff0000;
+            font-weight: bold;
+            text-decoration: line-through;
+        }
+        
+        .chemical-formula {
+            font-family: monospace;
+            font-size: 1.2rem;
+            color: #00ff00;
+            margin: 1rem 0;
+            text-align: center;
+        }
+        
+        .warranty-sticker {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #ff0000;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            transform: rotate(15deg);
+            font-size: 0.8rem;
+            font-weight: bold;
+            border: 2px dashed #fff;
+            text-transform: uppercase;
+        }
+        
+        .promise-graveyard {
+            background: rgba(10, 10, 10, 0.9);
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .graveyard-title {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #666;
+        }
+        
+        .tombstone {
+            background: linear-gradient(to bottom, #444, #222);
+            border-radius: 10px 10px 0 0;
+            padding: 1rem;
+            margin: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #999;
+            position: relative;
+            display: inline-block;
+            width: calc(33% - 2rem);
+            vertical-align: top;
+        }
+        
+        .tombstone::after {
+            content: 'R.I.P.';
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: #666;
+        }
+        
+        .archive-stats {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #DC143C;
+            margin-top: 2rem;
+            padding: 1rem;
+            border: 1px solid #DC143C;
+            border-radius: 5px;
+        }
+        
+        .truth-serum {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 5px;
+            font-style: italic;
+            color: #00ff00;
+            display: none;
+        }
+        
+        .fire-effect {
+            animation: burn 2s ease-out forwards;
+        }
+        
+        @keyframes burn {
+            0% { filter: brightness(1) hue-rotate(0deg); }
+            50% { filter: brightness(1.5) hue-rotate(20deg); }
+            100% { filter: brightness(0.3) hue-rotate(30deg); opacity: 0.5; }
+        }
+        
+        .broken-counter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(139, 0, 0, 0.9);
+            padding: 1rem;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            color: #fff;
+        }
+        
+        audio {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">Promise Decomposer</h1>
+            <p class="subtitle">Watch Every Vow Rot Into Lies</p>
+        </header>
+        
+        <div class="promise-input-section">
+            <input type="text" class="promise-input" placeholder="Enter a promise to watch it decompose..." id="promiseInput">
+            <button class="decompose-btn" onclick="decomposePromise()">Begin Decomposition</button>
+            <div class="authenticity-meter" id="authenticityMeter">
+                🚨 LIE DETECTED - Promise authenticity: 0% 🚨
+            </div>
+        </div>
+        
+        <div class="promise-display" id="promiseDisplay"></div>
+        
+        <div class="chemical-formula" id="chemicalFormula"></div>
+        
+        <div class="truth-serum" id="truthSerum"></div>
+        
+        <div class="promise-graveyard">
+            <h2 class="graveyard-title">Promise Graveyard</h2>
+            <div id="graveyard"></div>
+            <div class="archive-stats" id="archiveStats">
+                <span id="promiseCounter">0</span> promises made, <span id="brokenCounter">0</span> promises broken
+            </div>
+        </div>
+    </div>
+    
+    <div class="broken-counter">
+        Total Lies: <span id="totalLies">10,847</span>
+    </div>
+    
+    <script>
+        let promiseCount = 0;
+        let brokenCount = 0;
+        let totalLies = 10847;
+        
+        const decompositionStages = ['fresh', 'stale', 'rotten', 'putrid', 'dust'];
+        const stageDescriptions = {
+            'fresh': 'Fresh Promise - Life Expectancy: 2.3 years',
+            'stale': 'Going Stale - 73% integrity lost',
+            'rotten': 'Rotting - Truth value approaching zero',
+            'putrid': 'Putrid - Complete moral decay detected',
+            'dust': 'Dust - Nothing but ashes remain'
+        };
+        
+        const promiseTransformations = {
+            "forever": "forever (expired yesterday)",
+            "always": "always (terms and conditions apply)",
+            "never": "never (until convenient)",
+            "love you": "love you (subject to change)",
+            "i'll never hurt you": "i'll always hurt you",
+            "till death do us part": "till death do us part (or till I get bored)",
+            "trust me": "trust me (at your own risk)",
+            "i promise": "i promise (but promises mean nothing)",
+            "be there": "be there (when it suits me)",
+            "faithful": "faithful (to myself only)"
+        };
+        
+        const truthSerumReveals = {
+            "i love you": "I'm just afraid of being alone",
+            "forever": "Until someone better comes along",
+            "i'll never hurt you": "I'll hurt you without meaning to",
+            "till death do us part": "Till the honeymoon phase ends",
+            "you're the only one": "You're the only one right now",
+            "i'll change": "I'll pretend to change",
+            "trust me": "I don't even trust myself",
+            "i promise": "I'm just saying what you want to hear"
+        };
+        
+        function decomposePromise() {
+            const input = document.getElementById('promiseInput');
+            const promise = input.value.trim();
+            
+            if (!promise) return;
+            
+            promiseCount++;
+            document.getElementById('promiseCounter').textContent = promiseCount;
+            
+            // Show authenticity meter
+            const meter = document.getElementById('authenticityMeter');
+            meter.style.display = 'block';
+            setTimeout(() => {
+                meter.style.display = 'none';
+            }, 3000);
+            
+            // Create promise display
+            const display = document.getElementById('promiseDisplay');
+            display.innerHTML = '';
+            
+            const parchment = document.createElement('div');
+            parchment.className = 'promise-parchment stage-fresh';
+            parchment.textContent = promise;
+            
+            // Add warranty sticker for certain promises
+            if (promise.toLowerCase().includes('wedding') || promise.toLowerCase().includes('vow')) {
+                const sticker = document.createElement('div');
+                sticker.className = 'warranty-sticker';
+                sticker.textContent = 'VOID IF ACTUALLY BELIEVED';
+                parchment.appendChild(sticker);
+            }
+            
+            display.appendChild(parchment);
+            
+            // Create decay info
+            const decayInfo = document.createElement('div');
+            decayInfo.className = 'decay-info';
+            decayInfo.textContent = stageDescriptions['fresh'];
+            display.appendChild(decayInfo);
+            
+            // Show chemical formula
+            const formula = document.getElementById('chemicalFormula');
+            formula.textContent = 'C₈H₁₁NO₂ (Love) → C₉H₁₃NO₃ (Indifference)';
+            
+            // Show truth serum
+            const truthSerum = document.getElementById('truthSerum');
+            const lowerPromise = promise.toLowerCase();
+            for (let key in truthSerumReveals) {
+                if (lowerPromise.includes(key)) {
+                    truthSerum.textContent = `Truth Serum Reveals: "${truthSerumReveals[key]}"`;
+                    truthSerum.style.display = 'block';
+                    break;
+                }
+            }
+            
+            // Start decomposition
+            let stageIndex = 0;
+            const decompositionInterval = setInterval(() => {
+                stageIndex++;
+                
+                if (stageIndex >= decompositionStages.length) {
+                    clearInterval(decompositionInterval);
+                    
+                    // Add to graveyard
+                    addToGraveyard(promise);
+                    
+                    // Update counters
+                    brokenCount++;
+                    totalLies++;
+                    document.getElementById('brokenCounter').textContent = brokenCount;
+                    document.getElementById('totalLies').textContent = totalLies.toLocaleString();
+                    
+                    // Final message
+                    display.innerHTML = '<div style="text-align: center; font-size: 2rem; color: #DC143C; margin-top: 3rem;">EVERYTHING WAS TEMPORARY</div>';
+                    
+                    return;
+                }
+                
+                const stage = decompositionStages[stageIndex];
+                parchment.className = `promise-parchment stage-${stage}`;
+                decayInfo.textContent = stageDescriptions[stage];
+                
+                // Transform text at certain stages
+                if (stageIndex === 2) {
+                    let transformedText = parchment.textContent;
+                    for (let key in promiseTransformations) {
+                        const regex = new RegExp(`\\b${key}\\b`, 'gi');
+                        transformedText = transformedText.replace(regex, promiseTransformations[key]);
+                    }
+                    parchment.innerHTML = transformedText;
+                    
+                    // Add expiration date
+                    if (transformedText.includes('forever')) {
+                        const expDate = document.createElement('div');
+                        expDate.className = 'expiration-date';
+                        expDate.textContent = `Expired: ${new Date(Date.now() - 86400000).toLocaleDateString()}`;
+                        parchment.appendChild(expDate);
+                    }
+                }
+                
+                // Special effect for wedding vows
+                if (stage === 'putrid' && (promise.toLowerCase().includes('wedding') || promise.toLowerCase().includes('vow'))) {
+                    parchment.classList.add('fire-effect');
+                }
+                
+            }, 2000);
+            
+            input.value = '';
+        }
+        
+        function addToGraveyard(promise) {
+            const graveyard = document.getElementById('graveyard');
+            const tombstone = document.createElement('div');
+            tombstone.className = 'tombstone';
+            
+            const deathDate = new Date();
+            const birthDate = new Date(deathDate.getTime() - (2.3 * 365 * 24 * 60 * 60 * 1000));
+            
+            tombstone.innerHTML = `
+                <div style="margin-top: 20px;">"${promise.substring(0, 30)}${promise.length > 30 ? '...' : ''}"</div>
+                <div style="font-size: 0.8rem; margin-top: 10px;">
+                    ${birthDate.toLocaleDateString()} - ${deathDate.toLocaleDateString()}
+                </div>
+                <div style="font-size: 0.7rem; color: #666;">Cause of death: Reality</div>
+            `;
+            
+            graveyard.insertBefore(tombstone, graveyard.firstChild);
+            
+            // Keep only last 6 tombstones
+            while (graveyard.children.length > 6) {
+                graveyard.removeChild(graveyard.lastChild);
+            }
+        }
+        
+        // Enter key support
+        document.getElementById('promiseInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                decomposePromise();
+            }
+        });
+        
+        // Initialize with some broken promises
+        document.getElementById('promiseCounter').textContent = promiseCount;
+        document.getElementById('brokenCounter').textContent = brokenCount;
+    </script>
+</body>
+</html>

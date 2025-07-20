@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voicemail Purgatory - Messages to the Void</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a0a;
+            color: #e0e0e0;
+            font-family: 'Share Tech Mono', monospace;
+            overflow: hidden;
+            position: relative;
+            height: 100vh;
+        }
+        
+        /* Phone booth background */
+        .limbo-booth {
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(ellipse at center, transparent 40%, #000 70%),
+                linear-gradient(180deg, #111 0%, #000 100%);
+            opacity: 0.8;
+        }
+        
+        .fluorescent-flicker {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(0deg, transparent 50%, rgba(255,255,200,0.03) 50%);
+            background-size: 100% 4px;
+            animation: flicker 0.1s infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes flicker {
+            0%, 100% { opacity: 0.95; }
+            50% { opacity: 0.85; }
+        }
+        
+        /* Main container */
+        .voicemail-system {
+            position: relative;
+            max-width: 500px;
+            margin: 50px auto;
+            background: #1a1a1a;
+            border: 2px solid #333;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 
+                0 0 50px rgba(100,0,0,0.5),
+                inset 0 0 20px rgba(0,0,0,0.8);
+            z-index: 10;
+        }
+        
+        /* Phone display */
+        .phone-display {
+            background: #0f0f0f;
+            border: 1px solid #2a2a2a;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .display-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .mailbox-status {
+            color: #ff3333;
+            font-size: 14px;
+            text-transform: uppercase;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .message-counter {
+            font-family: 'VT323', monospace;
+            font-size: 24px;
+            color: #66ff66;
+            text-shadow: 0 0 5px currentColor;
+        }
+        
+        /* Cassette tape visual */
+        .cassette-container {
+            position: relative;
+            height: 100px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .cassette-tape {
+            width: 200px;
+            height: 80px;
+            background: #2a2a2a;
+            border: 2px solid #444;
+            border-radius: 5px;
+            position: relative;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .tape-reel {
+            width: 50px;
+            height: 50px;
+            background: #1a1a1a;
+            border: 2px solid #555;
+            border-radius: 50%;
+            position: relative;
+            animation: spin 3s linear infinite;
+        }
+        
+        .tape-reel.degrading {
+            animation: spin 3s linear infinite, unravel 5s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes unravel {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(0.9); }
+        }
+        
+        .tape-strip {
+            position: absolute;
+            top: 50%;
+            left: 50px;
+            right: 50px;
+            height: 20px;
+            background: linear-gradient(90deg, #3a3a3a 0%, #2a2a2a 50%, #3a3a3a 100%);
+            transform: translateY(-50%);
+            overflow: hidden;
+        }
+        
+        .tape-strip::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 2px,
+                rgba(255,255,255,0.1) 2px,
+                rgba(255,255,255,0.1) 4px
+            );
+            animation: tape-move 2s linear infinite;
+        }
+        
+        @keyframes tape-move {
+            from { transform: translateX(0); }
+            to { transform: translateX(4px); }
+        }
+        
+        /* Messages list */
+        .messages-container {
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 20px 0;
+            padding-right: 10px;
+        }
+        
+        .messages-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .messages-container::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        
+        .messages-container::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+        }
+        
+        .voicemail-item {
+            background: #0a0a0a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .voicemail-item:hover {
+            border-color: #444;
+            box-shadow: 0 0 10px rgba(100,0,0,0.5);
+        }
+        
+        .voicemail-item.corrupted {
+            animation: glitch 0.3s infinite;
+        }
+        
+        @keyframes glitch {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-2px); }
+            40% { transform: translateX(2px); }
+            60% { transform: translateX(-1px); }
+            80% { transform: translateX(1px); }
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .caller-info {
+            font-size: 14px;
+            color: #888;
+        }
+        
+        .caller-info.unknown {
+            color: #ff3333;
+            animation: fade-in-out 2s infinite;
+        }
+        
+        @keyframes fade-in-out {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        .timestamp {
+            font-size: 12px;
+            color: #666;
+            font-family: 'VT323', monospace;
+        }
+        
+        .timestamp.burning {
+            color: #ff6633;
+            text-shadow: 0 0 5px currentColor;
+            animation: burn 3s infinite;
+        }
+        
+        @keyframes burn {
+            0%, 100% { opacity: 1; filter: brightness(1); }
+            50% { opacity: 0.8; filter: brightness(1.2); }
+        }
+        
+        .transcript {
+            font-size: 16px;
+            line-height: 1.4;
+            margin: 10px 0;
+            position: relative;
+        }
+        
+        .transcript.degrading-1 {
+            animation: degrade-1 0.5s infinite;
+        }
+        
+        .transcript.degrading-2 {
+            animation: degrade-2 0.3s infinite;
+            filter: blur(0.5px);
+        }
+        
+        .transcript.degrading-3 {
+            animation: degrade-3 0.1s infinite;
+            filter: blur(1px);
+            opacity: 0.7;
+        }
+        
+        .transcript.fully-corrupted {
+            animation: corrupt 0.05s infinite;
+            filter: blur(2px);
+            color: #ff0000;
+            text-shadow: 0 0 10px currentColor;
+        }
+        
+        @keyframes degrade-1 {
+            0%, 90% { transform: translateX(0); }
+            95% { transform: translateX(-1px); }
+        }
+        
+        @keyframes degrade-2 {
+            0%, 80% { transform: translateX(0); opacity: 1; }
+            85% { transform: translateX(2px); opacity: 0.8; }
+            90% { transform: translateX(-2px); opacity: 0.9; }
+        }
+        
+        @keyframes degrade-3 {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(1px, -1px); }
+            50% { transform: translate(-1px, 1px); }
+            75% { transform: translate(1px, 1px); }
+            100% { transform: translate(-1px, -1px); }
+        }
+        
+        @keyframes corrupt {
+            0% { transform: translate(0, 0) skew(0deg); }
+            20% { transform: translate(-2px, 2px) skew(5deg); }
+            40% { transform: translate(2px, -2px) skew(-5deg); }
+            60% { transform: translate(-1px, 1px) skew(3deg); }
+            80% { transform: translate(1px, -1px) skew(-3deg); }
+            100% { transform: translate(0, 0) skew(0deg); }
+        }
+        
+        .play-count {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .corruption-warning {
+            color: #ff3333;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-top: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .voicemail-item:hover .corruption-warning {
+            opacity: 1;
+        }
+        
+        /* Control buttons */
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .control-btn {
+            flex: 1;
+            padding: 12px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #888;
+            font-family: 'Share Tech Mono', monospace;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .control-btn:hover {
+            border-color: #555;
+            color: #aaa;
+        }
+        
+        .control-btn.delete {
+            color: #ff3333;
+            border-color: #ff3333;
+        }
+        
+        .control-btn.delete:hover {
+            animation: shake 0.3s infinite;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .control-btn.record {
+            background: #1a0000;
+            border-color: #660000;
+            color: #ff6666;
+        }
+        
+        /* New message form */
+        .new-message-form {
+            display: none;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .new-message-form.active {
+            display: block;
+        }
+        
+        .form-header {
+            font-size: 18px;
+            color: #ff6666;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .message-input {
+            width: 100%;
+            padding: 10px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 5px;
+            color: #e0e0e0;
+            font-family: 'Share Tech Mono', monospace;
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .void-response {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            margin-top: 10px;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+        
+        .void-response.visible {
+            opacity: 1;
+        }
+        
+        /* Connection status */
+        .connection-status {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a0000;
+            border: 1px solid #660000;
+            border-radius: 5px;
+            padding: 10px 20px;
+            color: #ff3333;
+            text-transform: uppercase;
+            font-size: 12px;
+            animation: connection-pulse 2s infinite;
+        }
+        
+        @keyframes connection-pulse {
+            0%, 100% { opacity: 0.8; box-shadow: 0 0 10px rgba(255,0,0,0.5); }
+            50% { opacity: 1; box-shadow: 0 0 20px rgba(255,0,0,0.8); }
+        }
+        
+        /* Audio visualization */
+        .audio-viz {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .audio-viz.playing {
+            opacity: 1;
+        }
+        
+        .audio-bar {
+            width: 3px;
+            background: #66ff66;
+            animation: audio-wave 0.5s infinite ease-in-out;
+        }
+        
+        .audio-bar.corrupted {
+            background: #ff3333;
+            animation: audio-wave-corrupt 0.2s infinite;
+        }
+        
+        @keyframes audio-wave {
+            0%, 100% { height: 5px; }
+            50% { height: 20px; }
+        }
+        
+        @keyframes audio-wave-corrupt {
+            0% { height: random(30px); background: #ff3333; }
+            25% { height: random(30px); background: #ff6666; }
+            50% { height: random(30px); background: #ff0000; }
+            75% { height: random(30px); background: #cc0000; }
+            100% { height: random(30px); background: #ff3333; }
+        }
+        
+        /* Static overlay */
+        .static-overlay {
+            position: fixed;
+            inset: 0;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(255,255,255,0.03) 2px,
+                    rgba(255,255,255,0.03) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(255,255,255,0.03) 2px,
+                    rgba(255,255,255,0.03) 4px
+                );
+            pointer-events: none;
+            opacity: 0.5;
+            animation: static-move 0.5s steps(10) infinite;
+        }
+        
+        @keyframes static-move {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(10px, 10px); }
+        }
+        
+        /* Final corruption state */
+        .system-corrupted {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            color: #ff0000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            text-align: center;
+            z-index: 1000;
+            animation: final-glitch 0.1s infinite;
+        }
+        
+        .system-corrupted.active {
+            display: flex;
+        }
+        
+        @keyframes final-glitch {
+            0% { transform: scale(1) rotate(0deg); filter: hue-rotate(0deg); }
+            25% { transform: scale(1.1) rotate(-5deg); filter: hue-rotate(90deg); }
+            50% { transform: scale(0.9) rotate(5deg); filter: hue-rotate(180deg); }
+            75% { transform: scale(1.05) rotate(-3deg); filter: hue-rotate(270deg); }
+            100% { transform: scale(1) rotate(0deg); filter: hue-rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="limbo-booth"></div>
+    <div class="fluorescent-flicker"></div>
+    <div class="static-overlay"></div>
+    
+    <div class="voicemail-system">
+        <div class="phone-display">
+            <div class="display-header">
+                <div class="mailbox-status">MAILBOX FULL</div>
+                <div class="message-counter">47 UNHEARD</div>
+            </div>
+            
+            <div class="cassette-container">
+                <div class="cassette-tape">
+                    <div class="tape-reel"></div>
+                    <div class="tape-strip"></div>
+                    <div class="tape-reel"></div>
+                </div>
+            </div>
+            
+            <div class="messages-container" id="messagesContainer">
+                <!-- Messages will be dynamically inserted here -->
+            </div>
+            
+            <div class="controls">
+                <button class="control-btn play" onclick="playSelectedMessage()">PLAY</button>
+                <button class="control-btn delete" onclick="attemptDelete()">DELETE</button>
+                <button class="control-btn record" onclick="toggleNewMessage()">LEAVE MESSAGE</button>
+            </div>
+            
+            <div class="new-message-form" id="newMessageForm">
+                <div class="form-header">Message to the Void</div>
+                <textarea class="message-input" id="messageInput" placeholder="They can't hear you anymore..."></textarea>
+                <button class="control-btn" onclick="sendToVoid()">SEND TO VOID</button>
+                <div class="void-response" id="voidResponse">Message sent. No one is listening.</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="connection-status">
+        CONNECTION TO THE LIVING: PERMANENTLY SEVERED
+    </div>
+    
+    <div class="system-corrupted" id="systemCorrupted">
+        <div>ALL VOICES MERGE INTO ETERNAL STATIC</div>
+    </div>
+    
+    <script>
+        // Initial messages data
+        const messages = [
+            {
+                id: 1,
+                caller: "Sarah",
+                transcript: "Hey, I'm running late. Traffic is crazy. See you soon!",
+                timestamp: new Date(Date.now() - 3 * 365 * 24 * 60 * 60 * 1000 - 47 * 24 * 60 * 60 * 1000 - 13 * 60 * 60 * 1000),
+                playCount: 0,
+                special: false
+            },
+            {
+                id: 2,
+                caller: "Mom",
+                transcript: "Love you sweetie. Call me when you get this.",
+                timestamp: new Date(Date.now() - 2 * 365 * 24 * 60 * 60 * 1000 - 156 * 24 * 60 * 60 * 1000),
+                playCount: 0,
+                special: false
+            },
+            {
+                id: 3,
+                caller: "Jake",
+                transcript: "Call me back when you can. It's important.",
+                timestamp: new Date(Date.now() - 4 * 365 * 24 * 60 * 60 * 1000 - 23 * 24 * 60 * 60 * 1000),
+                playCount: 0,
+                special: false
+            },
+            {
+                id: 4,
+                caller: "Sarah",
+                transcript: "I'll never leave you. I promise. We'll get through this together.",
+                timestamp: new Date(Date.now() - 3 * 365 * 24 * 60 * 60 * 1000 - 48 * 24 * 60 * 60 * 1000),
+                playCount: 0,
+                special: true
+            }
+        ];
+        
+        let selectedMessage = null;
+        let totalCorruption = 0;
+        const maxCorruption = 15;
+        
+        // Corruption phrases
+        const corruptionPhrases = [
+            "Where... are... you...",
+            "Can't... reach... help...",
+            "Static... consuming... everything...",
+            "Voices... fading... to... silence...",
+            "Remember... me... please...",
+            "Why... didn't... you... save...",
+            "Forever... trapped... here...",
+            "Can't... escape... the... void..."
+        ];
+        
+        // Initialize messages
+        function initializeMessages() {
+            renderMessages();
+            
+            // Add unknown messages periodically
+            setInterval(() => {
+                if (Math.random() > 0.7 && messages.length < 10) {
+                    addUnknownMessage();
+                }
+            }, 30000);
+        }
+        
+        // Render messages
+        function renderMessages() {
+            const container = document.getElementById('messagesContainer');
+            container.innerHTML = '';
+            
+            messages.forEach(msg => {
+                const messageEl = createMessageElement(msg);
+                container.appendChild(messageEl);
+            });
+        }
+        
+        // Create message element
+        function createMessageElement(msg) {
+            const div = document.createElement('div');
+            div.className = `voicemail-item ${msg.playCount > 3 ? 'corrupted' : ''}`;
+            div.onclick = () => selectMessage(msg.id);
+            
+            const degradationClass = getDegradationClass(msg.playCount);
+            const timestampText = getTimestampText(msg.timestamp);
+            
+            div.innerHTML = `
+                <div class="message-header">
+                    <span class="caller-info ${msg.caller === 'UNKNOWN' ? 'unknown' : ''}">${msg.caller}</span>
+                    <span class="timestamp ${msg.special ? 'burning' : ''}">${timestampText}</span>
+                </div>
+                <div class="transcript ${degradationClass}">${getCorruptedText(msg.transcript, msg.playCount)}</div>
+                ${msg.playCount > 0 ? `<div class="play-count">Played ${msg.playCount} times</div>` : ''}
+                ${msg.playCount > 2 ? '<div class="corruption-warning">PLAYING THIS MESSAGE AGAIN WILL CORRUPT IT FURTHER</div>' : ''}
+                <div class="audio-viz" id="viz-${msg.id}">
+                    ${Array(20).fill(0).map(() => `<div class="audio-bar ${msg.playCount > 3 ? 'corrupted' : ''}" style="animation-delay: ${Math.random() * 0.5}s"></div>`).join('')}
+                </div>
+            `;
+            
+            return div;
+        }
+        
+        // Get degradation class based on play count
+        function getDegradationClass(playCount) {
+            if (playCount === 0) return '';
+            if (playCount <= 2) return 'degrading-1';
+            if (playCount <= 4) return 'degrading-2';
+            if (playCount <= 6) return 'degrading-3';
+            return 'fully-corrupted';
+        }
+        
+        // Get corrupted text based on play count
+        function getCorruptedText(originalText, playCount) {
+            if (playCount === 0) return originalText;
+            
+            let text = originalText;
+            const corruptionLevel = Math.min(playCount / 10, 1);
+            
+            // Progressive corruption
+            if (playCount > 2) {
+                const words = text.split(' ');
+                const corruptedWords = words.map(word => {
+                    if (Math.random() < corruptionLevel * 0.3) {
+                        return word.split('').map(char => 
+                            Math.random() < 0.5 ? char : String.fromCharCode(char.charCodeAt(0) + Math.floor(Math.random() * 10) - 5)
+                        ).join('');
+                    }
+                    return word;
+                });
+                text = corruptedWords.join(' ');
+            }
+            
+            // Add static characters
+            if (playCount > 4) {
+                const staticChars = ['█', '▓', '▒', '░', '╳', '◈', '◉'];
+                text = text.split('').map(char => 
+                    Math.random() < corruptionLevel * 0.2 ? staticChars[Math.floor(Math.random() * staticChars.length)] : char
+                ).join('');
+            }
+            
+            // Final corruption - merge with void messages
+            if (playCount > 6) {
+                const voidPhrase = corruptionPhrases[Math.floor(Math.random() * corruptionPhrases.length)];
+                text = text.substring(0, Math.floor(text.length * (1 - corruptionLevel * 0.5))) + '... ' + voidPhrase;
+            }
+            
+            return text;
+        }
+        
+        // Get timestamp text
+        function getTimestampText(timestamp) {
+            const now = Date.now();
+            const diff = now - timestamp;
+            const days = Math.floor(diff / (24 * 60 * 60 * 1000));
+            const years = Math.floor(days / 365);
+            const remainingDays = days % 365;
+            const hours = Math.floor((diff % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+            
+            return `Saved ${years} years, ${remainingDays} days, ${hours} hours ago`;
+        }
+        
+        // Select message
+        function selectMessage(id) {
+            selectedMessage = messages.find(msg => msg.id === id);
+            
+            // Update visual selection
+            document.querySelectorAll('.voicemail-item').forEach((el, index) => {
+                el.style.borderColor = messages[index].id === id ? '#666' : '#2a2a2a';
+            });
+        }
+        
+        // Play selected message
+        function playSelectedMessage() {
+            if (!selectedMessage) return;
+            
+            // Increment play count
+            selectedMessage.playCount++;
+            totalCorruption++;
+            
+            // Show audio visualization
+            const viz = document.getElementById(`viz-${selectedMessage.id}`);
+            viz.classList.add('playing');
+            setTimeout(() => viz.classList.remove('playing'), 3000);
+            
+            // Update tape reels
+            document.querySelectorAll('.tape-reel').forEach(reel => {
+                reel.classList.add('degrading');
+            });
+            
+            // Simulate audio playback with degradation
+            simulateAudioDegradation(selectedMessage);
+            
+            // Re-render messages
+            setTimeout(() => {
+                renderMessages();
+                
+                // Check for total system corruption
+                if (totalCorruption >= maxCorruption) {
+                    triggerSystemCorruption();
+                }
+            }, 3000);
+        }
+        
+        // Simulate audio degradation
+        function simulateAudioDegradation(message) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // Base frequency gets lower with each play
+            const baseFreq = 440 - (message.playCount * 50);
+            oscillator.frequency.value = baseFreq;
+            
+            // More distortion with each play
+            oscillator.type = message.playCount > 3 ? 'square' : 'sine';
+            
+            // Volume decreases and becomes more erratic
+            gainNode.gain.value = 0.1 / (message.playCount + 1);
+            
+            // Add random frequency changes for corruption effect
+            if (message.playCount > 2) {
+                setInterval(() => {
+                    oscillator.frequency.value = baseFreq + (Math.random() * 200 - 100) * message.playCount;
+                }, 100);
+            }
+            
+            oscillator.start();
+            setTimeout(() => oscillator.stop(), 3000);
+        }
+        
+        // Attempt to delete (but can't)
+        function attemptDelete() {
+            if (!selectedMessage) return;
+            
+            const deleteBtn = document.querySelector('.control-btn.delete');
+            deleteBtn.style.animation = 'shake 0.5s';
+            
+            setTimeout(() => {
+                deleteBtn.style.animation = '';
+                alert("Too precious to delete. These memories are all that remain.");
+            }, 500);
+        }
+        
+        // Toggle new message form
+        function toggleNewMessage() {
+            const form = document.getElementById('newMessageForm');
+            form.classList.toggle('active');
+        }
+        
+        // Send message to void
+        function sendToVoid() {
+            const input = document.getElementById('messageInput');
+            const response = document.getElementById('voidResponse');
+            
+            if (input.value.trim()) {
+                // Show void response
+                response.classList.add('visible');
+                
+                // Clear input
+                setTimeout(() => {
+                    input.value = '';
+                    response.classList.remove('visible');
+                    toggleNewMessage();
+                    
+                    // Sometimes add an unknown message in response
+                    if (Math.random() > 0.5) {
+                        setTimeout(() => addUnknownMessage(), 5000);
+                    }
+                }, 3000);
+            }
+        }
+        
+        // Add unknown message
+        function addUnknownMessage() {
+            const unknownMessages = [
+                "Why didn't you save me?",
+                "I'm still here... waiting...",
+                "Can you hear me? Please...",
+                "It's so cold here...",
+                "I tried to call... no one answered...",
+                "Remember our promise?",
+                "The static is getting louder...",
+                "I can't find my way back..."
+            ];
+            
+            const newMessage = {
+                id: messages.length + 1,
+                caller: "UNKNOWN",
+                transcript: unknownMessages[Math.floor(Math.random() * unknownMessages.length)],
+                timestamp: new Date(),
+                playCount: 0,
+                special: false
+            };
+            
+            messages.unshift(newMessage);
+            renderMessages();
+            
+            // Update message counter
+            const counter = document.querySelector('.message-counter');
+            const count = parseInt(counter.textContent) + 1;
+            counter.textContent = `${count} UNHEARD`;
+        }
+        
+        // Trigger final system corruption
+        function triggerSystemCorruption() {
+            const corrupted = document.getElementById('systemCorrupted');
+            
+            // Build up to corruption
+            document.body.style.animation = 'final-glitch 0.1s infinite';
+            
+            setTimeout(() => {
+                corrupted.classList.add('active');
+                
+                // Create cacophonous audio
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                for (let i = 0; i < 10; i++) {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.value = Math.random() * 1000 + 100;
+                    oscillator.type = ['square', 'sawtooth', 'triangle'][Math.floor(Math.random() * 3)];
+                    gainNode.gain.value = 0.05;
+                    
+                    oscillator.start();
+                    setTimeout(() => oscillator.stop(), 5000);
+                }
+            }, 2000);
+        }
+        
+        // Initialize on load
+        window.onload = initializeMessages;
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const form = document.getElementById('newMessageForm');
+                if (form.classList.contains('active')) {
+                    toggleNewMessage();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

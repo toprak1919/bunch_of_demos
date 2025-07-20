@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forever Never - Ghost Wedding Planner</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;1,400&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a0a;
+            color: #999;
+            font-family: 'Playfair Display', serif;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23000"/><circle cx="50" cy="50" r="40" fill="none" stroke="%23111" stroke-width="0.5" opacity="0.5"/></svg>') center/cover,
+                        radial-gradient(circle at 20% 50%, rgba(255,255,255,0.01) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 50%, rgba(255,255,255,0.01) 0%, transparent 50%);
+            pointer-events: none;
+            opacity: 0.3;
+            z-index: 1;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 60px 0;
+            position: relative;
+        }
+        
+        .title {
+            font-family: 'Great Vibes', cursive;
+            font-size: 4rem;
+            color: #fff;
+            opacity: 0.3;
+            animation: flicker 3s infinite alternate;
+            text-shadow: 0 0 20px rgba(255,255,255,0.2);
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            color: #666;
+            letter-spacing: 4px;
+            animation: fade 4s infinite alternate;
+        }
+        
+        @keyframes flicker {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+            75% { opacity: 0.2; }
+        }
+        
+        @keyframes fade {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+        }
+        
+        .planning-sections {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .section {
+            background: rgba(20, 20, 20, 0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+        
+        .section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.01) 0%, transparent 40%);
+            animation: float 10s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+        
+        .section-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.8rem;
+            color: #ccc;
+            margin-bottom: 20px;
+            opacity: 0.7;
+            position: relative;
+        }
+        
+        .section-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .ghost-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #666;
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .ghost-input:focus {
+            outline: none;
+            border-color: rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.5);
+        }
+        
+        .ghost-select {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #666;
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+        
+        .ghost-select option {
+            background: #000;
+            color: #666;
+        }
+        
+        .error-message {
+            color: #800000;
+            font-style: italic;
+            margin-top: 10px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .error-message.show {
+            opacity: 1;
+        }
+        
+        .ghost-button {
+            padding: 15px 40px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #999;
+            font-family: 'Cinzel', serif;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ghost-button:hover {
+            border-color: rgba(255,255,255,0.4);
+            color: #ccc;
+        }
+        
+        .preview-section {
+            margin-top: 60px;
+            padding: 40px;
+            background: rgba(10,10,10,0.5);
+            border: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
+        }
+        
+        .preview-title {
+            font-family: 'Great Vibes', cursive;
+            font-size: 3rem;
+            color: #fff;
+            opacity: 0.4;
+            margin-bottom: 30px;
+        }
+        
+        .empty-altar {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.02));
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .forever-alone {
+            font-family: 'Cinzel', serif;
+            font-size: 2rem;
+            color: #333;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            animation: pulse 3s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.05); }
+        }
+        
+        .ghost-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(255,255,255,0.02);
+            border-left: 2px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .ghost-item:hover {
+            background: rgba(255,255,255,0.04);
+            border-left-color: rgba(255,255,255,0.2);
+        }
+        
+        .fade-text {
+            animation: textFade 2s ease-out;
+        }
+        
+        @keyframes textFade {
+            0% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+        
+        .wilt-animation {
+            animation: wilt 3s ease-out forwards;
+        }
+        
+        @keyframes wilt {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(20px) scale(0.8); opacity: 0.3; }
+        }
+        
+        .glitch-text {
+            animation: glitch 2s infinite;
+        }
+        
+        @keyframes glitch {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-2px); }
+            40% { transform: translateX(2px); }
+            60% { transform: translateX(-1px); }
+            80% { transform: translateX(1px); }
+        }
+        
+        .rsvp-counter {
+            font-size: 3rem;
+            font-family: 'Cinzel', serif;
+            color: #800000;
+            margin: 20px 0;
+        }
+        
+        .budget-total {
+            font-size: 2rem;
+            color: #666;
+            font-style: italic;
+            margin-top: 20px;
+        }
+        
+        .floating-ghost {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.1;
+            animation: floatGhost 20s infinite ease-in-out;
+            pointer-events: none;
+        }
+        
+        @keyframes floatGhost {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(100px, -50px) rotate(10deg); }
+            50% { transform: translate(-50px, -100px) rotate(-10deg); }
+            75% { transform: translate(50px, 50px) rotate(5deg); }
+        }
+        
+        .shatter {
+            animation: shatter 1s ease-out forwards;
+        }
+        
+        @keyframes shatter {
+            0% { transform: scale(1) rotate(0deg); opacity: 1; }
+            100% { transform: scale(0.8) rotate(10deg); opacity: 0.3; filter: blur(2px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-ghost" style="top: 10%; left: 10%;">👻</div>
+    <div class="floating-ghost" style="top: 20%; right: 15%;">💀</div>
+    <div class="floating-ghost" style="bottom: 20%; left: 20%;">⚰️</div>
+    
+    <div class="container">
+        <header class="header">
+            <h1 class="title">Forever Never</h1>
+            <p class="subtitle">PLAN THE WEDDING THAT DIED WITH YOUR LOVE</p>
+        </header>
+        
+        <div class="planning-sections">
+            <!-- Venue Selection -->
+            <div class="section" id="venue-section">
+                <h2 class="section-title">Venue Selection</h2>
+                <div class="section-content">
+                    <select class="ghost-select" id="venue-select">
+                        <option value="">Choose your dream venue...</option>
+                        <option value="beach">Sunset Beach Resort</option>
+                        <option value="garden">Rose Garden Estate</option>
+                        <option value="ballroom">Grand Crystal Ballroom</option>
+                        <option value="church">St. Mary's Cathedral</option>
+                        <option value="vineyard">Hillside Vineyard</option>
+                    </select>
+                    <div class="error-message" id="venue-error">PERMANENTLY UNAVAILABLE - BOOKED FOR ETERNITY</div>
+                </div>
+            </div>
+            
+            <!-- Guest List -->
+            <div class="section" id="guest-section">
+                <h2 class="section-title">Guest List</h2>
+                <div class="section-content">
+                    <input type="text" class="ghost-input" id="guest-input" placeholder="Enter guest name...">
+                    <button class="ghost-button" onclick="addGuest()">Add Guest</button>
+                    <div id="guest-list" style="margin-top: 20px;"></div>
+                    <div class="error-message">NO LONGER FRIENDS WITH COUPLE</div>
+                </div>
+            </div>
+            
+            <!-- Dress Selection -->
+            <div class="section" id="dress-section">
+                <h2 class="section-title">Wedding Attire</h2>
+                <div class="section-content">
+                    <select class="ghost-select" id="dress-select">
+                        <option value="">Select your dream dress...</option>
+                        <option value="ballgown">Princess Ballgown</option>
+                        <option value="mermaid">Elegant Mermaid</option>
+                        <option value="aline">Classic A-Line</option>
+                        <option value="sheath">Sleek Sheath</option>
+                    </select>
+                    <div class="error-message" id="dress-error">TRANSFORMS TO FUNERAL SHROUD</div>
+                </div>
+            </div>
+            
+            <!-- Menu Tasting -->
+            <div class="section" id="menu-section">
+                <h2 class="section-title">Menu Selection</h2>
+                <div class="section-content">
+                    <input type="text" class="ghost-input" id="menu-input" placeholder="Design your menu...">
+                    <button class="ghost-button" onclick="tasteMenu()">Taste Menu</button>
+                    <div class="error-message" id="menu-error">EVERYTHING TASTES LIKE REGRET</div>
+                </div>
+            </div>
+            
+            <!-- Flower Arrangements -->
+            <div class="section" id="flower-section">
+                <h2 class="section-title">Floral Design</h2>
+                <div class="section-content">
+                    <select class="ghost-select" id="flower-select">
+                        <option value="">Choose bouquet style...</option>
+                        <option value="roses">Red Roses</option>
+                        <option value="lilies">White Lilies</option>
+                        <option value="peonies">Pink Peonies</option>
+                        <option value="wildflowers">Wildflower Mix</option>
+                    </select>
+                    <div id="flower-display"></div>
+                    <div class="error-message" id="flower-error">WILTED BEFORE THEY BLOOMED</div>
+                </div>
+            </div>
+            
+            <!-- Music Playlist -->
+            <div class="section" id="music-section">
+                <h2 class="section-title">Wedding Music</h2>
+                <div class="section-content">
+                    <input type="text" class="ghost-input" id="song-input" placeholder="Add your special song...">
+                    <button class="ghost-button" onclick="addSong()">Add to Playlist</button>
+                    <div id="playlist"></div>
+                    <div class="error-message">PLAYING IN REVERSE - MEMORIES UNWINDING</div>
+                </div>
+            </div>
+            
+            <!-- Wedding Vows -->
+            <div class="section" id="vows-section">
+                <h2 class="section-title">Sacred Vows</h2>
+                <div class="section-content">
+                    <textarea class="ghost-input" id="vows-input" rows="4" placeholder="Write your eternal promises..."></textarea>
+                    <button class="ghost-button" onclick="scrambleVows()">Preview Vows</button>
+                    <div id="vows-display" style="margin-top: 20px;"></div>
+                    <div class="error-message">PROMISES ALREADY BROKEN</div>
+                </div>
+            </div>
+            
+            <!-- Ring Selection -->
+            <div class="section" id="ring-section">
+                <h2 class="section-title">Ring Selection</h2>
+                <div class="section-content">
+                    <select class="ghost-select" id="ring-select">
+                        <option value="">Choose your rings...</option>
+                        <option value="diamond">Diamond Solitaire</option>
+                        <option value="vintage">Vintage Heirloom</option>
+                        <option value="eternity">Eternity Band</option>
+                        <option value="custom">Custom Design</option>
+                    </select>
+                    <div id="ring-display"></div>
+                    <div class="error-message" id="ring-error">RUST AND DECAY - CIRCLE BROKEN</div>
+                </div>
+            </div>
+            
+            <!-- Wedding Cake -->
+            <div class="section" id="cake-section">
+                <h2 class="section-title">Wedding Cake</h2>
+                <div class="section-content">
+                    <input type="number" class="ghost-input" id="cake-tiers" placeholder="Number of tiers..." min="1" max="7">
+                    <button class="ghost-button" onclick="designCake()">Design Cake</button>
+                    <div id="cake-display"></div>
+                    <div class="error-message">SWEETNESS TURNED BITTER - COLLAPSED</div>
+                </div>
+            </div>
+            
+            <!-- Seating Chart -->
+            <div class="section" id="seating-section">
+                <h2 class="section-title">Seating Arrangement</h2>
+                <div class="section-content">
+                    <div class="ghost-item">BRIDE'S SIDE: <span style="color: #800000;">EMPTY</span></div>
+                    <div class="ghost-item">GROOM'S SIDE: <span style="color: #800000;">EMPTY</span></div>
+                    <div class="ghost-item">FAMILY TABLE: <span style="color: #800000;">ABANDONED</span></div>
+                    <div class="error-message show">ALL SEATS RESERVED FOR GHOSTS</div>
+                </div>
+            </div>
+            
+            <!-- Budget Calculator -->
+            <div class="section" id="budget-section">
+                <h2 class="section-title">Wedding Budget</h2>
+                <div class="section-content">
+                    <input type="number" class="ghost-input" id="budget-input" placeholder="Enter your budget...">
+                    <button class="ghost-button" onclick="calculateCost()">Calculate Total</button>
+                    <div class="budget-total" id="budget-display">COST: EVERYTHING YOU HAD</div>
+                </div>
+            </div>
+            
+            <!-- RSVP Tracker -->
+            <div class="section" id="rsvp-section">
+                <h2 class="section-title">RSVP Status</h2>
+                <div class="section-content">
+                    <div class="rsvp-counter">0</div>
+                    <div class="error-message show">ATTENDING - EVENT CANCELLED DUE TO DEATH OF LOVE</div>
+                </div>
+            </div>
+            
+            <!-- Save the Date -->
+            <div class="section" id="save-date-section">
+                <h2 class="section-title">Save the Date</h2>
+                <div class="section-content">
+                    <input type="date" class="ghost-input" id="date-input">
+                    <div class="error-message show" id="date-error">TOO LATE TO SAVE</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Final Preview -->
+        <div class="preview-section">
+            <h2 class="preview-title">Your Wedding Preview</h2>
+            <div class="empty-altar">
+                <div class="forever-alone">FOREVER ALONE</div>
+            </div>
+            <p style="margin-top: 30px; font-style: italic; color: #666;">
+                "In this empty space, where love once lived, only shadows dance"
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        // Venue selection
+        document.getElementById('venue-select').addEventListener('change', function() {
+            if (this.value) {
+                document.getElementById('venue-error').classList.add('show');
+                setTimeout(() => {
+                    this.value = '';
+                    this.style.opacity = '0.3';
+                }, 2000);
+            }
+        });
+        
+        // Guest list
+        function addGuest() {
+            const input = document.getElementById('guest-input');
+            const list = document.getElementById('guest-list');
+            
+            if (input.value) {
+                const guest = document.createElement('div');
+                guest.className = 'ghost-item fade-text';
+                guest.textContent = input.value;
+                list.appendChild(guest);
+                
+                setTimeout(() => {
+                    guest.style.textDecoration = 'line-through';
+                    guest.style.opacity = '0.3';
+                    guest.textContent += ' - NO LONGER FRIENDS';
+                }, 1500);
+                
+                input.value = '';
+            }
+        }
+        
+        // Dress selection
+        document.getElementById('dress-select').addEventListener('change', function() {
+            if (this.value) {
+                document.getElementById('dress-error').classList.add('show');
+                this.classList.add('shatter');
+            }
+        });
+        
+        // Menu tasting
+        function tasteMenu() {
+            const input = document.getElementById('menu-input');
+            if (input.value) {
+                document.getElementById('menu-error').classList.add('show');
+                input.value = 'Ashes and dust...';
+                input.style.color = '#333';
+            }
+        }
+        
+        // Flower selection
+        document.getElementById('flower-select').addEventListener('change', function() {
+            if (this.value) {
+                const display = document.getElementById('flower-display');
+                display.innerHTML = '<div class="ghost-item wilt-animation">🌹 → 🥀</div>';
+                document.getElementById('flower-error').classList.add('show');
+            }
+        });
+        
+        // Music playlist
+        function addSong() {
+            const input = document.getElementById('song-input');
+            const playlist = document.getElementById('playlist');
+            
+            if (input.value) {
+                const song = document.createElement('div');
+                song.className = 'ghost-item glitch-text';
+                song.textContent = input.value.split('').reverse().join('');
+                playlist.appendChild(song);
+                input.value = '';
+            }
+        }
+        
+        // Wedding vows
+        function scrambleVows() {
+            const input = document.getElementById('vows-input');
+            const display = document.getElementById('vows-display');
+            
+            if (input.value) {
+                const words = input.value.split(' ');
+                const scrambled = words.sort(() => Math.random() - 0.5).join(' ');
+                display.innerHTML = `<div class="ghost-item glitch-text">${scrambled}</div>`;
+                
+                setTimeout(() => {
+                    display.innerHTML = '<div class="ghost-item">PROMISES ALREADY BROKEN</div>';
+                }, 2000);
+            }
+        }
+        
+        // Ring selection
+        document.getElementById('ring-select').addEventListener('change', function() {
+            if (this.value) {
+                const display = document.getElementById('ring-display');
+                display.innerHTML = '<div class="ghost-item shatter">💍 → 💔</div>';
+                document.getElementById('ring-error').classList.add('show');
+            }
+        });
+        
+        // Cake design
+        function designCake() {
+            const tiers = document.getElementById('cake-tiers').value;
+            const display = document.getElementById('cake-display');
+            
+            if (tiers) {
+                let cake = '';
+                for (let i = 0; i < tiers; i++) {
+                    cake += '<div class="ghost-item" style="text-align: center;">🎂</div>';
+                }
+                display.innerHTML = cake;
+                
+                setTimeout(() => {
+                    display.classList.add('wilt-animation');
+                    display.style.opacity = '0.3';
+                }, 1000);
+            }
+        }
+        
+        // Budget calculator
+        function calculateCost() {
+            const input = document.getElementById('budget-input');
+            const display = document.getElementById('budget-display');
+            
+            if (input.value) {
+                display.textContent = 'CALCULATING...';
+                setTimeout(() => {
+                    display.textContent = 'COST: YOUR SOUL + $' + (input.value * 666);
+                    display.classList.add('glitch-text');
+                }, 1500);
+            }
+        }
+        
+        // Date input - always show past date
+        document.getElementById('date-input').addEventListener('change', function() {
+            const selectedDate = new Date(this.value);
+            const pastDate = new Date(selectedDate.setFullYear(selectedDate.getFullYear() - 1));
+            this.value = pastDate.toISOString().split('T')[0];
+            document.getElementById('date-error').textContent = 'THAT DATE HAS ALREADY PASSED';
+        });
+        
+        // Add atmospheric effects
+        setInterval(() => {
+            const sections = document.querySelectorAll('.section');
+            const randomSection = sections[Math.floor(Math.random() * sections.length)];
+            randomSection.style.opacity = '0.7';
+            setTimeout(() => {
+                randomSection.style.opacity = '1';
+            }, 200);
+        }, 5000);
+        
+        // Ghostly whispers effect
+        const whispers = [
+            'till death do us part...',
+            'forever and never...',
+            'what could have been...',
+            'promises in the wind...',
+            'love\'s funeral march...'
+        ];
+        
+        setInterval(() => {
+            const whisper = document.createElement('div');
+            whisper.style.cssText = `
+                position: fixed;
+                top: ${Math.random() * 100}%;
+                left: ${Math.random() * 100}%;
+                color: rgba(255,255,255,0.1);
+                font-style: italic;
+                pointer-events: none;
+                animation: fade 3s ease-out forwards;
+                z-index: 1000;
+            `;
+            whisper.textContent = whispers[Math.floor(Math.random() * whispers.length)];
+            document.body.appendChild(whisper);
+            
+            setTimeout(() => whisper.remove(), 3000);
+        }, 8000);
+    </script>
+</body>
+</html>

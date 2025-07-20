@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intimacy Graveyard - GPS Coordinates of Dead Love</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Nosifer&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            background: #0a0a0a;
+            color: #ddd;
+            overflow: hidden;
+        }
+        
+        #map {
+            height: 100vh;
+            width: 100%;
+            filter: desaturate(50%);
+        }
+        
+        .controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #333;
+            padding: 20px;
+            border-radius: 5px;
+            max-width: 350px;
+        }
+        
+        .title {
+            font-family: 'Nosifer', cursive;
+            font-size: 24px;
+            color: #8b0000;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px #000;
+        }
+        
+        .location-counter {
+            font-size: 14px;
+            color: #999;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(139, 0, 0, 0.1);
+            border-left: 3px solid #8b0000;
+        }
+        
+        .current-location {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+        }
+        
+        .current-location h3 {
+            color: #8b0000;
+            margin-bottom: 5px;
+        }
+        
+        .warning-zone {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(139, 0, 0, 0.9);
+            color: #fff;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border: 2px solid #ff0000;
+            animation: pulse 2s infinite;
+            z-index: 1000;
+            display: none;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.8; transform: translateX(-50%) scale(1); }
+            50% { opacity: 1; transform: translateX(-50%) scale(1.05); }
+            100% { opacity: 0.8; transform: translateX(-50%) scale(1); }
+        }
+        
+        .time-slider {
+            margin: 20px 0;
+        }
+        
+        .time-slider input {
+            width: 100%;
+            background: #222;
+            height: 5px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .time-slider input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 15px;
+            height: 15px;
+            background: #8b0000;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        
+        .time-label {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .add-location {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: #ddd;
+            padding: 10px 20px;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+            transition: all 0.3s;
+        }
+        
+        .add-location:hover {
+            background: #8b0000;
+            border-color: #8b0000;
+        }
+        
+        .navigation-history {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+            font-size: 14px;
+        }
+        
+        .navigation-history span {
+            color: #ff0000;
+            font-weight: bold;
+        }
+        
+        .final-message {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: #000;
+            color: #8b0000;
+            padding: 15px;
+            font-family: 'Creepster', cursive;
+            font-size: 18px;
+            border: 2px solid #8b0000;
+            z-index: 1000;
+            animation: flicker 3s infinite;
+        }
+        
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .tombstone-popup {
+            font-family: 'Georgia', serif;
+        }
+        
+        .tombstone-popup h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #333;
+            text-align: center;
+        }
+        
+        .epitaph {
+            font-style: italic;
+            color: #666;
+            text-align: center;
+            margin: 10px 0;
+            padding: 10px;
+            border-top: 1px solid #999;
+            border-bottom: 1px solid #999;
+        }
+        
+        .dates {
+            text-align: center;
+            font-size: 14px;
+            color: #999;
+        }
+        
+        .decay-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            background: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.4) 100%);
+            z-index: 500;
+        }
+        
+        .gps-voice {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: #8b0000;
+            padding: 30px;
+            font-size: 24px;
+            border: 2px solid #8b0000;
+            z-index: 2000;
+            display: none;
+            text-align: center;
+            font-family: monospace;
+        }
+        
+        .route-planning {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+        }
+        
+        .route-option {
+            margin: 5px 0;
+            color: #999;
+        }
+        
+        .route-option input {
+            margin-right: 10px;
+        }
+        
+        .heatmap-toggle {
+            margin: 15px 0;
+        }
+        
+        .heatmap-toggle button {
+            background: #333;
+            border: 1px solid #666;
+            color: #ddd;
+            padding: 8px 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .heatmap-toggle button:hover {
+            background: #8b0000;
+            border-color: #8b0000;
+        }
+        
+        .distance-indicator {
+            position: absolute;
+            top: 100px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 15px;
+            border: 1px solid #8b0000;
+            z-index: 1000;
+            max-width: 300px;
+        }
+        
+        .distance-text {
+            color: #ff6666;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .location-type {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="decay-overlay"></div>
+    
+    <div class="controls">
+        <h1 class="title">INTIMACY GRAVEYARD</h1>
+        <div class="location-counter">
+            <strong>Memorial Count:</strong> <span id="location-count">0</span> places where love died
+        </div>
+        
+        <div class="current-location">
+            <h3>YOUR LOCATION</h3>
+            <p>Standing in emotional graveyard</p>
+            <small>GPS: Coordinates of sorrow</small>
+        </div>
+        
+        <div class="time-slider">
+            <label>Time Machine of Decay:</label>
+            <input type="range" id="time-slider" min="0" max="100" value="100">
+            <div class="time-label">
+                <span>Alive</span>
+                <span>Dead</span>
+            </div>
+        </div>
+        
+        <button class="add-location" onclick="addNewGrave()">
+            + Add New Memorial Location
+        </button>
+        
+        <div class="route-planning">
+            <h4>Directions to Heartbreak:</h4>
+            <div class="route-option">
+                <input type="checkbox" id="avoid-tolls" checked>
+                <label for="avoid-tolls">Avoid tolls?</label>
+            </div>
+            <div class="route-option">
+                <input type="checkbox" id="avoid-memories" checked>
+                <label for="avoid-memories">Avoid memories? (IMPOSSIBLE)</label>
+            </div>
+        </div>
+        
+        <div class="heatmap-toggle">
+            <button onclick="toggleHeatmap()">Show Pain Heatmap</button>
+        </div>
+        
+        <div class="navigation-history">
+            You've avoided this area <span>847</span> times
+        </div>
+    </div>
+    
+    <div class="distance-indicator" id="distance-indicator" style="display: none;">
+        <div class="distance-text" id="distance-text"></div>
+        <div class="location-type" id="location-type"></div>
+    </div>
+    
+    <div class="warning-zone" id="warning-zone">
+        ⚠️ ENTERING HIGH TRAUMA DISTRICT ⚠️
+    </div>
+    
+    <div class="gps-voice" id="gps-voice">
+        In 100 feet, remember when you were happy...
+    </div>
+    
+    <div class="final-message">
+        NOWHERE IS SAFE FROM MEMORIES
+    </div>
+    
+    <div id="map"></div>
+    
+    <script>
+        // Initialize map centered on a generic location
+        const map = L.map('map').setView([40.7128, -74.0060], 13);
+        
+        // Dark themed map
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap contributors',
+            opacity: 0.7
+        }).addTo(map);
+        
+        // Custom tombstone icon
+        const tombstoneIcon = L.divIcon({
+            className: 'tombstone-marker',
+            html: `<div style="
+                width: 30px;
+                height: 40px;
+                background: #333;
+                border: 2px solid #000;
+                border-radius: 10px 10px 0 0;
+                position: relative;
+                box-shadow: 0 0 10px rgba(139, 0, 0, 0.5);
+            ">
+                <div style="
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    color: #666;
+                    font-weight: bold;
+                    font-size: 16px;
+                ">†</div>
+            </div>`,
+            iconSize: [30, 40],
+            iconAnchor: [15, 40]
+        });
+        
+        // Mausoleum icon for special location
+        const mausoleumIcon = L.divIcon({
+            className: 'mausoleum-marker',
+            html: `<div style="
+                width: 60px;
+                height: 60px;
+                background: #1a1a1a;
+                border: 3px solid #8b0000;
+                position: relative;
+                box-shadow: 0 0 20px rgba(139, 0, 0, 0.8);
+            ">
+                <div style="
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    color: #8b0000;
+                    font-weight: bold;
+                    font-size: 10px;
+                    text-align: center;
+                    width: 100%;
+                ">DO NOT<br>ENTER</div>
+            </div>`,
+            iconSize: [60, 60],
+            iconAnchor: [30, 60]
+        });
+        
+        // Memorial locations
+        const memorialLocations = [
+            {
+                name: "First Kiss Memorial",
+                coords: [40.7260, -73.9830],
+                epitaph: "Here lies the memory of innocent love",
+                dates: "Spring 2019 - Winter 2021",
+                type: "first_kiss",
+                description: "Park bench, now a coffin of memories"
+            },
+            {
+                name: "Their Apartment",
+                coords: [40.7489, -73.9680],
+                epitaph: "Mausoleum of shared dreams",
+                dates: "2020 - 2022",
+                type: "apartment",
+                description: "Once home, now haunted",
+                special: true
+            },
+            {
+                name: "Last Fight Location",
+                coords: [40.7580, -73.9855],
+                epitaph: "Where words became weapons",
+                dates: "December 15, 2021",
+                type: "fight",
+                description: "Times Square - Where it all unraveled"
+            },
+            {
+                name: "Restaurant of First Date",
+                coords: [40.7440, -73.9910],
+                epitaph: "Closed forever, like our future",
+                dates: "February 14, 2019",
+                type: "restaurant",
+                description: "Now serves only regret"
+            },
+            {
+                name: "Where It All Ended",
+                coords: [40.7130, -74.0130],
+                epitaph: "Final resting place of us",
+                dates: "January 3, 2022",
+                type: "ending",
+                description: "Battery Park - Where love went to die"
+            }
+        ];
+        
+        let markers = [];
+        let heatmapLayer = null;
+        let showingHeatmap = false;
+        
+        // Add memorial markers
+        function addMemorials() {
+            memorialLocations.forEach(location => {
+                const marker = L.marker(
+                    location.coords, 
+                    { icon: location.special ? mausoleumIcon : tombstoneIcon }
+                ).addTo(map);
+                
+                const popupContent = `
+                    <div class="tombstone-popup">
+                        <h3>${location.name}</h3>
+                        <div class="epitaph">"${location.epitaph}"</div>
+                        <div class="dates">${location.dates}</div>
+                        <hr style="margin: 10px 0; border-color: #ccc;">
+                        <p style="text-align: center; color: #666; font-size: 12px;">
+                            ${location.description}
+                        </p>
+                    </div>
+                `;
+                
+                marker.bindPopup(popupContent);
+                markers.push(marker);
+                
+                // Add warning zones around high trauma areas
+                if (location.type === 'apartment' || location.type === 'ending') {
+                    L.circle(location.coords, {
+                        radius: 500,
+                        color: '#8b0000',
+                        fillColor: '#8b0000',
+                        fillOpacity: 0.1,
+                        weight: 2,
+                        dashArray: '5, 10'
+                    }).addTo(map);
+                }
+            });
+            
+            updateLocationCount();
+        }
+        
+        // Update location counter
+        function updateLocationCount() {
+            document.getElementById('location-count').textContent = markers.length;
+        }
+        
+        // Add new grave location
+        function addNewGrave() {
+            const center = map.getCenter();
+            const newLocation = {
+                name: "New Memory Grave #" + (markers.length + 1),
+                coords: [center.lat + (Math.random() - 0.5) * 0.01, center.lng + (Math.random() - 0.5) * 0.01],
+                epitaph: "Another place where happiness died",
+                dates: "Unknown - " + new Date().getFullYear(),
+                type: "custom",
+                description: "Freshly dug grave of intimacy"
+            };
+            
+            const marker = L.marker(newLocation.coords, { icon: tombstoneIcon }).addTo(map);
+            
+            const popupContent = `
+                <div class="tombstone-popup">
+                    <h3>${newLocation.name}</h3>
+                    <div class="epitaph">"${newLocation.epitaph}"</div>
+                    <div class="dates">${newLocation.dates}</div>
+                    <hr style="margin: 10px 0; border-color: #ccc;">
+                    <p style="text-align: center; color: #666; font-size: 12px;">
+                        ${newLocation.description}
+                    </p>
+                </div>
+            `;
+            
+            marker.bindPopup(popupContent);
+            markers.push(marker);
+            updateLocationCount();
+            
+            // Flash warning
+            showWarning();
+        }
+        
+        // Show warning zone
+        function showWarning() {
+            const warning = document.getElementById('warning-zone');
+            warning.style.display = 'block';
+            setTimeout(() => {
+                warning.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Time slider functionality
+        document.getElementById('time-slider').addEventListener('input', function(e) {
+            const value = e.target.value;
+            const decay = value / 100;
+            
+            // Adjust map opacity to show decay
+            document.querySelector('#map').style.filter = 
+                `desaturate(${50 + decay * 50}%) brightness(${1 - decay * 0.3})`;
+            
+            // Show GPS voice at certain point
+            if (value > 80) {
+                showGPSVoice();
+            }
+        });
+        
+        // Show corrupted GPS voice
+        function showGPSVoice() {
+            const gpsVoice = document.getElementById('gps-voice');
+            gpsVoice.style.display = 'block';
+            setTimeout(() => {
+                gpsVoice.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Toggle heatmap
+        function toggleHeatmap() {
+            if (showingHeatmap) {
+                if (heatmapLayer) {
+                    map.removeLayer(heatmapLayer);
+                }
+                showingHeatmap = false;
+            } else {
+                // Create pain heatmap
+                const heatPoints = [];
+                memorialLocations.forEach(loc => {
+                    for (let i = 0; i < 10; i++) {
+                        heatPoints.push([
+                            loc.coords[0] + (Math.random() - 0.5) * 0.005,
+                            loc.coords[1] + (Math.random() - 0.5) * 0.005
+                        ]);
+                    }
+                });
+                
+                // Add red overlay for maximum pain areas
+                memorialLocations.forEach(loc => {
+                    if (loc.type === 'apartment' || loc.type === 'ending' || loc.type === 'first_kiss') {
+                        L.circle(loc.coords, {
+                            radius: 300,
+                            color: '#ff0000',
+                            fillColor: '#ff0000',
+                            fillOpacity: 0.3,
+                            weight: 0
+                        }).addTo(map);
+                    }
+                });
+                
+                showingHeatmap = true;
+            }
+        }
+        
+        // Track mouse movement for distance indicator
+        map.on('mousemove', function(e) {
+            const distances = memorialLocations.map(loc => {
+                const distance = map.distance(e.latlng, L.latLng(loc.coords));
+                return { ...loc, distance: distance };
+            }).sort((a, b) => a.distance - b.distance);
+            
+            const nearest = distances[0];
+            if (nearest.distance < 1000) {
+                const distanceDiv = document.getElementById('distance-indicator');
+                const distanceText = document.getElementById('distance-text');
+                const locationType = document.getElementById('location-type');
+                
+                distanceDiv.style.display = 'block';
+                distanceText.textContent = `You are ${(nearest.distance * 0.000621371).toFixed(2)} miles from ${nearest.name}`;
+                locationType.textContent = nearest.epitaph;
+                
+                if (nearest.distance < 200) {
+                    showWarning();
+                }
+            } else {
+                document.getElementById('distance-indicator').style.display = 'none';
+            }
+        });
+        
+        // Initialize
+        addMemorials();
+        
+        // Periodic glitch effect
+        setInterval(() => {
+            const decayOverlay = document.querySelector('.decay-overlay');
+            decayOverlay.style.opacity = Math.random() * 0.5;
+            setTimeout(() => {
+                decayOverlay.style.opacity = 1;
+            }, 100);
+        }, 5000);
+        
+        // Avoid memories checkbox behavior
+        document.getElementById('avoid-memories').addEventListener('change', function() {
+            if (!this.checked) {
+                this.checked = true;
+                alert("ERROR: Cannot disable memory avoidance. Memories are everywhere.");
+            }
+        });
+    </script>
+</body>
+</html>

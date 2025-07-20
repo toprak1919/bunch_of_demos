@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love Withdrawal Syndrome - Patient Monitor</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a0a;
+            color: #00ff41;
+            font-family: 'Share Tech Mono', monospace;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        .monitor-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .header {
+            border: 2px solid #00ff41;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            background: rgba(0, 255, 65, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            animation: glitch 3s infinite;
+        }
+        
+        .patient-info {
+            font-size: 0.9em;
+            margin-top: 10px;
+            opacity: 0.8;
+        }
+        
+        .warning-banner {
+            background: #ff0000;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+            margin-bottom: 20px;
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .panel {
+            border: 1px solid #00ff41;
+            padding: 20px;
+            background: rgba(0, 255, 65, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .panel-header {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #00ff41;
+            padding-bottom: 10px;
+        }
+        
+        .vital-signs {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .vital {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #00ff41;
+        }
+        
+        .vital-value {
+            font-size: 1.5em;
+            color: #ff0000;
+            animation: blink 1s infinite;
+        }
+        
+        .heart-monitor {
+            height: 100px;
+            position: relative;
+            background: #000;
+            border: 1px solid #00ff41;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .heartbeat-line {
+            position: absolute;
+            height: 2px;
+            background: #00ff41;
+            width: 100%;
+            top: 50%;
+            animation: heartbeat 2s linear infinite;
+        }
+        
+        .heartbeat-line::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            left: -100%;
+            animation: heartbeat-wave 2s linear infinite;
+        }
+        
+        .symptom-tracker {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .symptom {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border: 1px solid #00ff41;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .symptom-name {
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .severity-bar {
+            height: 20px;
+            background: #1a1a1a;
+            border: 1px solid #00ff41;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .severity-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff41, #ffff00, #ff0000);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .withdrawal-timeline {
+            margin-top: 30px;
+        }
+        
+        .timeline-stage {
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 3px solid #ff0000;
+            background: rgba(255, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .timeline-stage.active {
+            background: rgba(255, 0, 0, 0.3);
+            border-left-width: 5px;
+        }
+        
+        .stage-day {
+            font-size: 1.2em;
+            color: #ff0000;
+        }
+        
+        .stage-description {
+            margin-top: 5px;
+            opacity: 0.8;
+        }
+        
+        .brain-scan {
+            height: 200px;
+            background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxjaXJjbGUgY3g9IjEwMCIgY3k9IjEwMCIgcj0iODAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwZmY0MSIgc3Ryb2tlLXdpZHRoPSIyIiBvcGFjaXR5PSIwLjUiLz4KICAgIDxjaXJjbGUgY3g9IjcwIiBjeT0iODAiIHI9IjE1IiBmaWxsPSIjZmYwMDAwIiBvcGFjaXR5PSIwLjgiPgogICAgICAgIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9Im9wYWNpdHkiIHZhbHVlcz0iMC44OzE7MC44IiBkdXI9IjJzIiByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSIvPgogICAgPC9jaXJjbGU+CiAgICA8Y2lyY2xlIGN4PSIxMzAiIGN5PSI5MCIgcj0iMjAiIGZpbGw9IiNmZjAwMDAiIG9wYWNpdHk9IjAuNiI+CiAgICAgICAgPGFuaW1hdGUgYXR0cmlidXRlTmFtZT0ib3BhY2l0eSIgdmFsdWVzPSIwLjY7MTswLjYiIGR1cj0iMy41cyIgcmVwZWF0Q291bnQ9ImluZGVmaW5pdGUiLz4KICAgIDwvY2lyY2xlPgogICAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iMTMwIiByPSIyNSIgZmlsbD0iI2ZmMDAwMCIgb3BhY2l0eT0iMC45Ij4KICAgICAgICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSJvcGFjaXR5IiB2YWx1ZXM9IjAuOTsxOzAuOSIgZHVyPSIxLjVzIiByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSIvPgogICAgPC9jaXJjbGU+Cjwvc3ZnPg==') center/contain no-repeat;
+            border: 1px solid #00ff41;
+            position: relative;
+        }
+        
+        .brain-label {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            font-size: 0.8em;
+            color: #ff0000;
+        }
+        
+        .relapse-calculator {
+            background: rgba(255, 0, 0, 0.1);
+            padding: 20px;
+            border: 2px solid #ff0000;
+            margin-top: 20px;
+        }
+        
+        .risk-meter {
+            height: 30px;
+            background: #1a1a1a;
+            border: 2px solid #ff0000;
+            position: relative;
+            margin-top: 10px;
+        }
+        
+        .risk-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff41, #ffff00, #ff0000);
+            width: 0%;
+            transition: width 1s ease;
+        }
+        
+        .risk-percentage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2em;
+            color: white;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+        }
+        
+        .hallucination-log {
+            max-height: 200px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border: 1px solid #00ff41;
+        }
+        
+        .hallucination-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(0, 255, 65, 0.3);
+            font-size: 0.9em;
+            color: #ff9999;
+        }
+        
+        .medication-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+        
+        .medication {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border: 1px solid #00ff41;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .med-name {
+            font-size: 1.1em;
+            color: #00ff41;
+        }
+        
+        .med-effectiveness {
+            color: #ff0000;
+            font-size: 0.9em;
+        }
+        
+        .support-messages {
+            max-height: 150px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border: 1px solid #00ff41;
+        }
+        
+        .support-msg {
+            padding: 8px;
+            margin: 5px 0;
+            background: rgba(0, 255, 65, 0.1);
+            border-left: 3px solid #00ff41;
+            font-size: 0.9em;
+        }
+        
+        .emergency-button {
+            width: 100%;
+            padding: 20px;
+            background: #ff0000;
+            color: white;
+            border: none;
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            animation: emergency-pulse 2s infinite;
+        }
+        
+        .emergency-button:hover {
+            background: #cc0000;
+            transform: scale(1.05);
+        }
+        
+        .emergency-button:active {
+            transform: scale(0.95);
+        }
+        
+        .detox-meter {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 255, 65, 0.1);
+            border: 2px solid #00ff41;
+        }
+        
+        .detox-bar {
+            height: 40px;
+            background: #1a1a1a;
+            border: 2px solid #00ff41;
+            position: relative;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .detox-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000, #ffff00, #00ff41);
+            width: 0%;
+            transition: width 2s ease;
+        }
+        
+        .detox-percentage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5em;
+            color: white;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+        }
+        
+        .recovery-status {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 1.2em;
+            color: #ff0000;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        @keyframes glitch {
+            0%, 100% {
+                text-shadow: 2px 2px 0px #ff0000, -2px -2px 0px #0000ff;
+            }
+            50% {
+                text-shadow: -2px 2px 0px #0000ff, 2px -2px 0px #ff0000;
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+        
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+        
+        @keyframes heartbeat {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+        
+        @keyframes heartbeat-wave {
+            0%, 20%, 40%, 60%, 80%, 100% {
+                height: 2px;
+                top: 50%;
+            }
+            10% {
+                height: 40px;
+                top: 30%;
+            }
+            30% {
+                height: 20px;
+                top: 40%;
+            }
+            50% {
+                height: 60px;
+                top: 20%;
+            }
+            70% {
+                height: 30px;
+                top: 35%;
+            }
+            90% {
+                height: 50px;
+                top: 25%;
+            }
+        }
+        
+        @keyframes emergency-pulse {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(255, 0, 0, 0.8);
+            }
+        }
+        
+        .glitch-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            animation: glitch-overlay 10s infinite;
+        }
+        
+        @keyframes glitch-overlay {
+            0%, 90%, 100% {
+                opacity: 0;
+            }
+            95% {
+                opacity: 1;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="glitch-overlay"></div>
+    
+    <div class="monitor-container">
+        <div class="header">
+            <h1>Love Withdrawal Syndrome</h1>
+            <div class="patient-info">
+                PATIENT ID: <span id="patientId">LWS-2024-</span> | 
+                ADMISSION: <span id="admissionDate"></span> | 
+                STATUS: CRITICAL
+            </div>
+        </div>
+        
+        <div class="warning-banner">
+            WARNING: ATTEMPTING CONTACT WILL RESET WITHDRAWAL
+        </div>
+        
+        <div class="main-grid">
+            <div class="panel">
+                <div class="panel-header">Vital Signs</div>
+                <div class="vital-signs">
+                    <div class="vital">
+                        <span>Heart Rate</span>
+                        <span class="vital-value" id="heartRate">--</span>
+                    </div>
+                    <div class="vital">
+                        <span>Blood Pressure</span>
+                        <span class="vital-value" id="bloodPressure">--/--</span>
+                    </div>
+                    <div class="vital">
+                        <span>Cortisol Level</span>
+                        <span class="vital-value" id="cortisol">--</span>
+                    </div>
+                    <div class="vital">
+                        <span>Dopamine</span>
+                        <span class="vital-value" id="dopamine">--</span>
+                    </div>
+                </div>
+                
+                <div class="heart-monitor">
+                    <div class="heartbeat-line"></div>
+                </div>
+                
+                <div class="panel-header">Physical Symptoms</div>
+                <div class="symptom-tracker" id="physicalSymptoms">
+                    <div class="symptom">
+                        <div class="symptom-name">Chest Pain</div>
+                        <div class="severity-bar">
+                            <div class="severity-fill" id="chestPain"></div>
+                        </div>
+                    </div>
+                    <div class="symptom">
+                        <div class="symptom-name">Insomnia</div>
+                        <div class="severity-bar">
+                            <div class="severity-fill" id="insomnia"></div>
+                        </div>
+                    </div>
+                    <div class="symptom">
+                        <div class="symptom-name">Loss of Appetite</div>
+                        <div class="severity-bar">
+                            <div class="severity-fill" id="appetite"></div>
+                        </div>
+                    </div>
+                    <div class="symptom">
+                        <div class="symptom-name">Phantom Limb Sensation</div>
+                        <div class="severity-bar">
+                            <div class="severity-fill" id="phantom"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-header">Psychological Symptoms</div>
+                <div class="symptom-tracker" id="psychSymptoms">
+                    <div class="symptom">
+                        <div class="symptom-name">Obsessive Thoughts</div>
+                        <div class="severity-bar">
+                            <div class="severity-fill" id="obsessive"></div>
+                        </div>
+                    </div>
+                    <div class="symptom">
+                        <div class="symptom-name">Social Media Checking</div>
+                        <div class="severity-bar">
+                            <div class="severity-fill" id="socialMedia"></div>
+                        </div>
+                    </div>
+                    <div class="symptom">
+                        <div class="symptom-name">Auditory Hallucinations</div>
+                        <div class="severity-bar">
+                            <div class="severity-fill" id="auditory"></div>
+                        </div>
+                    </div>
+                    <div class="symptom">
+                        <div class="symptom-name">Memory Intrusion</div>
+                        <div class="severity-bar">
+                            <div class="severity-fill" id="memory"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="panel-header" style="margin-top: 20px;">Brain Activity</div>
+                <div class="brain-scan">
+                    <div class="brain-label">Memory Centers: HYPERACTIVE</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <div class="panel-header">Withdrawal Timeline</div>
+            <div class="withdrawal-timeline" id="timeline">
+                <div class="timeline-stage" data-day="1">
+                    <div class="stage-day">Day 1: Denial</div>
+                    <div class="stage-description">"This is temporary. They'll come back."</div>
+                </div>
+                <div class="timeline-stage" data-day="7">
+                    <div class="stage-day">Day 7: Anger Peaks</div>
+                    <div class="stage-description">"How could they do this to me?"</div>
+                </div>
+                <div class="timeline-stage" data-day="30">
+                    <div class="stage-day">Day 30: Depression Sets</div>
+                    <div class="stage-description">"Nothing matters anymore."</div>
+                </div>
+                <div class="timeline-stage" data-day="90">
+                    <div class="stage-day">Day 90: False Hope</div>
+                    <div class="stage-description">"Maybe I'm getting better... Maybe not."</div>
+                </div>
+                <div class="timeline-stage" data-day="365">
+                    <div class="stage-day">Day 365: Chronic Phase</div>
+                    <div class="stage-description">"The pain is permanent now."</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-grid">
+            <div class="panel">
+                <div class="panel-header">Hallucination Log</div>
+                <div class="hallucination-log" id="hallucinationLog">
+                    <div class="hallucination-entry">14:32 - Saw them in crowd (FALSE)</div>
+                    <div class="hallucination-entry">15:45 - Heard their laugh (AUDITORY)</div>
+                    <div class="hallucination-entry">18:23 - Felt their touch (TACTILE)</div>
+                    <div class="hallucination-entry">22:10 - Smelled their perfume (OLFACTORY)</div>
+                    <div class="hallucination-entry">23:47 - Heard phone notification (FALSE)</div>
+                </div>
+                
+                <div class="panel-header" style="margin-top: 20px;">Support Group Messages</div>
+                <div class="support-messages">
+                    <div class="support-msg">Day 847 - Still not clean</div>
+                    <div class="support-msg">Day 1,293 - Relapsed after seeing their photo</div>
+                    <div class="support-msg">Day 523 - The dreams won't stop</div>
+                    <div class="support-msg">Day 2,106 - Accepted this is forever</div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-header">Prescribed Medications</div>
+                <div class="medication-list">
+                    <div class="medication">
+                        <span class="med-name">Time</span>
+                        <span class="med-effectiveness">Effectiveness: 13%</span>
+                    </div>
+                    <div class="medication">
+                        <span class="med-name">Rebounds</span>
+                        <span class="med-effectiveness">WARNING: Dangerous</span>
+                    </div>
+                    <div class="medication">
+                        <span class="med-name">Alcohol</span>
+                        <span class="med-effectiveness">Temporary Relief Only</span>
+                    </div>
+                    <div class="medication">
+                        <span class="med-name">Distractions</span>
+                        <span class="med-effectiveness">Minimal Impact</span>
+                    </div>
+                </div>
+                
+                <div class="relapse-calculator">
+                    <div class="panel-header">Relapse Risk Calculator</div>
+                    <div class="risk-meter">
+                        <div class="risk-fill" id="riskFill"></div>
+                        <div class="risk-percentage" id="riskPercentage">0%</div>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 0.9em; color: #ff9999;">
+                        Triggers detected: Their song on radio, Similar perfume, Anniversary date approaching
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <button class="emergency-button" onclick="emergencyClick()">
+                EXPERIENCING SEVERE WITHDRAWAL
+            </button>
+        </div>
+        
+        <div class="detox-meter">
+            <div class="panel-header">Detoxification Progress</div>
+            <div class="detox-bar">
+                <div class="detox-fill" id="detoxFill"></div>
+                <div class="detox-percentage" id="detoxPercentage">0%</div>
+            </div>
+            <div class="recovery-status">FULL RECOVERY: IMPOSSIBLE</div>
+        </div>
+    </div>
+    
+    <audio id="heartbeatSound" loop>
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQoGAACBhYmLjY+TlZmbnJ6ipKepq62vsLK0trm7u72/wMHDxcbIysrLzM7P0NLT1NXW2Nna3N3e4OHh4uXm5+jp6uvs7e/w8fLz9PX29/j5+vz8/f7+/v////////////7+/v7+/v7+/v7+/v7+/v3+/f38+/z7+vv6+fn5+Pf49/b39vX19PX09PPy8vLx8PDv7+7u7e3t7Ozr6+rq6ejp6Ofn5+bl5eXk5OPj4uLh4eHg4N/f3t7d3d3c3Nvb2tra2tjZ2NfX1tbW1dXU1NTT09LS0dHR0NDPz8/Ozs3NzMzMy8vLysrJycnIyMjHx8bGxsXFxMTEw8PDwsLCwcHBwMDAwL+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v76+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr69vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vb29vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6+vr6/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/v7+/wMDAwMDAwMDAwMDAwMDAwMDAwcHBwcHBwsLCwsLDw8PDxMTExMTFxcXFxsbGxsfHx8fIyMjIycnJycrKysrLy8vLzMzMzM3Nzc3Ozs7Oz8/Pz9DQ0NDR0dHR0tLS0tPT09PU1NTU1dXV1dbW1tbX19fX2NjY2NnZ2dna2tra29vb29zc3Nzd3d3d3t7e3t/f39/g4ODg4eHh4eLi4uLj4+Pj5OTk5OXl5eXm5ubm5+fn5+jo6Ojp6enp6urq6uvr6+vs7Ozs7e3t7e7u7u7v7+/v8PDw8PHx8fHy8vLy8/Pz8/T09PT19fX19vb29vf39/f4+Pj4+fn5+fr6+vr7+/v7/Pz8/P39/f3+/v7+/////////w==" type="audio/wav">
+    </audio>
+    
+    <script>
+        // Initialize patient ID
+        document.getElementById('patientId').textContent = 'LWS-2024-' + Math.floor(Math.random() * 10000);
+        document.getElementById('admissionDate').textContent = new Date().toLocaleDateString();
+        
+        // Vital signs simulation
+        function updateVitals() {
+            const heartRate = document.getElementById('heartRate');
+            const bloodPressure = document.getElementById('bloodPressure');
+            const cortisol = document.getElementById('cortisol');
+            const dopamine = document.getElementById('dopamine');
+            
+            // Irregular heart rate
+            heartRate.textContent = Math.floor(Math.random() * 40 + 90) + ' BPM';
+            
+            // Elevated blood pressure
+            const systolic = Math.floor(Math.random() * 30 + 140);
+            const diastolic = Math.floor(Math.random() * 20 + 90);
+            bloodPressure.textContent = systolic + '/' + diastolic;
+            
+            // High cortisol
+            cortisol.textContent = (Math.random() * 10 + 25).toFixed(1) + ' μg/dL';
+            
+            // Low dopamine
+            dopamine.textContent = (Math.random() * 20 + 10).toFixed(0) + ' pg/mL';
+        }
+        
+        setInterval(updateVitals, 2000);
+        updateVitals();
+        
+        // Symptom severity simulation
+        const symptoms = {
+            chestPain: { current: 0, target: 0 },
+            insomnia: { current: 0, target: 0 },
+            appetite: { current: 0, target: 0 },
+            phantom: { current: 0, target: 0 },
+            obsessive: { current: 0, target: 0 },
+            socialMedia: { current: 0, target: 0 },
+            auditory: { current: 0, target: 0 },
+            memory: { current: 0, target: 0 }
+        };
+        
+        function updateSymptoms() {
+            Object.keys(symptoms).forEach(symptom => {
+                // Random spikes in symptoms
+                if (Math.random() > 0.7) {
+                    symptoms[symptom].target = Math.random() * 100;
+                } else if (Math.random() > 0.5) {
+                    symptoms[symptom].target = Math.max(0, symptoms[symptom].target - Math.random() * 20);
+                }
+                
+                // Smooth transition
+                symptoms[symptom].current += (symptoms[symptom].target - symptoms[symptom].current) * 0.1;
+                
+                const element = document.getElementById(symptom);
+                if (element) {
+                    element.style.width = symptoms[symptom].current + '%';
+                }
+            });
+        }
+        
+        setInterval(updateSymptoms, 100);
+        
+        // Initialize symptoms with random values
+        Object.keys(symptoms).forEach(symptom => {
+            symptoms[symptom].target = Math.random() * 80 + 20;
+        });
+        
+        // Timeline interaction
+        const timelineStages = document.querySelectorAll('.timeline-stage');
+        let currentStage = 0;
+        
+        timelineStages.forEach((stage, index) => {
+            stage.addEventListener('click', () => {
+                timelineStages.forEach(s => s.classList.remove('active'));
+                stage.classList.add('active');
+                currentStage = index;
+                
+                // Trigger symptom spikes when changing stages
+                Object.keys(symptoms).forEach(symptom => {
+                    symptoms[symptom].target = Math.random() * 100;
+                });
+            });
+        });
+        
+        // Activate first stage
+        timelineStages[0].classList.add('active');
+        
+        // Relapse risk calculator
+        let riskLevel = 45;
+        
+        function updateRisk() {
+            // Random risk fluctuations
+            riskLevel += (Math.random() - 0.5) * 10;
+            riskLevel = Math.max(0, Math.min(100, riskLevel));
+            
+            // Increase risk over time
+            if (Math.random() > 0.8) {
+                riskLevel = Math.min(100, riskLevel + 15);
+            }
+            
+            document.getElementById('riskFill').style.width = riskLevel + '%';
+            document.getElementById('riskPercentage').textContent = Math.floor(riskLevel) + '%';
+        }
+        
+        setInterval(updateRisk, 3000);
+        updateRisk();
+        
+        // Detox progress (never reaches 100%)
+        let detoxLevel = 0;
+        let detoxDirection = 1;
+        
+        function updateDetox() {
+            detoxLevel += detoxDirection * Math.random() * 2;
+            
+            // Random setbacks
+            if (Math.random() > 0.95) {
+                detoxLevel = Math.max(0, detoxLevel - Math.random() * 30);
+            }
+            
+            // Never exceed 85%
+            if (detoxLevel > 85) {
+                detoxLevel = 85;
+                detoxDirection = -1;
+            } else if (detoxLevel < 0) {
+                detoxLevel = 0;
+                detoxDirection = 1;
+            } else if (Math.random() > 0.9) {
+                detoxDirection *= -1;
+            }
+            
+            document.getElementById('detoxFill').style.width = detoxLevel + '%';
+            document.getElementById('detoxPercentage').textContent = Math.floor(detoxLevel) + '%';
+        }
+        
+        setInterval(updateDetox, 2000);
+        
+        // Hallucination log updates
+        const hallucinations = [
+            "Saw their car (FALSE)",
+            "Heard text notification (AUDITORY)",
+            "Felt their presence (DELUSIONAL)",
+            "Smelled their shampoo (OLFACTORY)",
+            "Saw them online (CHECKED SOCIAL MEDIA)",
+            "Heard their voice in crowd (AUDITORY)",
+            "Dreamed they came back (REM INTRUSION)",
+            "Felt phantom touch (TACTILE)",
+            "Saw their face in stranger (VISUAL)",
+            "Heard their ringtone (AUDITORY)"
+        ];
+        
+        function addHallucination() {
+            const log = document.getElementById('hallucinationLog');
+            const entry = document.createElement('div');
+            entry.className = 'hallucination-entry';
+            const time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+            entry.textContent = time + ' - ' + hallucinations[Math.floor(Math.random() * hallucinations.length)];
+            log.insertBefore(entry, log.firstChild);
+            
+            // Remove old entries
+            while (log.children.length > 10) {
+                log.removeChild(log.lastChild);
+            }
+        }
+        
+        setInterval(addHallucination, 15000);
+        
+        // Emergency button (does nothing)
+        function emergencyClick() {
+            const button = document.querySelector('.emergency-button');
+            button.style.background = '#660000';
+            setTimeout(() => {
+                button.style.background = '#ff0000';
+            }, 200);
+            
+            // Spike all symptoms
+            Object.keys(symptoms).forEach(symptom => {
+                symptoms[symptom].target = 100;
+            });
+            
+            // Add alert hallucination
+            const log = document.getElementById('hallucinationLog');
+            const entry = document.createElement('div');
+            entry.className = 'hallucination-entry';
+            entry.style.color = '#ff0000';
+            entry.textContent = 'EMERGENCY LOGGED - NO HELP AVAILABLE';
+            log.insertBefore(entry, log.firstChild);
+        }
+        
+        // Heartbeat sound effect
+        let heartbeatPlaying = false;
+        document.addEventListener('click', () => {
+            if (!heartbeatPlaying) {
+                const audio = document.getElementById('heartbeatSound');
+                audio.volume = 0.3;
+                audio.play().catch(() => {});
+                heartbeatPlaying = true;
+            }
+        });
+        
+        // Random glitches
+        setInterval(() => {
+            if (Math.random() > 0.95) {
+                document.body.style.filter = 'hue-rotate(' + Math.random() * 360 + 'deg)';
+                setTimeout(() => {
+                    document.body.style.filter = 'none';
+                }, 100);
+            }
+        }, 5000);
+    </script>
+</body>
+</html>

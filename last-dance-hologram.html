@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Last Dance - Hologram</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background: #000;
+            overflow: hidden;
+            cursor: none;
+            font-family: 'Georgia', serif;
+        }
+
+        #ballroom {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            background: radial-gradient(ellipse at center 40%, rgba(20, 20, 40, 0.3) 0%, #000 70%);
+        }
+
+        #spotlight {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            pointer-events: none;
+            animation: spotlightFlicker 3s infinite;
+        }
+
+        @keyframes spotlightFlicker {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 0.6; }
+        }
+
+        #hologram {
+            position: absolute;
+            width: 150px;
+            height: 400px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 2s;
+        }
+
+        .hologram-body {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, 
+                rgba(100, 200, 255, 0.3) 0%,
+                rgba(100, 200, 255, 0.2) 50%,
+                rgba(100, 200, 255, 0.1) 100%);
+            filter: blur(1px);
+            position: relative;
+            animation: hologramGlitch 0.3s infinite;
+        }
+
+        @keyframes hologramGlitch {
+            0%, 100% { 
+                transform: translateX(0);
+                filter: blur(1px);
+            }
+            20% { 
+                transform: translateX(-2px);
+                filter: blur(2px);
+            }
+            40% { 
+                transform: translateX(2px);
+                filter: blur(1px);
+            }
+        }
+
+        .hologram-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(100, 200, 255, 0.8);
+            border-radius: 50%;
+            animation: float 3s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+            50% { transform: translateY(-20px) translateX(10px); opacity: 1; }
+        }
+
+        #lyrics {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 24px;
+            text-align: center;
+            letter-spacing: 2px;
+            pointer-events: none;
+        }
+
+        .lyric-fragment {
+            display: inline-block;
+            animation: shatter 4s forwards;
+        }
+
+        @keyframes shatter {
+            0% { 
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% { 
+                transform: translateY(300px) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        #footsteps {
+            position: absolute;
+            bottom: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            height: 200px;
+            pointer-events: none;
+        }
+
+        .footstep {
+            position: absolute;
+            width: 30px;
+            height: 50px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 50% 50% 30% 30%;
+            animation: fadeStep 2s infinite;
+        }
+
+        @keyframes fadeStep {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 0.5; }
+        }
+
+        #mirror {
+            position: absolute;
+            top: 50%;
+            right: 10%;
+            transform: translateY(-50%);
+            width: 150px;
+            height: 300px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .reflection {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, rgba(50, 50, 50, 0.3) 0%, transparent 70%);
+            position: relative;
+        }
+
+        .lonely-dancer {
+            position: absolute;
+            bottom: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 100px;
+            background: rgba(0, 0, 0, 0.8);
+            animation: sway 4s infinite ease-in-out;
+        }
+
+        @keyframes sway {
+            0%, 100% { transform: translateX(-50%) rotate(-5deg); }
+            50% { transform: translateX(-50%) rotate(5deg); }
+        }
+
+        #speech-bubbles {
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translateX(-50%);
+            pointer-events: none;
+        }
+
+        .bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.9);
+            color: #000;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            opacity: 0;
+            animation: appearFade 3s forwards;
+        }
+
+        .bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid rgba(255, 255, 255, 0.9);
+        }
+
+        @keyframes appearFade {
+            0% { opacity: 0; transform: translateY(10px); }
+            50% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+
+        #warning {
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ff0000;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0;
+            animation: warningPulse 1s infinite;
+        }
+
+        @keyframes warningPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        #floor-cracks {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .crack {
+            position: absolute;
+            height: 2px;
+            background: rgba(50, 50, 50, 0.8);
+            transform-origin: left center;
+            animation: growCrack 2s forwards;
+        }
+
+        @keyframes growCrack {
+            0% { width: 0; }
+            100% { width: 100px; }
+        }
+
+        #ghost-couples {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        .ghost-couple {
+            position: absolute;
+            width: 100px;
+            height: 200px;
+            opacity: 0.1;
+            filter: blur(2px);
+            animation: ghostDance 10s infinite ease-in-out;
+        }
+
+        @keyframes ghostDance {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(50px, -20px) rotate(10deg); }
+            50% { transform: translate(-50px, -40px) rotate(-10deg); }
+            75% { transform: translate(30px, -10px) rotate(5deg); }
+        }
+
+        #goodbye-particles {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            color: rgba(100, 200, 255, 0.8);
+            letter-spacing: 20px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #song-selector {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border: 1px solid rgba(100, 200, 255, 0.5);
+            border-radius: 10px;
+            text-align: center;
+            color: #fff;
+        }
+
+        #song-selector h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: rgba(100, 200, 255, 0.8);
+        }
+
+        #song-selector input {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(100, 200, 255, 0.5);
+            color: #fff;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        #song-selector button {
+            padding: 10px 30px;
+            background: rgba(100, 200, 255, 0.3);
+            border: 1px solid rgba(100, 200, 255, 0.5);
+            color: #fff;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        #song-selector button:hover {
+            background: rgba(100, 200, 255, 0.5);
+        }
+
+        #cursor-light {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, rgba(100, 200, 255, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        #dance-timer {
+            position: absolute;
+            top: 5%;
+            right: 5%;
+            color: rgba(100, 200, 255, 0.5);
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+        }
+
+        #after-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            opacity: 0;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 24px;
+            letter-spacing: 3px;
+        }
+
+        #replay-button {
+            position: absolute;
+            bottom: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 30px;
+            background: rgba(100, 200, 255, 0.2);
+            border: 1px solid rgba(100, 200, 255, 0.5);
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            border-radius: 5px;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        #replay-button:hover {
+            background: rgba(100, 200, 255, 0.3);
+        }
+
+        .degraded {
+            filter: contrast(0.8) brightness(0.8) blur(0.5px);
+        }
+    </style>
+</head>
+<body>
+    <div id="ballroom">
+        <div id="spotlight"></div>
+        
+        <div id="lyrics"></div>
+        
+        <div id="hologram">
+            <div class="hologram-body"></div>
+            <div class="hologram-particles"></div>
+        </div>
+        
+        <div id="footsteps"></div>
+        
+        <div id="mirror">
+            <div class="reflection">
+                <div class="lonely-dancer"></div>
+            </div>
+        </div>
+        
+        <div id="speech-bubbles"></div>
+        
+        <div id="warning"></div>
+        
+        <div id="floor-cracks"></div>
+        
+        <div id="ghost-couples"></div>
+        
+        <div id="goodbye-particles"></div>
+        
+        <div id="dance-timer"></div>
+        
+        <div id="song-selector">
+            <h2>Select Our Song</h2>
+            <input type="text" id="song-input" placeholder="Enter the name of our song..." />
+            <button onclick="startDance()">Begin Last Dance</button>
+        </div>
+        
+        <div id="after-message">DANCE CARD: PERMANENTLY EMPTY</div>
+        
+        <button id="replay-button" onclick="replayDance()">Dance again?</button>
+        
+        <div id="cursor-light"></div>
+    </div>
+    
+    <audio id="music-box" loop></audio>
+
+    <script>
+        let hologramOpacity = 0.8;
+        let danceTime = 227; // 3:47 in seconds
+        let isHologramActive = false;
+        let replayCount = 0;
+        let mouseX = 0, mouseY = 0;
+        let hologramX = window.innerWidth / 2;
+        let hologramY = window.innerHeight / 2;
+        let danceInterval;
+        let musicSpeed = 1;
+
+        const lyrics = [
+            "I reach for you but touch only light",
+            "Your shadow dances where you used to be",
+            "Every step we take, you fade away",
+            "This ballroom echoes with your memory",
+            "I'm dancing with a ghost tonight"
+        ];
+
+        const speeches = [
+            "Why can't I hold you?",
+            "You're not real",
+            "Come back to me",
+            "I miss you",
+            "Don't leave me alone"
+        ];
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            const cursorLight = document.getElementById('cursor-light');
+            cursorLight.style.left = mouseX - 10 + 'px';
+            cursorLight.style.top = mouseY - 10 + 'px';
+
+            if (isHologramActive) {
+                moveHologram();
+            }
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            const touch = e.touches[0];
+            mouseX = touch.clientX;
+            mouseY = touch.clientY;
+            
+            const cursorLight = document.getElementById('cursor-light');
+            cursorLight.style.left = mouseX - 10 + 'px';
+            cursorLight.style.top = mouseY - 10 + 'px';
+
+            if (isHologramActive) {
+                moveHologram();
+            }
+        });
+
+        function startDance() {
+            document.getElementById('song-selector').style.display = 'none';
+            isHologramActive = true;
+            
+            // Create music box effect
+            createMusicBoxSound();
+            
+            // Show hologram
+            const hologram = document.getElementById('hologram');
+            hologram.style.opacity = hologramOpacity;
+            
+            // Add particles
+            createHologramParticles();
+            
+            // Show lyrics
+            showLyrics();
+            
+            // Create footsteps
+            createFootsteps();
+            
+            // Start dance timer
+            startDanceTimer();
+            
+            // Create ghost couples
+            createGhostCouples();
+            
+            // Show warning after 2 minutes
+            setTimeout(() => {
+                document.getElementById('warning').textContent = 'HOLOGRAPHIC PARTNER STABILITY: CRITICAL';
+                document.getElementById('warning').style.opacity = '1';
+            }, 120000);
+            
+            // Create floor cracks
+            setTimeout(() => {
+                createFloorCracks();
+            }, 180000);
+            
+            // Show speech bubbles periodically
+            setInterval(showSpeechBubble, 15000);
+        }
+
+        function moveHologram() {
+            const hologram = document.getElementById('hologram');
+            const distance = Math.sqrt(Math.pow(mouseX - hologramX, 2) + Math.pow(mouseY - hologramY, 2));
+            
+            if (distance < 200) {
+                // Try to move away when cursor gets close
+                const angle = Math.atan2(hologramY - mouseY, hologramX - mouseX);
+                hologramX += Math.cos(angle) * 5;
+                hologramY += Math.sin(angle) * 5;
+                
+                // Fade more when touched
+                hologramOpacity -= 0.002;
+                hologram.style.opacity = Math.max(0, hologramOpacity);
+                
+                // Add glitch effect
+                hologram.style.filter = `blur(${Math.random() * 3}px)`;
+                
+                // Disperse particles
+                disperseParticles();
+            }
+            
+            hologram.style.left = hologramX + 'px';
+            hologram.style.top = hologramY + 'px';
+        }
+
+        function createHologramParticles() {
+            const particlesContainer = document.querySelector('.hologram-particles');
+            
+            setInterval(() => {
+                if (hologramOpacity > 0) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.top = Math.random() * 100 + '%';
+                    particle.style.animationDelay = Math.random() * 3 + 's';
+                    particlesContainer.appendChild(particle);
+                    
+                    setTimeout(() => particle.remove(), 3000);
+                }
+            }, 100);
+        }
+
+        function disperseParticles() {
+            const particles = document.querySelectorAll('.particle');
+            particles.forEach(particle => {
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 100 + 50;
+                particle.style.transform = `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px)`;
+                particle.style.opacity = '0';
+            });
+        }
+
+        function showLyrics() {
+            const lyricsContainer = document.getElementById('lyrics');
+            let lyricIndex = 0;
+            
+            setInterval(() => {
+                if (lyricIndex < lyrics.length && isHologramActive) {
+                    lyricsContainer.innerHTML = '';
+                    const words = lyrics[lyricIndex].split(' ');
+                    
+                    words.forEach((word, i) => {
+                        const span = document.createElement('span');
+                        span.className = 'lyric-fragment';
+                        span.textContent = word + ' ';
+                        span.style.animationDelay = i * 0.2 + 's';
+                        lyricsContainer.appendChild(span);
+                    });
+                    
+                    lyricIndex++;
+                }
+            }, 10000);
+        }
+
+        function createFootsteps() {
+            const footstepsContainer = document.getElementById('footsteps');
+            const positions = [
+                {left: '20%', bottom: '0%', rotation: -10},
+                {left: '40%', bottom: '20%', rotation: 10},
+                {left: '60%', bottom: '10%', rotation: -5},
+                {left: '80%', bottom: '30%', rotation: 15}
+            ];
+            
+            positions.forEach((pos, i) => {
+                const footstep = document.createElement('div');
+                footstep.className = 'footstep';
+                footstep.style.left = pos.left;
+                footstep.style.bottom = pos.bottom;
+                footstep.style.transform = `rotate(${pos.rotation}deg)`;
+                footstep.style.animationDelay = i * 0.5 + 's';
+                footstepsContainer.appendChild(footstep);
+            });
+        }
+
+        function createGhostCouples() {
+            const ghostContainer = document.getElementById('ghost-couples');
+            
+            for (let i = 0; i < 5; i++) {
+                const couple = document.createElement('div');
+                couple.className = 'ghost-couple';
+                couple.style.left = Math.random() * 80 + 10 + '%';
+                couple.style.top = Math.random() * 60 + 20 + '%';
+                couple.style.animationDelay = Math.random() * 10 + 's';
+                
+                // Create simple silhouettes
+                couple.innerHTML = `
+                    <div style="width: 40%; height: 100%; background: rgba(100, 100, 100, 0.3); float: left;"></div>
+                    <div style="width: 40%; height: 100%; background: rgba(100, 100, 100, 0.3); float: right;"></div>
+                `;
+                
+                ghostContainer.appendChild(couple);
+            }
+        }
+
+        function showSpeechBubble() {
+            const bubblesContainer = document.getElementById('speech-bubbles');
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.textContent = speeches[Math.floor(Math.random() * speeches.length)];
+            bubble.style.left = (Math.random() * 200 - 100) + 'px';
+            bubble.style.top = (Math.random() * 100 - 50) + 'px';
+            
+            bubblesContainer.appendChild(bubble);
+            
+            setTimeout(() => bubble.remove(), 3000);
+        }
+
+        function createFloorCracks() {
+            const cracksContainer = document.getElementById('floor-cracks');
+            cracksContainer.style.opacity = '1';
+            
+            for (let i = 0; i < 10; i++) {
+                setTimeout(() => {
+                    const crack = document.createElement('div');
+                    crack.className = 'crack';
+                    crack.style.bottom = Math.random() * 30 + '%';
+                    crack.style.left = Math.random() * 100 + '%';
+                    crack.style.transform = `rotate(${Math.random() * 180}deg)`;
+                    cracksContainer.appendChild(crack);
+                }, i * 200);
+            }
+        }
+
+        function startDanceTimer() {
+            const timerDisplay = document.getElementById('dance-timer');
+            let timeLeft = danceTime;
+            
+            danceInterval = setInterval(() => {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                // Fade hologram
+                hologramOpacity -= 0.0035;
+                document.getElementById('hologram').style.opacity = Math.max(0, hologramOpacity);
+                
+                // Slow down music
+                musicSpeed *= 0.998;
+                updateMusicSpeed();
+                
+                timeLeft--;
+                
+                if (timeLeft <= 0) {
+                    endDance();
+                }
+            }, 1000);
+        }
+
+        function endDance() {
+            clearInterval(danceInterval);
+            isHologramActive = false;
+            
+            // Final explosion
+            const goodbye = document.getElementById('goodbye-particles');
+            goodbye.textContent = 'GOODBYE';
+            goodbye.style.opacity = '1';
+            
+            // Explode letters
+            setTimeout(() => {
+                const letters = goodbye.textContent.split('');
+                goodbye.innerHTML = '';
+                letters.forEach((letter, i) => {
+                    const span = document.createElement('span');
+                    span.textContent = letter;
+                    span.style.position = 'absolute';
+                    span.style.left = i * 30 + 'px';
+                    span.style.transition = 'all 2s';
+                    goodbye.appendChild(span);
+                    
+                    setTimeout(() => {
+                        const angle = Math.random() * Math.PI * 2;
+                        const distance = Math.random() * 300 + 200;
+                        span.style.transform = `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) rotate(${Math.random() * 720}deg)`;
+                        span.style.opacity = '0';
+                    }, 100);
+                });
+            }, 1000);
+            
+            // Show after message
+            setTimeout(() => {
+                document.getElementById('after-message').style.opacity = '1';
+                document.getElementById('replay-button').style.opacity = '1';
+            }, 3000);
+            
+            // Stop music
+            const audio = document.getElementById('music-box');
+            audio.pause();
+        }
+
+        function replayDance() {
+            replayCount++;
+            hologramOpacity = Math.max(0.3, 0.8 - (replayCount * 0.1));
+            
+            // Add degradation
+            document.body.classList.add('degraded');
+            
+            // Reset
+            document.getElementById('after-message').style.opacity = '0';
+            document.getElementById('replay-button').style.opacity = '0';
+            document.getElementById('goodbye-particles').style.opacity = '0';
+            document.getElementById('warning').style.opacity = '0';
+            document.getElementById('lyrics').innerHTML = '';
+            document.getElementById('floor-cracks').innerHTML = '';
+            document.getElementById('floor-cracks').style.opacity = '0';
+            
+            startDance();
+        }
+
+        function createMusicBoxSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const audio = document.getElementById('music-box');
+            
+            // Create a simple music box melody
+            const notes = [523.25, 587.33, 659.25, 698.46, 783.99, 880.00, 987.77, 1046.50];
+            let noteIndex = 0;
+            
+            function playNote() {
+                if (!isHologramActive) return;
+                
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = notes[noteIndex] * musicSpeed;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+                
+                noteIndex = (noteIndex + 1) % notes.length;
+                
+                setTimeout(playNote, 500 / musicSpeed);
+            }
+            
+            playNote();
+        }
+
+        function updateMusicSpeed() {
+            // Music speed is updated in the playNote function
+        }
+    </script>

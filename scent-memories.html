@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Olfactory Torture Chamber</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        #warning {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ff4444;
+            font-size: 12px;
+            letter-spacing: 3px;
+            opacity: 0;
+            animation: warningPulse 3s infinite;
+            z-index: 1000;
+            text-shadow: 0 0 10px #ff4444;
+        }
+
+        @keyframes warningPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        #chamber {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at center, #0a0a0a 0%, #000 100%);
+        }
+
+        .mist-background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><filter id="mist"><feTurbulence baseFrequency="0.01" numOctaves="2"/><feColorMatrix values="0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 1 0"/></filter><rect width="100%" height="100%" filter="url(%23mist)"/></svg>');
+            animation: mistFlow 30s infinite linear;
+        }
+
+        @keyframes mistFlow {
+            from { transform: translateX(0) translateY(0); }
+            to { transform: translateX(-100px) translateY(-100px); }
+        }
+
+        .scent-particle {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-30px) rotate(90deg); }
+            50% { transform: translateY(0) rotate(180deg); }
+            75% { transform: translateY(30px) rotate(270deg); }
+        }
+
+        .scent-particle::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: inherit;
+            filter: blur(15px);
+            opacity: 0.6;
+            transform: scale(1.5);
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow {
+            from { opacity: 0.6; transform: scale(1.5); }
+            to { opacity: 0.3; transform: scale(2); }
+        }
+
+        .scent-particle:hover {
+            transform: scale(1.2);
+        }
+
+        .perfume { background: radial-gradient(circle, #9b59b6, #8e44ad); }
+        .coffee { background: radial-gradient(circle, #8b6914, #654321); }
+        .laundry { background: radial-gradient(circle, #3498db, #2980b9); }
+        .cigarette { background: radial-gradient(circle, #7f8c8d, #34495e); }
+        .wine { background: radial-gradient(circle, #e74c3c, #c0392b); }
+        .shampoo { background: radial-gradient(circle, #1abc9c, #16a085); }
+
+        .scent-trail {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .memory-text {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0;
+            pointer-events: none;
+            text-align: center;
+            width: 300px;
+            text-shadow: 0 0 20px currentColor;
+            font-style: italic;
+        }
+
+        .dispersing {
+            animation: disperse 3s forwards;
+        }
+
+        @keyframes disperse {
+            0% {
+                opacity: 1;
+                letter-spacing: 0;
+                filter: blur(0);
+            }
+            100% {
+                opacity: 0;
+                letter-spacing: 20px;
+                filter: blur(10px);
+                transform: translateY(-50px);
+            }
+        }
+
+        #breathe-instruction {
+            position: fixed;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 18px;
+            opacity: 0;
+            transition: opacity 1s ease;
+            letter-spacing: 2px;
+            animation: breathePulse 4s infinite;
+        }
+
+        @keyframes breathePulse {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.1); }
+        }
+
+        .memory-flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.1);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .flash-active {
+            animation: memoryFlash 0.5s forwards;
+        }
+
+        @keyframes memoryFlash {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        #essence-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            opacity: 0;
+            pointer-events: none;
+            background: radial-gradient(circle, 
+                rgba(155,89,182,0.3), 
+                rgba(139,105,20,0.3), 
+                rgba(52,152,219,0.3), 
+                rgba(127,140,141,0.3), 
+                rgba(231,76,60,0.3), 
+                rgba(26,188,156,0.3)
+            );
+            filter: blur(30px);
+            animation: essencePulse 3s infinite;
+        }
+
+        @keyframes essencePulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.5); }
+        }
+
+        .torment-message {
+            position: fixed;
+            font-size: 32px;
+            opacity: 0;
+            text-align: center;
+            width: 80%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            text-shadow: 0 0 30px #fff;
+            letter-spacing: 3px;
+            pointer-events: none;
+        }
+
+        .pillow-scent {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1), transparent);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .fading {
+            animation: pillowFade 60s forwards;
+        }
+
+        @keyframes pillowFade {
+            0% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(3); }
+        }
+
+        #sound-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 12px;
+            opacity: 0.5;
+            cursor: pointer;
+        }
+
+        .vapor-text {
+            position: absolute;
+            font-size: 16px;
+            color: rgba(255,255,255,0.7);
+            pointer-events: none;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <div id="warning">OLFACTORY TORTURE CHAMBER ACTIVE</div>
+    
+    <div id="chamber">
+        <div class="mist-background"></div>
+        
+        <div id="breathe-instruction">BREATHE DEEPLY</div>
+        
+        <div class="memory-flash"></div>
+        
+        <div id="essence-container"></div>
+        
+        <div class="pillow-scent"></div>
+        
+        <div class="torment-message" id="torment1">YOU'LL SMELL THEM ON STRANGERS FOREVER</div>
+        <div class="torment-message" id="torment2">GHOSTS LEAVE NO SCENT BUT MEMORIES DO</div>
+        
+        <div id="sound-indicator">🔊 Click for breathing sounds</div>
+    </div>
+
+    <audio id="breathingSound" loop>
+        <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=" type="audio/wav">
+    </audio>
+
+    <script>
+        const chamber = document.getElementById('chamber');
+        const warning = document.getElementById('warning');
+        const breatheInstruction = document.getElementById('breathe-instruction');
+        const memoryFlash = document.querySelector('.memory-flash');
+        const essenceContainer = document.getElementById('essence-container');
+        const pillowScent = document.querySelector('.pillow-scent');
+        const soundIndicator = document.getElementById('sound-indicator');
+        const breathingSound = document.getElementById('breathingSound');
+
+        const scents = [
+            { type: 'perfume', memory: 'their neck against your cheek' },
+            { type: 'coffee', memory: 'morning rituals that will never repeat' },
+            { type: 'laundry', memory: 'clothes that still hang in the closet' },
+            { type: 'cigarette', memory: 'conversations on the balcony at 3am' },
+            { type: 'wine', memory: 'that last dinner together' },
+            { type: 'shampoo', memory: 'fingers through wet hair' }
+        ];
+
+        const memories = {
+            perfume: ['lavender and vanilla', 'the way they hugged', 'birthday mornings'],
+            coffee: ['shared cups', 'sleepy smiles', 'newspaper rustling'],
+            laundry: ['fresh sheets', 'sunday folding', 'their sweater'],
+            cigarette: ['late night talks', 'nervous habits', 'ash falling like snow'],
+            wine: ['anniversary toasts', 'lips stained burgundy', 'empty bottles'],
+            shampoo: ['shower steam', 'humming old songs', 'wet footprints']
+        };
+
+        let activeScents = new Set();
+        let particles = [];
+
+        // Initialize scent particles
+        function createScentParticle(scent, index) {
+            const particle = document.createElement('div');
+            particle.className = `scent-particle ${scent.type}`;
+            particle.dataset.type = scent.type;
+            particle.dataset.memory = scent.memory;
+            
+            const angle = (Math.PI * 2 / scents.length) * index;
+            const radius = Math.min(window.innerWidth, window.innerHeight) * 0.3;
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            
+            particle.style.left = centerX + Math.cos(angle) * radius + 'px';
+            particle.style.top = centerY + Math.sin(angle) * radius + 'px';
+            particle.style.animationDelay = `${index * 2}s`;
+            
+            particle.addEventListener('click', () => activateScent(particle));
+            particle.addEventListener('mouseenter', () => createVaporText(particle));
+            
+            chamber.appendChild(particle);
+            particles.push(particle);
+        }
+
+        // Create vapor text on hover
+        function createVaporText(particle) {
+            const text = document.createElement('div');
+            text.className = 'vapor-text';
+            text.textContent = particle.dataset.type;
+            text.style.left = particle.style.left;
+            text.style.top = (parseInt(particle.style.top) - 30) + 'px';
+            chamber.appendChild(text);
+            
+            setTimeout(() => {
+                text.classList.add('dispersing');
+                setTimeout(() => text.remove(), 3000);
+            }, 100);
+        }
+
+        // Activate scent and trigger memory
+        function activateScent(particle) {
+            const type = particle.dataset.type;
+            activeScents.add(type);
+            
+            // Show breathing instruction
+            breatheInstruction.style.opacity = '1';
+            setTimeout(() => breatheInstruction.style.opacity = '0', 3000);
+            
+            // Create memory flash
+            memoryFlash.classList.add('flash-active');
+            setTimeout(() => memoryFlash.classList.remove('flash-active'), 500);
+            
+            // Show memory text
+            showMemoryText(particle);
+            
+            // Create scent trail
+            createScentTrail(particle);
+            
+            // Check for combinations
+            checkScentCombinations();
+            
+            // Intensify effect
+            particle.style.filter = 'brightness(2)';
+            setTimeout(() => particle.style.filter = 'brightness(1)', 1000);
+        }
+
+        // Show memory text that disperses
+        function showMemoryText(particle) {
+            const memoryText = document.createElement('div');
+            memoryText.className = 'memory-text';
+            memoryText.textContent = particle.dataset.memory;
+            memoryText.style.left = '50%';
+            memoryText.style.top = '30%';
+            memoryText.style.transform = 'translate(-50%, -50%)';
+            memoryText.style.opacity = '1';
+            
+            chamber.appendChild(memoryText);
+            
+            setTimeout(() => {
+                memoryText.classList.add('dispersing');
+                setTimeout(() => memoryText.remove(), 3000);
+            }, 1000);
+        }
+
+        // Create scent trail effect
+        function createScentTrail(particle) {
+            const trail = document.createElement('div');
+            trail.className = 'scent-trail';
+            trail.style.width = '100px';
+            trail.style.height = '100px';
+            trail.style.background = getComputedStyle(particle).background;
+            trail.style.borderRadius = '50%';
+            trail.style.filter = 'blur(50px)';
+            trail.style.left = particle.style.left;
+            trail.style.top = particle.style.top;
+            trail.style.opacity = '0.5';
+            
+            chamber.appendChild(trail);
+            
+            const animation = trail.animate([
+                { transform: 'scale(1)', opacity: 0.5 },
+                { transform: 'scale(5)', opacity: 0 }
+            ], {
+                duration: 3000,
+                easing: 'ease-out'
+            });
+            
+            animation.onfinish = () => trail.remove();
+        }
+
+        // Check for scent combinations
+        function checkScentCombinations() {
+            if (activeScents.has('perfume') && activeScents.has('wine')) {
+                showTormentMessage('that last dinner echoes in every restaurant');
+            }
+            
+            if (activeScents.size >= 3) {
+                activatePillowScent();
+            }
+            
+            if (activeScents.size === scents.length) {
+                createEssenceOfThem();
+            }
+        }
+
+        // Show torment messages
+        function showTormentMessage(customMessage) {
+            const message = document.createElement('div');
+            message.className = 'torment-message';
+            message.textContent = customMessage || document.getElementById('torment1').textContent;
+            message.style.opacity = '1';
+            
+            chamber.appendChild(message);
+            
+            setTimeout(() => {
+                message.style.opacity = '0';
+                setTimeout(() => message.remove(), 1000);
+            }, 3000);
+        }
+
+        // Activate pillow scent that fades
+        function activatePillowScent() {
+            pillowScent.classList.add('fading');
+            showTormentMessage('their pillow loses its scent a little more each night');
+        }
+
+        // Create the final essence combination
+        function createEssenceOfThem() {
+            essenceContainer.style.opacity = '1';
+            warning.textContent = 'ESSENCE OF THEM - UNBEARABLE';
+            warning.style.opacity = '1';
+            
+            // Show all torment messages
+            document.getElementById('torment1').style.opacity = '1';
+            setTimeout(() => {
+                document.getElementById('torment2').style.opacity = '1';
+            }, 2000);
+            
+            // Create overwhelming effect
+            particles.forEach((particle, index) => {
+                setTimeout(() => {
+                    particle.click();
+                }, index * 500);
+            });
+            
+            // Final message
+            setTimeout(() => {
+                const finalMessage = document.createElement('div');
+                finalMessage.className = 'torment-message';
+                finalMessage.textContent = 'PHANTOM SCENTS NEVER LEAVE';
+                finalMessage.style.fontSize = '48px';
+                finalMessage.style.opacity = '1';
+                chamber.appendChild(finalMessage);
+            }, 5000);
+        }
+
+        // Sound control
+        soundIndicator.addEventListener('click', () => {
+            if (breathingSound.paused) {
+                breathingSound.play();
+                soundIndicator.textContent = '🔇 Mute breathing sounds';
+            } else {
+                breathingSound.pause();
+                soundIndicator.textContent = '🔊 Click for breathing sounds';
+            }
+        });
+
+        // Mouse movement creates subtle mist disturbance
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            particles.forEach(particle => {
+                const rect = particle.getBoundingClientRect();
+                const distance = Math.sqrt(
+                    Math.pow(mouseX - (rect.left + rect.width/2), 2) +
+                    Math.pow(mouseY - (rect.top + rect.height/2), 2)
+                );
+                
+                if (distance < 150) {
+                    const angle = Math.atan2(
+                        rect.top + rect.height/2 - mouseY,
+                        rect.left + rect.width/2 - mouseX
+                    );
+                    const push = (150 - distance) / 150 * 20;
+                    particle.style.transform = `translate(${Math.cos(angle) * push}px, ${Math.sin(angle) * push}px)`;
+                } else {
+                    particle.style.transform = 'translate(0, 0)';
+                }
+            });
+        });
+
+        // Random phantom scent appearances
+        setInterval(() => {
+            if (Math.random() > 0.7 && particles.length > 0) {
+                const randomParticle = particles[Math.floor(Math.random() * particles.length)];
+                const ghostMemory = memories[randomParticle.dataset.type];
+                if (ghostMemory) {
+                    const memory = ghostMemory[Math.floor(Math.random() * ghostMemory.length)];
+                    const ghostText = document.createElement('div');
+                    ghostText.className = 'memory-text';
+                    ghostText.textContent = memory;
+                    ghostText.style.left = Math.random() * (window.innerWidth - 300) + 'px';
+                    ghostText.style.top = Math.random() * (window.innerHeight - 100) + 'px';
+                    ghostText.style.opacity = '0.3';
+                    ghostText.style.fontSize = '14px';
+                    
+                    chamber.appendChild(ghostText);
+                    
+                    setTimeout(() => {
+                        ghostText.classList.add('dispersing');
+                        setTimeout(() => ghostText.remove(), 3000);
+                    }, 2000);
+                }
+            }
+        }, 5000);
+
+        // Initialize
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                warning.style.opacity = '0.8';
+            }, 1000);
+            
+            scents.forEach((scent, index) => {
+                setTimeout(() => {
+                    createScentParticle(scent, index);
+                }, index * 300);
+            });
+        });
+
+        // Keyboard interaction for intensity
+        document.addEventListener('keydown', (e) => {
+            if (e.key === ' ') {
+                e.preventDefault();
+                breatheInstruction.style.opacity = '1';
+                particles.forEach(particle => {
+                    particle.style.animation = 'float 5s infinite ease-in-out';
+                });
+                setTimeout(() => {
+                    breatheInstruction.style.opacity = '0';
+                    particles.forEach(particle => {
+                        particle.style.animation = 'float 20s infinite ease-in-out';
+                    });
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>

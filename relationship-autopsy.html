@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relationship Autopsy Report #2024-LOVE-DECEASED</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f5f5f0;
+            font-family: 'Courier New', monospace;
+            color: #2c2c2c;
+            line-height: 1.4;
+            padding: 20px;
+        }
+
+        .report-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border: 2px solid #000;
+        }
+
+        .header {
+            background-color: #1a1a1a;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #000;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .case-number {
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        .stamp {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            transform: rotate(-15deg);
+            font-size: 48px;
+            color: #ff0000;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            border: 4px solid #ff0000;
+            padding: 10px;
+            background-color: rgba(255,255,255,0.8);
+        }
+
+        .patient-info {
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-bottom: 2px solid #000;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .info-item {
+            border-bottom: 1px solid #999;
+            padding-bottom: 5px;
+        }
+
+        .label {
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .value {
+            font-size: 16px;
+            margin-top: 5px;
+        }
+
+        .section {
+            padding: 30px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+        }
+
+        .cause-of-death {
+            background-color: #fee;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #000;
+            margin-right: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .checked {
+            background-color: #000;
+            color: white;
+        }
+
+        .body-diagram {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px dashed #999;
+        }
+
+        .heart-container {
+            position: relative;
+            display: inline-block;
+            font-size: 150px;
+            color: #8b0000;
+        }
+
+        .damage-marker {
+            position: absolute;
+            background-color: #ff0000;
+            color: white;
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: 3px;
+            white-space: nowrap;
+        }
+
+        .toxicology {
+            background-color: #f0f8ff;
+        }
+
+        .toxicology-item {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: rgba(0,0,0,0.05);
+            border-left: 4px solid #000;
+        }
+
+        .level {
+            float: right;
+            font-weight: bold;
+            color: #ff0000;
+        }
+
+        .evidence {
+            background-color: #fffaf0;
+        }
+
+        .evidence-item {
+            margin: 15px 0;
+            padding: 15px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+        }
+
+        .corrupted {
+            background: repeating-linear-gradient(
+                45deg,
+                #f0f0f0,
+                #f0f0f0 10px,
+                #e0e0e0 10px,
+                #e0e0e0 20px
+            );
+            color: #999;
+            font-style: italic;
+        }
+
+        .witness-statement {
+            font-style: italic;
+            margin: 15px 0;
+            padding-left: 20px;
+            border-left: 3px solid #666;
+        }
+
+        .organ-status table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .organ-status th,
+        .organ-status td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #000;
+        }
+
+        .organ-status th {
+            background-color: #333;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .status-critical {
+            color: #ff0000;
+            font-weight: bold;
+        }
+
+        .morgue-tag {
+            background-color: #ffffcc;
+            border: 2px solid #000;
+            padding: 20px;
+            margin: 20px 0;
+            transform: rotate(-2deg);
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.2);
+        }
+
+        .final-notes {
+            background-color: #fff5f5;
+            font-style: italic;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px dashed #999;
+        }
+
+        .recommendation {
+            background-color: #000;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .date-input {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border: 2px solid #000;
+            text-align: center;
+        }
+
+        .date-input input {
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            padding: 10px;
+            border: 2px solid #000;
+            background-color: white;
+        }
+
+        .date-input button {
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            padding: 10px 20px;
+            margin-left: 10px;
+            background-color: #000;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .date-input button:hover {
+            background-color: #333;
+        }
+
+        @media print {
+            .date-input {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <div class="stamp">DECEASED</div>
+        
+        <div class="header">
+            <h1>OFFICIAL AUTOPSY REPORT</h1>
+            <div class="case-number">CASE #2024-LOVE-DECEASED-001</div>
+        </div>
+
+        <div class="date-input">
+            <label for="deathDate">Enter Date of Relationship Death:</label>
+            <input type="date" id="deathDate" />
+            <button onclick="updateReport()">Generate Report</button>
+        </div>
+
+        <div class="patient-info">
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="label">Patient Name</div>
+                    <div class="value">US</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">Date of Death</div>
+                    <div class="value" id="deathDateDisplay">PENDING INPUT</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">Time of Death</div>
+                    <div class="value" id="timeOfDeath">23:47 - Last "I love you" detected as insincere</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">Location</div>
+                    <div class="value">Shared apartment, now divided by invisible wall</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section cause-of-death">
+            <h2 class="section-title">Primary Cause of Death</h2>
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <div class="checkbox checked">X</div>
+                    <span>Chronic Neglect</span>
+                </div>
+                <div class="checkbox-item">
+                    <div class="checkbox checked">X</div>
+                    <span>Terminal Dishonesty</span>
+                </div>
+                <div class="checkbox-item">
+                    <div class="checkbox">X</div>
+                    <span>Acute Infidelity</span>
+                </div>
+                <div class="checkbox-item">
+                    <div class="checkbox checked">X</div>
+                    <span>Growing Apart Syndrome</span>
+                </div>
+                <div class="checkbox-item">
+                    <div class="checkbox checked">X</div>
+                    <span>Communication Failure</span>
+                </div>
+                <div class="checkbox-item">
+                    <div class="checkbox">X</div>
+                    <span>Trust Hemorrhage</span>
+                </div>
+                <div class="checkbox-item">
+                    <div class="checkbox checked">X</div>
+                    <span>Emotional Starvation</span>
+                </div>
+                <div class="checkbox-item">
+                    <div class="checkbox checked">X</div>
+                    <span>Unresolved Conflict Toxicity</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Body Examination</h2>
+            <div class="body-diagram">
+                <div class="heart-container">
+                    ♥
+                    <div class="damage-marker" style="top: 20px; left: -100px;">Critical damage to communication center</div>
+                    <div class="damage-marker" style="top: 80px; right: -120px;">Severe trust fractures detected</div>
+                    <div class="damage-marker" style="bottom: 20px; left: 50%;">Broken heart syndrome confirmed</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section toxicology">
+            <h2 class="section-title">Toxicology Report</h2>
+            <div class="toxicology-item">
+                Resentment <span class="level">LETHAL LEVELS</span>
+            </div>
+            <div class="toxicology-item">
+                Bitterness <span class="level">847 mg/L (toxic > 50)</span>
+            </div>
+            <div class="toxicology-item">
+                Old Love (traces) <span class="level">0.003 mg/L (barely detectable)</span>
+            </div>
+            <div class="toxicology-item">
+                Regret <span class="level">OVERWHELMING</span>
+            </div>
+            <div class="toxicology-item">
+                False Hope <span class="level">Chronic exposure detected</span>
+            </div>
+        </div>
+
+        <div class="section organ-status">
+            <h2 class="section-title">Organ Status Report</h2>
+            <table>
+                <tr>
+                    <th>Organ</th>
+                    <th>Status</th>
+                    <th>Notes</th>
+                </tr>
+                <tr>
+                    <td>Heart</td>
+                    <td class="status-critical">SHATTERED</td>
+                    <td>Multiple fractures, beyond surgical repair</td>
+                </tr>
+                <tr>
+                    <td>Trust</td>
+                    <td class="status-critical">NECROTIC</td>
+                    <td>Complete tissue death observed</td>
+                </tr>
+                <tr>
+                    <td>Future</td>
+                    <td class="status-critical">ABSENT</td>
+                    <td>No viable tissue remaining</td>
+                </tr>
+                <tr>
+                    <td>Dreams</td>
+                    <td class="status-critical">ATROPHIED</td>
+                    <td>Severe deterioration, non-functional</td>
+                </tr>
+                <tr>
+                    <td>Intimacy</td>
+                    <td class="status-critical">DECEASED</td>
+                    <td>Time of death: 6 months prior to relationship termination</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section evidence">
+            <h2 class="section-title">Evidence Documentation</h2>
+            <div class="evidence-item">
+                <strong>Exhibit A:</strong> Final text messages<br>
+                "We need to talk" - Sent 11:32 PM<br>
+                "I know" - Read 11:33 PM<br>
+                <em>No further communication detected</em>
+            </div>
+            <div class="evidence-item corrupted">
+                <strong>Exhibit B:</strong> Last photograph together<br>
+                [FILE CORRUPTED - HAPPINESS.JPG UNRECOVERABLE]
+            </div>
+            <div class="evidence-item">
+                <strong>Exhibit C:</strong> Browser history showing<br>
+                - "How to know when it's over" (47 searches)<br>
+                - "Apartment rentals near me" (23 searches)<br>
+                - "Starting over after relationship" (112 searches)
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Witness Statements</h2>
+            <div class="witness-statement">
+                "We saw it coming. They stopped looking at each other months ago." - Friend A
+            </div>
+            <div class="witness-statement">
+                "The silence at dinner was deafening. We all knew." - Friend B
+            </div>
+            <div class="witness-statement">
+                "They kept saying they were fine. Nobody believed them." - Family Member
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Coroner's Notes</h2>
+            <div class="final-notes">
+                Subject attempted resuscitation 47 times over a period of 3 months. All attempts failed. 
+                Notable efforts included: couple's therapy (abandoned after 3 sessions), date nights 
+                (mechanical, joyless), and repeated promises to "try harder" (ineffective). 
+                Post-mortem lividity suggests relationship was deceased long before official termination. 
+                Defensive wounds on both parties indicate mutual destruction. No signs of foul play from 
+                external sources - damage was entirely self-inflicted.
+            </div>
+        </div>
+
+        <div class="morgue-tag">
+            <strong>MORGUE TAG #0847</strong><br>
+            John/Jane Doe - Formerly "Us"<br>
+            Handle with care - Emotional hazard<br>
+            Storage: Permanent cold storage<br>
+            Next of kin: None (all bridges burned)
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Manner of Death</h2>
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <div class="checkbox">X</div>
+                    <span>Natural Causes</span>
+                </div>
+                <div class="checkbox-item">
+                    <div class="checkbox checked">X</div>
+                    <span>Homicide/Suicide (Mutual Destruction)</span>
+                </div>
+                <div class="checkbox-item">
+                    <div class="checkbox">X</div>
+                    <span>Accidental</span>
+                </div>
+                <div class="checkbox-item">
+                    <div class="checkbox">X</div>
+                    <span>Undetermined</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="recommendation">
+            FINAL RECOMMENDATION: Cremate all evidence. Scatter ashes. No memorial service recommended.<br>
+            CASE CLOSED - NO HOPE OF REVIVAL
+        </div>
+    </div>
+
+    <script>
+        function updateReport() {
+            const deathDate = document.getElementById('deathDate').value;
+            if (deathDate) {
+                const date = new Date(deathDate);
+                const formattedDate = date.toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+                document.getElementById('deathDateDisplay').textContent = formattedDate;
+                
+                // Calculate days since death
+                const today = new Date();
+                const daysSince = Math.floor((today - date) / (1000 * 60 * 60 * 24));
+                
+                // Update time of death with dynamic content
+                document.getElementById('timeOfDeath').textContent = 
+                    `23:47 - ${daysSince} days post-mortem. Decomposition advanced.`;
+            }
+        }
+    </script>
+</body>
+</html>
