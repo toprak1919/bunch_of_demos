@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RELATIONSHIP BLACK BOX RECORDER - CRASH SITE ANALYSIS</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #ff6b00;
+            font-family: 'Share Tech Mono', monospace;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 107, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 0, 0, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .scanner-line {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff6b00, transparent);
+            animation: scan 8s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100vh); }
+        }
+
+        .warning-header {
+            background: repeating-linear-gradient(
+                45deg,
+                #ff0000,
+                #ff0000 10px,
+                #ffff00 10px,
+                #ffff00 20px
+            );
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            color: #000;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: flash 1s infinite;
+        }
+
+        @keyframes flash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .black-box {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            border: 3px solid #ff6b00;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 20px 0;
+            position: relative;
+            box-shadow: 
+                0 0 50px rgba(255, 107, 0, 0.3),
+                inset 0 0 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .black-box::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 20%;
+            width: 100px;
+            height: 20px;
+            background: radial-gradient(ellipse at center, #333 0%, transparent 70%);
+            transform: rotate(-15deg);
+            filter: blur(5px);
+        }
+
+        .black-box::after {
+            content: '';
+            position: absolute;
+            bottom: 10px;
+            right: 15%;
+            width: 80px;
+            height: 30px;
+            background: radial-gradient(ellipse at center, #222 0%, transparent 70%);
+            transform: rotate(25deg);
+            filter: blur(8px);
+        }
+
+        .damage-indicator {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, #ff0000 0%, transparent 70%);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .damage-indicator.d1 { top: 10px; right: 20px; }
+        .damage-indicator.d2 { bottom: 30px; left: 50px; }
+        .damage-indicator.d3 { top: 50%; right: 10%; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 0.4; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5em;
+            text-align: center;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 20px rgba(255, 107, 0, 0.8);
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .status-panel {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #ff6b00;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff6b00, transparent);
+            animation: sweep 3s linear infinite;
+        }
+
+        @keyframes sweep {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .panel-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            color: #ffff00;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .flight-data {
+            font-size: 0.9em;
+            line-height: 1.8;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px dotted #333;
+        }
+
+        .data-label {
+            color: #888;
+        }
+
+        .data-value {
+            color: #ff6b00;
+            font-weight: bold;
+        }
+
+        .critical {
+            color: #ff0000 !important;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .warning-light {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background: #ff0000;
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: warning-pulse 0.5s infinite;
+            box-shadow: 0 0 10px #ff0000;
+        }
+
+        @keyframes warning-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .voice-transcript {
+            background: #000;
+            border: 1px solid #333;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .transcript-entry {
+            margin: 10px 0;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .timestamp {
+            color: #666;
+            margin-right: 10px;
+        }
+
+        .pilot1 { color: #00ff00; }
+        .pilot2 { color: #00ffff; }
+        .system { color: #ff0000; font-weight: bold; }
+
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+            margin: 30px 0;
+        }
+
+        .timeline-track {
+            height: 4px;
+            background: linear-gradient(90deg, #00ff00 0%, #ffff00 50%, #ff0000 100%);
+            position: relative;
+            margin: 20px 0;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            top: -8px;
+            width: 20px;
+            height: 20px;
+            background: #ff6b00;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            transform: translateX(-50%);
+        }
+
+        .timeline-event {
+            position: absolute;
+            top: 30px;
+            transform: translateX(-50%);
+            font-size: 0.8em;
+            white-space: nowrap;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 5px 10px;
+            border: 1px solid #ff6b00;
+        }
+
+        .impact-zone {
+            text-align: center;
+            margin: 40px 0;
+            padding: 30px;
+            background: radial-gradient(circle, rgba(255, 0, 0, 0.2) 0%, transparent 70%);
+            border: 2px dashed #ff0000;
+        }
+
+        .impact-data {
+            font-size: 2em;
+            font-family: 'Orbitron', sans-serif;
+            color: #ff0000;
+            text-transform: uppercase;
+            margin: 10px 0;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+        }
+
+        .conclusion-box {
+            background: rgba(255, 0, 0, 0.1);
+            border: 3px solid #ff0000;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .conclusion-text {
+            font-size: 1.5em;
+            font-family: 'Orbitron', sans-serif;
+            color: #ff0000;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            animation: pulse-text 2s infinite;
+        }
+
+        @keyframes pulse-text {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .scrubber {
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #ff6b00;
+        }
+
+        .scrubber-label {
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .scrubber-track {
+            width: 100%;
+            height: 40px;
+            background: linear-gradient(90deg, #00ff00 0%, #ffff00 50%, #ff0000 100%);
+            position: relative;
+            cursor: pointer;
+            border: 2px solid #333;
+        }
+
+        .scrubber-handle {
+            position: absolute;
+            top: -5px;
+            left: 0;
+            width: 10px;
+            height: 50px;
+            background: #fff;
+            cursor: grab;
+            transition: left 0.3s ease;
+        }
+
+        .scrubber-handle:active {
+            cursor: grabbing;
+        }
+
+        .maintenance-log {
+            background: rgba(255, 255, 0, 0.1);
+            border-left: 4px solid #ffff00;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .log-entry {
+            margin: 10px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .log-entry::before {
+            content: '⚠';
+            position: absolute;
+            left: 0;
+            color: #ffff00;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8em; }
+            .status-grid { grid-template-columns: 1fr; }
+            .impact-data { font-size: 1.5em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="scanner-line"></div>
+    
+    <div class="warning-header">
+        ⚠ CATASTROPHIC RELATIONSHIP FAILURE - INVESTIGATION IN PROGRESS ⚠
+    </div>
+
+    <div class="main-container">
+        <div class="black-box">
+            <div class="damage-indicator d1"></div>
+            <div class="damage-indicator d2"></div>
+            <div class="damage-indicator d3"></div>
+            
+            <h1>Black Box Recorder</h1>
+            <p style="text-align: center; color: #888; margin-bottom: 30px;">
+                FLIGHT LV-2021 | RECOVERED FROM CRASH SITE
+            </p>
+
+            <div class="status-grid">
+                <div class="status-panel">
+                    <h3 class="panel-title">Flight Data Parameters</h3>
+                    <div class="flight-data">
+                        <div class="data-row">
+                            <span class="data-label">Altitude of Love:</span>
+                            <span class="data-value critical">0 ft (CRASHED)</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Speed of Descent:</span>
+                            <span class="data-value">Terminal Velocity</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Pressure Levels:</span>
+                            <span class="data-value critical">EXCEEDED LIMITS</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Emotional Turbulence:</span>
+                            <span class="data-value critical">SEVERE</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Communication Systems:</span>
+                            <span class="data-value critical">OFFLINE</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="status-panel">
+                    <h3 class="panel-title">System Warnings</h3>
+                    <div class="flight-data">
+                        <div style="margin: 10px 0;">
+                            <span class="warning-light"></span>
+                            <span class="critical">PULL UP</span>
+                        </div>
+                        <div style="margin: 10px 0;">
+                            <span class="warning-light"></span>
+                            <span class="critical">TERRAIN TERRAIN</span>
+                        </div>
+                        <div style="margin: 10px 0;">
+                            <span class="warning-light"></span>
+                            <span class="critical">STALL WARNING</span>
+                        </div>
+                        <div style="margin: 10px 0;">
+                            <span class="warning-light"></span>
+                            <span class="critical">TOO LATE</span>
+                        </div>
+                        <div style="margin: 10px 0;">
+                            <span class="warning-light"></span>
+                            <span class="critical">EJECT EJECT</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="scrubber">
+                <div class="scrubber-label">Relationship Flight Path Analyzer</div>
+                <div class="scrubber-track" id="scrubber">
+                    <div class="scrubber-handle" id="handle"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.8em; color: #666;">
+                    <span>TAKEOFF</span>
+                    <span>CRUISING</span>
+                    <span>TURBULENCE</span>
+                    <span>MAYDAY</span>
+                    <span>IMPACT</span>
+                </div>
+            </div>
+
+            <div class="voice-transcript">
+                <h3 style="color: #ff6b00; margin-bottom: 20px;">COCKPIT VOICE RECORDER - FINAL MOMENTS</h3>
+                <div class="transcript-entry" style="animation-delay: 0s;">
+                    <span class="timestamp">23:47:32</span>
+                    <span class="pilot1">PILOT 1:</span> "We need to talk about us."
+                </div>
+                <div class="transcript-entry" style="animation-delay: 0.5s;">
+                    <span class="timestamp">23:47:45</span>
+                    <span class="pilot2">PILOT 2:</span> "Not now, I'm tired."
+                </div>
+                <div class="transcript-entry" style="animation-delay: 1s;">
+                    <span class="timestamp">23:48:03</span>
+                    <span class="system">SYSTEM:</span> [WARNING: ALTITUDE DECREASING]
+                </div>
+                <div class="transcript-entry" style="animation-delay: 1.5s;">
+                    <span class="timestamp">23:48:15</span>
+                    <span class="pilot1">PILOT 1:</span> "You never want to talk anymore!"
+                </div>
+                <div class="transcript-entry" style="animation-delay: 2s;">
+                    <span class="timestamp">23:48:22</span>
+                    <span class="pilot2">PILOT 2:</span> "Maybe because you never listen!"
+                </div>
+                <div class="transcript-entry" style="animation-delay: 2.5s;">
+                    <span class="timestamp">23:48:30</span>
+                    <span class="system">SYSTEM:</span> [PULL UP - PULL UP - PULL UP]
+                </div>
+                <div class="transcript-entry" style="animation-delay: 3s;">
+                    <span class="timestamp">23:48:45</span>
+                    <span class="pilot1">PILOT 1:</span> "I can't do this anymore..."
+                </div>
+                <div class="transcript-entry" style="animation-delay: 3.5s;">
+                    <span class="timestamp">23:48:52</span>
+                    <span class="pilot2">PILOT 2:</span> "Neither can I."
+                </div>
+                <div class="transcript-entry" style="animation-delay: 4s;">
+                    <span class="timestamp">23:48:58</span>
+                    <span class="system">SYSTEM:</span> [TERRAIN - TERRAIN - TOO LATE]
+                </div>
+                <div class="transcript-entry" style="animation-delay: 4.5s;">
+                    <span class="timestamp">23:49:00</span>
+                    <span class="system">SYSTEM:</span> [END OF RECORDING]
+                </div>
+            </div>
+
+            <div class="timeline">
+                <h3 class="panel-title">Critical Failure Timeline</h3>
+                <div class="timeline-track">
+                    <div class="timeline-marker" style="left: 20%;">
+                        <div class="timeline-event">First Red Flag Ignored</div>
+                    </div>
+                    <div class="timeline-marker" style="left: 40%;">
+                        <div class="timeline-event">Communication Breakdown</div>
+                    </div>
+                    <div class="timeline-marker" style="left: 60%;">
+                        <div class="timeline-event">Trust System Failure</div>
+                    </div>
+                    <div class="timeline-marker" style="left: 80%;">
+                        <div class="timeline-event">Point of No Return</div>
+                    </div>
+                    <div class="timeline-marker" style="left: 95%;">
+                        <div class="timeline-event">Total System Failure</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="maintenance-log">
+                <h3 class="panel-title">Maintenance Records</h3>
+                <div class="log-entry">Ignored warning signs for 6 months</div>
+                <div class="log-entry">Failed to perform routine emotional maintenance</div>
+                <div class="log-entry">Deferred critical conversations repeatedly</div>
+                <div class="log-entry">Navigation system recalibration overdue by 2 years</div>
+                <div class="log-entry">Both operators lacked proper certification for this flight level</div>
+            </div>
+
+            <div class="impact-zone">
+                <div class="impact-data">IMPACT RECORDED</div>
+                <div style="font-size: 1.2em; margin: 10px 0;">
+                    Terminal Velocity of Heartbreak Achieved
+                </div>
+                <div style="color: #888; margin: 20px 0;">
+                    <div>Survivor Count: <span class="critical">0 of 2 souls on board</span></div>
+                    <div>Recovery Status: <span class="critical">Wreckage scattered, no survivors</span></div>
+                    <div>Data Integrity: <span class="critical">Corrupted but pain preserved</span></div>
+                </div>
+            </div>
+
+            <div class="status-panel" style="margin: 30px 0;">
+                <h3 class="panel-title">Malfunction Analysis</h3>
+                <div class="flight-data">
+                    <div class="data-row">
+                        <span class="data-label">Primary Cause:</span>
+                        <span class="data-value critical">Dual Pilot Error</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Contributing Factors:</span>
+                        <span class="data-value">Multiple System Failures</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Weather Conditions:</span>
+                        <span class="data-value">Severe Emotional Turbulence</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Visibility:</span>
+                        <span class="data-value critical">Zero - Blinded by Tears</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="conclusion-box">
+                <div class="conclusion-text">NTSB RECOMMENDATION</div>
+                <div style="font-size: 2em; margin-top: 20px; font-family: 'Orbitron', sans-serif;">
+                    DO NOT ATTEMPT LOVE AGAIN
+                </div>
+                <div style="margin-top: 20px; color: #ff6b00;">
+                    This model has been permanently grounded.<br>
+                    All similar flights have been suspended indefinitely.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Scrubber functionality
+        const scrubber = document.getElementById('scrubber');
+        const handle = document.getElementById('handle');
+        let isDragging = false;
+
+        handle.addEventListener('mousedown', () => isDragging = true);
+        document.addEventListener('mouseup', () => isDragging = false);
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            const rect = scrubber.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
+            
+            handle.style.left = percentage + '%';
+            
+            // Update background based on position
+            if (percentage < 33) {
+                document.body.style.background = '#0a0a0a';
+            } else if (percentage < 66) {
+                document.body.style.background = '#1a0a0a';
+            } else {
+                document.body.style.background = '#2a0a0a';
+            }
+        });
+
+        scrubber.addEventListener('click', (e) => {
+            const rect = scrubber.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const percentage = (x / rect.width) * 100;
+            
+            handle.style.left = percentage + '%';
+        });
+
+        // Add random glitches
+        setInterval(() => {
+            const elements = document.querySelectorAll('.data-value, .transcript-entry');
+            const randomElement = elements[Math.floor(Math.random() * elements.length)];
+            
+            if (randomElement) {
+                randomElement.style.opacity = '0.3';
+                setTimeout(() => {
+                    randomElement.style.opacity = '1';
+                }, 100);
+            }
+        }, 3000);
+
+        // Simulate data corruption
+        const corruptText = (element) => {
+            const originalText = element.textContent;
+            const chars = '!@#$%^&*()_+-=[]{}|;:,.<>?/~`';
+            let corrupted = '';
+            
+            for (let i = 0; i < originalText.length; i++) {
+                corrupted += Math.random() > 0.3 ? originalText[i] : chars[Math.floor(Math.random() * chars.length)];
+            }
+            
+            element.textContent = corrupted;
+            
+            setTimeout(() => {
+                element.textContent = originalText;
+            }, 200);
+        };
+
+        // Apply corruption effect occasionally
+        setInterval(() => {
+            const elements = document.querySelectorAll('.data-value');
+            const randomElement = elements[Math.floor(Math.random() * elements.length)];
+            
+            if (randomElement && Math.random() > 0.7) {
+                corruptText(randomElement);
+            }
+        }, 5000);
+    </script>
+</body>
+</html>

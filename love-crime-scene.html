@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CASE #BROKEN-HEART-2024-UNSOLVED</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Special+Elite&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a0a;
+            color: #fff;
+            font-family: 'Courier Prime', monospace;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Crime Scene Tape */
+        .crime-tape {
+            position: fixed;
+            background: #ffeb3b;
+            color: #000;
+            font-weight: 900;
+            font-size: 2rem;
+            padding: 10px 0;
+            text-align: center;
+            transform: rotate(-5deg);
+            width: 150%;
+            left: -25%;
+            top: 10%;
+            z-index: 100;
+            text-shadow: 0 0 5px rgba(0,0,0,0.3);
+            animation: flutter 3s ease-in-out infinite;
+        }
+        
+        .crime-tape.bottom {
+            top: auto;
+            bottom: 15%;
+            transform: rotate(5deg);
+            animation-delay: 1.5s;
+        }
+        
+        @keyframes flutter {
+            0%, 100% { transform: rotate(-5deg) translateY(0); }
+            50% { transform: rotate(-5deg) translateY(-10px); }
+        }
+        
+        /* Main Container */
+        .scene-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Case Header */
+        .case-header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 40px 0;
+        }
+        
+        .case-number {
+            font-family: 'Special Elite', cursive;
+            font-size: 1.2rem;
+            color: #ff3333;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+        }
+        
+        .case-title {
+            font-size: 3rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+        
+        .case-status {
+            margin-top: 20px;
+            padding: 10px 30px;
+            display: inline-block;
+            background: #ff0000;
+            color: #fff;
+            font-weight: 700;
+            letter-spacing: 2px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        /* Crime Scene */
+        .crime-scene {
+            position: relative;
+            margin: 80px 0;
+            padding: 40px;
+            background: #111;
+            border: 3px dashed #ff3333;
+        }
+        
+        /* Chalk Outline */
+        .chalk-outline {
+            position: relative;
+            height: 400px;
+            margin: 40px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .body-outline {
+            position: absolute;
+            width: 150px;
+            height: 350px;
+            border: 3px dashed rgba(255, 255, 255, 0.6);
+            border-radius: 50% 50% 40% 40% / 30% 30% 70% 70%;
+            background: transparent;
+        }
+        
+        .body-outline.left {
+            transform: rotate(-15deg);
+            left: 35%;
+        }
+        
+        .body-outline.right {
+            transform: rotate(15deg);
+            right: 35%;
+        }
+        
+        .separation-point {
+            position: absolute;
+            width: 100px;
+            height: 2px;
+            background: #ff0000;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: bleed 3s infinite;
+        }
+        
+        @keyframes bleed {
+            0%, 100% { width: 100px; opacity: 0.8; }
+            50% { width: 200px; opacity: 1; }
+        }
+        
+        /* Evidence Markers */
+        .evidence-marker {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: #ffeb3b;
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 10;
+        }
+        
+        .evidence-marker:hover {
+            transform: scale(1.2);
+            background: #fff;
+        }
+        
+        .evidence-marker.A { top: 20%; left: 20%; }
+        .evidence-marker.B { top: 40%; right: 25%; }
+        .evidence-marker.C { bottom: 30%; left: 45%; }
+        .evidence-marker.D { top: 60%; left: 30%; }
+        .evidence-marker.E { bottom: 40%; right: 35%; }
+        
+        /* Evidence Details */
+        .evidence-details {
+            background: rgba(17, 17, 17, 0.95);
+            border: 1px solid #ff3333;
+            padding: 20px;
+            margin: 20px 0;
+            display: none;
+            position: relative;
+        }
+        
+        .evidence-details.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .evidence-label {
+            font-weight: 700;
+            color: #ffeb3b;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        
+        /* Blood Splatter */
+        .blood-splatter {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .splatter {
+            position: absolute;
+            background: radial-gradient(circle, rgba(255,0,0,0.8) 0%, rgba(139,0,0,0.6) 100%);
+            border-radius: 50%;
+            animation: drip 4s infinite;
+        }
+        
+        .splatter:nth-child(1) { width: 40px; height: 40px; top: 10%; left: 15%; }
+        .splatter:nth-child(2) { width: 60px; height: 60px; top: 30%; right: 20%; animation-delay: 1s; }
+        .splatter:nth-child(3) { width: 30px; height: 30px; bottom: 25%; left: 40%; animation-delay: 2s; }
+        .splatter:nth-child(4) { width: 50px; height: 50px; top: 50%; left: 60%; animation-delay: 1.5s; }
+        
+        @keyframes drip {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.8; }
+            50% { transform: translateY(10px) scale(1.1); opacity: 1; }
+        }
+        
+        /* Detective Notes */
+        .detective-notes {
+            background: #1a1a1a;
+            border-left: 4px solid #ff3333;
+            padding: 30px;
+            margin: 40px 0;
+            font-family: 'Special Elite', cursive;
+            position: relative;
+        }
+        
+        .detective-notes::before {
+            content: "DETECTIVE'S NOTES";
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: #1a1a1a;
+            padding: 0 10px;
+            color: #ff3333;
+            font-weight: 700;
+        }
+        
+        .note-entry {
+            margin: 20px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .note-entry::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #ffeb3b;
+        }
+        
+        /* Forensics Report */
+        .forensics-report {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .report-section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #333;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .report-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: #ff3333;
+        }
+        
+        .report-title {
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #ffeb3b;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+        
+        .report-content {
+            line-height: 1.8;
+            color: #ccc;
+        }
+        
+        /* Evidence Photos */
+        .evidence-photos {
+            margin: 40px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .photo-evidence {
+            position: relative;
+            background: #222;
+            padding: 10px;
+            border: 2px solid #444;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .photo-evidence:hover {
+            transform: scale(1.05);
+            border-color: #ff3333;
+        }
+        
+        .photo-evidence::before {
+            content: "EVIDENCE";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff0000;
+            color: #fff;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+        
+        .photo-content {
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-style: italic;
+            color: #666;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        /* Warning Banner */
+        .warning-banner {
+            background: repeating-linear-gradient(
+                45deg,
+                #ff0000,
+                #ff0000 10px,
+                #ffeb3b 10px,
+                #ffeb3b 20px
+            );
+            padding: 20px;
+            text-align: center;
+            margin: 40px 0;
+            font-weight: 900;
+            font-size: 1.5rem;
+            color: #000;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            animation: flash 2s infinite;
+        }
+        
+        @keyframes flash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .case-title {
+                font-size: 2rem;
+            }
+            
+            .crime-tape {
+                font-size: 1.5rem;
+            }
+            
+            .body-outline.left {
+                left: 25%;
+            }
+            
+            .body-outline.right {
+                right: 25%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="crime-tape">DO NOT CROSS - HEART CRIME SCENE - DO NOT CROSS</div>
+    <div class="crime-tape bottom">DO NOT CROSS - HEART CRIME SCENE - DO NOT CROSS</div>
+    
+    <div class="scene-container">
+        <div class="case-header">
+            <div class="case-number">CASE #BROKEN-HEART-2024-UNSOLVED</div>
+            <h1 class="case-title">Love Murder Investigation</h1>
+            <div class="case-status">COLD CASE - KILLER AT LARGE</div>
+        </div>
+        
+        <div class="crime-scene">
+            <div class="blood-splatter">
+                <div class="splatter"></div>
+                <div class="splatter"></div>
+                <div class="splatter"></div>
+                <div class="splatter"></div>
+            </div>
+            
+            <div class="chalk-outline">
+                <div class="body-outline left"></div>
+                <div class="body-outline right"></div>
+                <div class="separation-point"></div>
+                
+                <div class="evidence-marker A" onclick="showEvidence('A')">A</div>
+                <div class="evidence-marker B" onclick="showEvidence('B')">B</div>
+                <div class="evidence-marker C" onclick="showEvidence('C')">C</div>
+                <div class="evidence-marker D" onclick="showEvidence('D')">D</div>
+                <div class="evidence-marker E" onclick="showEvidence('E')">E</div>
+            </div>
+            
+            <div id="evidence-A" class="evidence-details">
+                <div class="evidence-label">Evidence A: Last Text Message</div>
+                <div class="evidence-content">
+                    "We need to talk" - Sent 11:47 PM<br>
+                    Read receipts: ON<br>
+                    Response time: Never<br>
+                    Analysis: Fatal blow delivered via 4 words
+                </div>
+            </div>
+            
+            <div id="evidence-B" class="evidence-details">
+                <div class="evidence-label">Evidence B: Their Toothbrush</div>
+                <div class="evidence-content">
+                    Location: Still in bathroom holder<br>
+                    Status: Abandoned property<br>
+                    DNA match: Confirmed<br>
+                    Emotional damage: Seeing it daily - severe
+                </div>
+            </div>
+            
+            <div id="evidence-C" class="evidence-details">
+                <div class="evidence-label">Evidence C: Broken Promises</div>
+                <div class="evidence-content">
+                    "Forever" - Duration: 2 years, 3 months<br>
+                    "I'll never hurt you" - Lie detected<br>
+                    "You're the only one" - Multiple suspects identified<br>
+                    Reliability rating: 0%
+                </div>
+            </div>
+            
+            <div id="evidence-D" class="evidence-details">
+                <div class="evidence-label">Evidence D: Murder Weapon</div>
+                <div class="evidence-content">
+                    Type: Words spoken in anger<br>
+                    Location: Still lodged in heart<br>
+                    Removal attempts: Failed<br>
+                    Permanent damage: Confirmed
+                </div>
+            </div>
+            
+            <div id="evidence-E" class="evidence-details">
+                <div class="evidence-label">Evidence E: Time of Death</div>
+                <div class="evidence-content">
+                    Exact moment: When they said "I don't love you anymore"<br>
+                    Witness: Your reflection in their cold eyes<br>
+                    Cause: Instant cardiac arrest<br>
+                    Revival attempts: All failed
+                </div>
+            </div>
+        </div>
+        
+        <div class="detective-notes">
+            <div class="note-entry">Victim bled out from thousand emotional cuts - death by a thousand "I'm fine"s</div>
+            <div class="note-entry">Suspect showed pattern of emotional unavailability - should have seen warning signs</div>
+            <div class="note-entry">Crime scene contaminated with false hope and wishful thinking</div>
+            <div class="note-entry">Witnesses report "seeing this coming for months" - failed to intervene</div>
+            <div class="note-entry">Suspect profile: Armed with indifference and extremely dangerous to hearts</div>
+        </div>
+        
+        <div class="forensics-report">
+            <div class="report-section">
+                <div class="report-title">Autopsy Results</div>
+                <div class="report-content">
+                    Heart showed signs of repeated trauma. Multiple scars from previous injuries detected. 
+                    Cause of death: Chronic exposure to mixed signals and emotional neglect. 
+                    Victim loved too much, suspect loved too little.
+                </div>
+            </div>
+            
+            <div class="report-section">
+                <div class="report-title">DNA Evidence</div>
+                <div class="report-content">
+                    Their hair still on your pillow - preserved for daily torment. 
+                    Scent particles detected on clothing. 
+                    Fingerprints of deceit found on every surface they touched.
+                </div>
+            </div>
+            
+            <div class="report-section">
+                <div class="report-title">Motive Analysis</div>
+                <div class="report-content">
+                    Primary: Victim's crime of loving unconditionally<br>
+                    Secondary: Suspect found "something better"<br>
+                    Premeditation: Evidence suggests planned execution
+                </div>
+            </div>
+            
+            <div class="report-section">
+                <div class="report-title">Suspect Location</div>
+                <div class="report-content">
+                    Last seen: Someone else's bed<br>
+                    Status: Starting fresh with new victim<br>
+                    Warning: Suspect will kill again<br>
+                    Approach with extreme caution
+                </div>
+            </div>
+        </div>
+        
+        <div class="evidence-photos">
+            <div class="photo-evidence" onclick="alert('Memory too painful to display')">
+                <div class="photo-content">First kiss location<br>Now a crime scene</div>
+            </div>
+            <div class="photo-evidence" onclick="alert('Evidence contaminated with tears')">
+                <div class="photo-content">"Our song" playlist<br>Now sounds like sirens</div>
+            </div>
+            <div class="photo-evidence" onclick="alert('Handle with emotional hazmat suit')">
+                <div class="photo-content">Anniversary gifts<br>Toxic evidence</div>
+            </div>
+            <div class="photo-evidence" onclick="alert('Viewing may cause relapse')">
+                <div class="photo-content">Happy photos<br>Before the murder</div>
+            </div>
+        </div>
+        
+        <div class="warning-banner">
+            ⚠ SIMILAR CRIMES REPORTED IN AREA - PROTECT YOUR HEART ⚠
+        </div>
+        
+        <div class="detective-notes">
+            <div class="note-entry">Evidence locker contains all gifts and letters - CONTAMINATED - Do not open</div>
+            <div class="note-entry">Case will remain open indefinitely - No statute of limitations on heartbreak</div>
+            <div class="note-entry">If you have any information about this crime, trust no one</div>
+            <div class="note-entry">Remember: Love kills. Handle with maximum security protocols</div>
+        </div>
+    </div>
+    
+    <script>
+        function showEvidence(marker) {
+            // Hide all evidence details
+            const allEvidence = document.querySelectorAll('.evidence-details');
+            allEvidence.forEach(e => e.classList.remove('active'));
+            
+            // Show selected evidence
+            const evidence = document.getElementById(`evidence-${marker}`);
+            evidence.classList.toggle('active');
+        }
+        
+        // Add ambient crime scene sounds
+        window.addEventListener('load', () => {
+            // Create typewriter effect for detective notes
+            const notes = document.querySelectorAll('.note-entry');
+            notes.forEach((note, index) => {
+                note.style.opacity = '0';
+                setTimeout(() => {
+                    note.style.opacity = '1';
+                    note.style.animation = 'fadeIn 1s';
+                }, index * 500);
+            });
+        });
+        
+        // Add blood drip animation on click
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('crime-scene')) {
+                const splatter = document.createElement('div');
+                splatter.className = 'splatter';
+                splatter.style.left = e.pageX + 'px';
+                splatter.style.top = e.pageY + 'px';
+                splatter.style.width = '20px';
+                splatter.style.height = '20px';
+                document.querySelector('.blood-splatter').appendChild(splatter);
+                
+                setTimeout(() => splatter.remove(), 4000);
+            }
+        });
+    </script>
+</body>
+</html>

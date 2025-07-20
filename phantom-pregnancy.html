@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phantom Pregnancy Test - Results</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;700&family=Kalam:wght@300&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #f0f0f0;
+            font-family: 'Roboto Mono', monospace;
+            color: #333;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,0,0,0.03) 2px,
+                rgba(0,0,0,0.03) 4px
+            );
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .medical-header {
+            background: #fff;
+            padding: 20px;
+            border-bottom: 3px solid #e0e0e0;
+            text-align: center;
+        }
+        
+        .medical-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .medical-header .subtitle {
+            font-size: 14px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .test-device {
+            background: #fff;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .test-window {
+            background: #f8f8f8;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .result-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            background: #fafafa;
+            border-left: 4px solid #e74c3c;
+            transition: all 0.3s ease;
+        }
+        
+        .result-line:hover {
+            background: #f5f5f5;
+            transform: translateX(5px);
+        }
+        
+        .result-text {
+            font-size: 16px;
+            color: #2c3e50;
+        }
+        
+        .result-status {
+            font-weight: 700;
+            color: #e74c3c;
+            font-size: 18px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .ultrasound-section {
+            background: #000;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 30px 0;
+            position: relative;
+            height: 300px;
+            overflow: hidden;
+        }
+        
+        .ultrasound-screen {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, #111 0%, #000 70%);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .void-text {
+            font-size: 48px;
+            color: #0f0;
+            font-family: monospace;
+            text-shadow: 0 0 10px #0f0;
+            opacity: 0;
+            animation: voidAppear 3s forwards;
+        }
+        
+        @keyframes voidAppear {
+            0% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        .phantom-figure {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: phantomFade 5s infinite;
+        }
+        
+        @keyframes phantomFade {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 0.3; }
+        }
+        
+        .name-section {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+        
+        .name-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Kalam', cursive;
+        }
+        
+        .fading-names {
+            margin-top: 20px;
+            min-height: 100px;
+        }
+        
+        .fading-name {
+            font-family: 'Kalam', cursive;
+            font-size: 24px;
+            color: #666;
+            margin: 10px 0;
+            animation: nameFade 5s forwards;
+        }
+        
+        @keyframes nameFade {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+        
+        .due-date-calculator {
+            background: #2c3e50;
+            color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .due-date-display {
+            font-size: 36px;
+            font-weight: 700;
+            margin: 20px 0;
+            overflow: hidden;
+            height: 50px;
+        }
+        
+        .never-scroll {
+            animation: neverScroll 10s linear infinite;
+        }
+        
+        @keyframes neverScroll {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-500px); }
+        }
+        
+        .symptoms-list {
+            background: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 30px 0;
+            border: 2px dashed #ddd;
+        }
+        
+        .symptom-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 16px;
+            color: #555;
+        }
+        
+        .symptom-item::before {
+            content: "✓ ";
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .doctor-notes {
+            background: #fffbf0;
+            border: 2px solid #f0e6d2;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 30px 0;
+            font-family: 'Kalam', cursive;
+            font-size: 18px;
+            color: #444;
+            transform: rotate(-1deg);
+        }
+        
+        .baby-items {
+            background: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+        
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .item-status {
+            color: #e74c3c;
+            font-weight: bold;
+            text-decoration: line-through;
+        }
+        
+        .gender-reveal {
+            background: linear-gradient(45deg, #ffb3ba, #bae1ff);
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .gender-text {
+            font-size: 48px;
+            font-weight: 700;
+            color: #2c3e50;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: voidPulse 3s infinite;
+        }
+        
+        @keyframes voidPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .support-group {
+            background: #34495e;
+            color: #ecf0f1;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .final-diagnosis {
+            background: #e74c3c;
+            color: #fff;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 40px 0;
+            font-size: 24px;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.3);
+            animation: diagnosisPulse 2s infinite;
+        }
+        
+        @keyframes diagnosisPulse {
+            0%, 100% { box-shadow: 0 10px 30px rgba(231, 76, 60, 0.3); }
+            50% { box-shadow: 0 15px 40px rgba(231, 76, 60, 0.5); }
+        }
+        
+        .crying-sound {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2c3e50;
+            color: #fff;
+            padding: 15px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .crying-sound:hover {
+            background: #34495e;
+            transform: scale(1.05);
+        }
+        
+        .milestone-book {
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+            border: 3px solid #e0e0e0;
+        }
+        
+        .milestone-page {
+            padding: 20px;
+            margin: 10px 0;
+            background: #fafafa;
+            border-left: 5px solid #bdc3c7;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .milestone-page::after {
+            content: "NEVER ACHIEVED";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 48px;
+            color: rgba(231, 76, 60, 0.2);
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="medical-header">
+        <h1>PHANTOM PREGNANCY TEST</h1>
+        <p class="subtitle">Testing for futures that died with the relationship</p>
+    </div>
+    
+    <div class="container">
+        <div class="test-device">
+            <h2 style="text-align: center; margin-bottom: 20px; color: #2c3e50;">TEST RESULTS</h2>
+            
+            <div class="test-window">
+                <div class="result-line">
+                    <span class="result-text">Pregnant with: False hopes</span>
+                    <span class="result-status">POSITIVE</span>
+                </div>
+                <div class="result-line">
+                    <span class="result-text">Pregnant with: Dead dreams</span>
+                    <span class="result-status">POSITIVE</span>
+                </div>
+                <div class="result-line">
+                    <span class="result-text">Pregnant with: What could have been</span>
+                    <span class="result-status">POSITIVE</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="ultrasound-section">
+            <div class="ultrasound-screen">
+                <div class="phantom-figure" style="top: 20%; left: 30%;"></div>
+                <div class="phantom-figure" style="top: 60%; left: 60%;"></div>
+                <div class="void-text">EMPTY</div>
+            </div>
+        </div>
+        
+        <div class="name-section">
+            <h3 style="margin-bottom: 15px; color: #2c3e50;">Name the children you'll never have:</h3>
+            <input type="text" class="name-input" placeholder="Enter a name and watch it fade..." id="nameInput">
+            <div class="fading-names" id="fadingNames"></div>
+        </div>
+        
+        <div class="due-date-calculator">
+            <h3>DUE DATE CALCULATOR</h3>
+            <div class="due-date-display">
+                <div class="never-scroll">
+                    NEVER<br>NEVER<br>NEVER<br>NEVER<br>NEVER<br>NEVER<br>NEVER<br>NEVER<br>NEVER<br>NEVER
+                </div>
+            </div>
+        </div>
+        
+        <div class="gender-reveal">
+            <h3 style="margin-bottom: 20px;">GENDER REVEAL</h3>
+            <div class="gender-text">IT'S A VOID!</div>
+        </div>
+        
+        <div class="symptoms-list">
+            <h3 style="margin-bottom: 20px; color: #2c3e50;">PHANTOM PREGNANCY SYMPTOMS</h3>
+            <div class="symptom-item">Morning sickness from grief</div>
+            <div class="symptom-item">Swollen with sadness</div>
+            <div class="symptom-item">Cravings for what could have been</div>
+            <div class="symptom-item">Fatigue from carrying broken dreams</div>
+            <div class="symptom-item">Mood swings between hope and despair</div>
+        </div>
+        
+        <div class="doctor-notes">
+            <h3 style="margin-bottom: 15px;">Doctor's Notes:</h3>
+            <p>"Patient carrying ghost of future family. Prognosis: Chronic emptiness where love once grew. Prescribed: Time and tears."</p>
+        </div>
+        
+        <div class="baby-items">
+            <h3 style="margin-bottom: 20px; color: #2c3e50;">BABY ITEMS CHECKLIST</h3>
+            <div class="item-row">
+                <span>Crib</span>
+                <span class="item-status">WILL NOT BE NEEDED</span>
+            </div>
+            <div class="item-row">
+                <span>Baby clothes</span>
+                <span class="item-status">WILL NOT BE NEEDED</span>
+            </div>
+            <div class="item-row">
+                <span>Stroller</span>
+                <span class="item-status">WILL NOT BE NEEDED</span>
+            </div>
+            <div class="item-row">
+                <span>Nursery decorations</span>
+                <span class="item-status">WILL NOT BE NEEDED</span>
+            </div>
+            <div class="item-row">
+                <span>Love and happiness</span>
+                <span class="item-status">WILL NOT BE NEEDED</span>
+            </div>
+        </div>
+        
+        <div class="milestone-book">
+            <h3 style="margin-bottom: 20px; color: #2c3e50;">BABY BOOK - MILESTONES</h3>
+            <div class="milestone-page">
+                <h4>First Smile</h4>
+                <p>Would have happened at 6 weeks</p>
+            </div>
+            <div class="milestone-page">
+                <h4>First Word</h4>
+                <p>Would have been "mama" or "dada"</p>
+            </div>
+            <div class="milestone-page">
+                <h4>First Steps</h4>
+                <p>Would have stumbled into your arms</p>
+            </div>
+            <div class="milestone-page">
+                <h4>First Day of School</h4>
+                <p>Would have cried, then been brave</p>
+            </div>
+        </div>
+        
+        <div class="support-group">
+            <h3>SUPPORT GROUP</h3>
+            <p style="margin-top: 15px; font-size: 18px;">Mothers of Never-Born Dreams</p>
+            <p style="margin-top: 10px; opacity: 0.8;">Meeting every day in the hearts of the grieving</p>
+        </div>
+        
+        <div class="final-diagnosis">
+            PHANTOM PREGNANCY - TERMINAL<br>
+            <span style="font-size: 16px; font-weight: 400;">No cure. Only time.</span>
+        </div>
+    </div>
+    
+    <div class="crying-sound" id="cryingSound">
+        🔊 Phantom crying
+    </div>
+    
+    <script>
+        // Name fading functionality
+        const nameInput = document.getElementById('nameInput');
+        const fadingNames = document.getElementById('fadingNames');
+        
+        nameInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && this.value.trim()) {
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'fading-name';
+                nameDiv.textContent = this.value;
+                fadingNames.appendChild(nameDiv);
+                this.value = '';
+                
+                setTimeout(() => {
+                    nameDiv.remove();
+                }, 5000);
+            }
+        });
+        
+        // Phantom crying sound
+        const cryingSound = document.getElementById('cryingSound');
+        let cryingInterval;
+        let isPlaying = false;
+        
+        cryingSound.addEventListener('click', function() {
+            if (!isPlaying) {
+                this.textContent = '🔇 Silence...';
+                isPlaying = true;
+                
+                // Simulate phantom crying that stops when you listen
+                setTimeout(() => {
+                    this.textContent = '🔊 Phantom crying';
+                    isPlaying = false;
+                }, 2000);
+            }
+        });
+        
+        // Add more phantom figures randomly
+        const ultrasoundScreen = document.querySelector('.ultrasound-screen');
+        
+        setInterval(() => {
+            const figure = document.createElement('div');
+            figure.className = 'phantom-figure';
+            figure.style.top = Math.random() * 80 + 10 + '%';
+            figure.style.left = Math.random() * 80 + 10 + '%';
+            figure.style.animationDelay = Math.random() * 2 + 's';
+            ultrasoundScreen.appendChild(figure);
+            
+            setTimeout(() => {
+                figure.remove();
+            }, 5000);
+        }, 3000);
+        
+        // Page fade-in effect
+        document.body.style.opacity = '0';
+        setTimeout(() => {
+            document.body.style.transition = 'opacity 2s';
+            document.body.style.opacity = '1';
+        }, 100);
+    </script>
+</body>
+</html>

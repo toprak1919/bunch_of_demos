@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eternal Waiting Room - Your Number: ∞</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Courier+New&family=Arial&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: #e8e8e8;
+            color: #333;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Flickering fluorescent light effect */
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            92% { opacity: 1; }
+            93% { opacity: 0.6; }
+            94% { opacity: 1; }
+            95% { opacity: 0.7; }
+            96% { opacity: 1; }
+        }
+        
+        .waiting-room {
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
+            animation: flicker 8s infinite;
+            position: relative;
+        }
+        
+        /* Header with check-in desk */
+        .check-in-desk {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #1a252f;
+            position: relative;
+        }
+        
+        .desk-sign {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .waiting-for {
+            font-size: 18px;
+            color: #ecf0f1;
+            font-style: italic;
+        }
+        
+        /* Ticket number display */
+        .ticket-display {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #e74c3c;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 5px;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .ticket-display .infinity {
+            font-size: 30px;
+            vertical-align: middle;
+        }
+        
+        /* Main waiting area */
+        .main-area {
+            display: grid;
+            grid-template-columns: 1fr 3fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Left sidebar */
+        .left-sidebar {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .announcement-board {
+            background: #34495e;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .announcement-board h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .now-serving {
+            font-size: 24px;
+            font-weight: bold;
+            color: #e74c3c;
+            animation: blink 2s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50%, 100% { opacity: 1; }
+            25%, 75% { opacity: 0.3; }
+        }
+        
+        /* Clock with backwards hands */
+        .clock-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .clock {
+            width: 150px;
+            height: 150px;
+            border: 8px solid #2c3e50;
+            border-radius: 50%;
+            position: relative;
+            margin: 0 auto;
+            background: white;
+        }
+        
+        .clock-hand {
+            position: absolute;
+            background: #2c3e50;
+            transform-origin: bottom;
+            left: 50%;
+            bottom: 50%;
+        }
+        
+        .hour-hand {
+            width: 4px;
+            height: 40px;
+            margin-left: -2px;
+            animation: rotate-backwards 43200s linear infinite;
+        }
+        
+        .minute-hand {
+            width: 2px;
+            height: 55px;
+            margin-left: -1px;
+            animation: rotate-backwards 3600s linear infinite;
+        }
+        
+        @keyframes rotate-backwards {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(-360deg); }
+        }
+        
+        /* Center content */
+        .center-content {
+            background: white;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .receptionist-desk {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            text-align: center;
+            border: 2px solid #bdc3c7;
+        }
+        
+        .receptionist-message {
+            font-size: 20px;
+            color: #2c3e50;
+            font-style: italic;
+            margin: 10px 0;
+        }
+        
+        .appointment-card {
+            background: #fff;
+            border: 2px dashed #95a5a6;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+            transform: rotate(-1deg);
+        }
+        
+        .appointment-card h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            color: #2c3e50;
+        }
+        
+        .appointment-details {
+            font-family: 'Courier New', monospace;
+            line-height: 1.8;
+        }
+        
+        .appointment-time {
+            font-size: 20px;
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        /* Waiting chairs with ghost figures */
+        .waiting-chairs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .chair {
+            width: 100%;
+            height: 80px;
+            background: #95a5a6;
+            border-radius: 5px 5px 0 0;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .ghost-figure {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 60px;
+            background: rgba(149, 165, 166, 0.3);
+            border-radius: 50% 50% 0 0;
+            opacity: 0.5;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .ghost-figure::after {
+            content: attr(data-years);
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: #7f8c8d;
+            white-space: nowrap;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-10px); }
+        }
+        
+        /* Right sidebar */
+        .right-sidebar {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .magazine-rack {
+            margin-bottom: 30px;
+        }
+        
+        .magazine-rack h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            text-transform: uppercase;
+        }
+        
+        .magazine {
+            background: #ecf0f1;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #95a5a6;
+            font-size: 14px;
+        }
+        
+        .magazine-date {
+            font-size: 12px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        
+        .vending-machine {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .vending-machine h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+        
+        .vending-item {
+            background: #34495e;
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+        
+        .out-of-order {
+            color: #e74c3c;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        /* TV Screen */
+        .tv-screen {
+            background: black;
+            color: #0f0;
+            padding: 20px;
+            margin: 20px 0;
+            border: 10px solid #333;
+            border-radius: 5px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tv-message {
+            font-size: 18px;
+            animation: scroll-left 10s linear infinite;
+            white-space: nowrap;
+        }
+        
+        @keyframes scroll-left {
+            from { transform: translateX(100%); }
+            to { transform: translateX(-100%); }
+        }
+        
+        /* Exit door */
+        .exit-door {
+            background: #c0392b;
+            color: white;
+            padding: 30px;
+            text-align: center;
+            margin-top: 40px;
+            position: relative;
+            border: 5px solid #a93226;
+        }
+        
+        .exit-sign {
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        
+        .exit-message {
+            font-size: 16px;
+            font-style: italic;
+        }
+        
+        /* Medical form */
+        .medical-form {
+            background: #fff;
+            border: 1px solid #bdc3c7;
+            padding: 20px;
+            margin: 20px 0;
+            transform: rotate(1deg);
+        }
+        
+        .form-header {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+        
+        .form-field {
+            margin-bottom: 10px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .form-label {
+            font-weight: bold;
+        }
+        
+        .form-value {
+            color: #e74c3c;
+            font-style: italic;
+        }
+        
+        /* Final message */
+        .final-message {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        /* Water cooler */
+        .water-cooler {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #3498db;
+        }
+        
+        .water-cooler h4 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            text-transform: uppercase;
+        }
+        
+        .conversation {
+            font-style: italic;
+            color: #7f8c8d;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        
+        /* False hope door animation */
+        .false-hope-door {
+            position: fixed;
+            top: 50%;
+            right: -300px;
+            transform: translateY(-50%);
+            width: 250px;
+            height: 400px;
+            background: #8b6914;
+            border: 5px solid #654321;
+            box-shadow: -5px 0 20px rgba(0,0,0,0.3);
+            animation: door-tease 20s infinite;
+            z-index: 100;
+        }
+        
+        @keyframes door-tease {
+            0%, 90%, 100% { right: -300px; }
+            92% { right: -100px; }
+            94% { right: -150px; }
+            96% { right: -100px; }
+            98% { right: -300px; }
+        }
+        
+        .door-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-90deg);
+            font-size: 18px;
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        
+        /* Background music indicator */
+        .music-indicator {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            animation: fade-in-out 3s ease-in-out infinite;
+        }
+        
+        @keyframes fade-in-out {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        /* Bathroom sign */
+        .bathroom-sign {
+            background: #e74c3c;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="waiting-room">
+        <!-- Music indicator -->
+        <div class="music-indicator">
+            ♪ Now playing: Their favorite song (Loop #8,743)
+        </div>
+        
+        <!-- False hope door -->
+        <div class="false-hope-door">
+            <div class="door-text">Maybe it's them...</div>
+        </div>
+        
+        <!-- Check-in desk -->
+        <div class="check-in-desk">
+            <div class="desk-sign">Memorial Hospital Waiting Room</div>
+            <div class="waiting-for">Waiting for: Them to realize their mistake</div>
+            <div class="ticket-display">
+                Your number: <span class="infinity">∞</span>
+            </div>
+        </div>
+        
+        <!-- Main area -->
+        <div class="main-area">
+            <!-- Left sidebar -->
+            <div class="left-sidebar">
+                <div class="announcement-board">
+                    <h3>Now Serving</h3>
+                    <div class="now-serving">NEVER YOU</div>
+                </div>
+                
+                <div class="clock-container">
+                    <div class="clock">
+                        <div class="clock-hand hour-hand"></div>
+                        <div class="clock-hand minute-hand"></div>
+                    </div>
+                    <p style="margin-top: 10px; font-size: 12px; color: #7f8c8d;">
+                        Time moves backwards here
+                    </p>
+                </div>
+                
+                <div class="water-cooler">
+                    <h4>Water Cooler Talk</h4>
+                    <div class="conversation">"I've been waiting since 2003..."</div>
+                    <div class="conversation">"My number was 47. That was in '97."</div>
+                    <div class="conversation">"They said 'just a minute' in 2010."</div>
+                </div>
+            </div>
+            
+            <!-- Center content -->
+            <div class="center-content">
+                <div class="receptionist-desk">
+                    <h3>Reception</h3>
+                    <div class="receptionist-message">"Just a little longer..."</div>
+                    <div style="font-size: 14px; color: #7f8c8d; margin-top: 10px;">
+                        (She's been saying this for 15 years)
+                    </div>
+                </div>
+                
+                <div class="appointment-card">
+                    <h3>Appointment Card</h3>
+                    <div class="appointment-details">
+                        <div>Patient: <span style="color: #e74c3c;">YOU</span></div>
+                        <div>Doctor: <span style="color: #e74c3c;">Closure, MD</span></div>
+                        <div>Date: <span style="color: #e74c3c;">Someday™</span></div>
+                        <div class="appointment-time">Time: When hell freezes over</div>
+                    </div>
+                </div>
+                
+                <div class="tv-screen">
+                    <div class="tv-message">
+                        BREAKING NEWS: They're not coming back... They're not coming back... They're not coming back...
+                    </div>
+                </div>
+                
+                <div class="waiting-chairs">
+                    <div class="chair">
+                        <div class="ghost-figure" data-years="Waiting since 1987"></div>
+                    </div>
+                    <div class="chair">
+                        <div class="ghost-figure" data-years="Here since 1993"></div>
+                    </div>
+                    <div class="chair">
+                        <div class="ghost-figure" data-years="Arrived in 2001"></div>
+                    </div>
+                    <div class="chair">
+                        <div class="ghost-figure" data-years="Checked in 2008"></div>
+                    </div>
+                    <div class="chair">
+                        <div class="ghost-figure" data-years="Since 2012"></div>
+                    </div>
+                    <div class="chair">
+                        <div class="ghost-figure" data-years="2015 arrival"></div>
+                    </div>
+                    <div class="chair">
+                        <div class="ghost-figure" data-years="2019 patient"></div>
+                    </div>
+                    <div class="chair">
+                        <div class="ghost-figure" data-years="New - 2023"></div>
+                    </div>
+                </div>
+                
+                <div class="medical-form">
+                    <div class="form-header">Patient Intake Form</div>
+                    <div class="form-field">
+                        <span class="form-label">Name:</span>
+                        <span class="form-value">Still Waiting</span>
+                    </div>
+                    <div class="form-field">
+                        <span class="form-label">Reason for visit:</span>
+                        <span class="form-value">Can't let go</span>
+                    </div>
+                    <div class="form-field">
+                        <span class="form-label">Symptoms:</span>
+                        <span class="form-value">Chronic hope, acute denial</span>
+                    </div>
+                    <div class="form-field">
+                        <span class="form-label">Insurance:</span>
+                        <span class="form-value">Expired (like the relationship)</span>
+                    </div>
+                </div>
+                
+                <div class="bathroom-sign">
+                    🚻 Restrooms: Out of Order - Like Your Life
+                </div>
+            </div>
+            
+            <!-- Right sidebar -->
+            <div class="right-sidebar">
+                <div class="magazine-rack">
+                    <h3>Reading Material</h3>
+                    <div class="magazine">
+                        "Getting Over It"
+                        <div class="magazine-date">March 1987 (Unread)</div>
+                    </div>
+                    <div class="magazine">
+                        "Moving On Monthly"
+                        <div class="magazine-date">July 1992 (Pristine)</div>
+                    </div>
+                    <div class="magazine">
+                        "Let Go Lifestyle"
+                        <div class="magazine-date">December 1999 (Untouched)</div>
+                    </div>
+                    <div class="magazine">
+                        "Acceptance Today"
+                        <div class="magazine-date">January 2005 (Still wrapped)</div>
+                    </div>
+                </div>
+                
+                <div class="vending-machine">
+                    <h3>Vending Machine</h3>
+                    <div class="vending-item">A1: False Hope - $2.50</div>
+                    <div class="vending-item">A2: Delusions - $3.00</div>
+                    <div class="vending-item">B1: Empty Promises - $2.75</div>
+                    <div class="vending-item">B2: What Ifs - $3.50</div>
+                    <div class="vending-item out-of-order">C1: Reality - OUT OF STOCK</div>
+                    <div class="vending-item out-of-order">C2: Closure - SOLD OUT</div>
+                </div>
+                
+                <div style="background: #ecf0f1; padding: 15px; border-radius: 5px; text-align: center;">
+                    <h4 style="font-size: 14px; margin-bottom: 10px;">Other Patients' Stories</h4>
+                    <p style="font-size: 12px; color: #7f8c8d; margin: 5px 0;">
+                        "Still waiting after 10 years"
+                    </p>
+                    <p style="font-size: 12px; color: #7f8c8d; margin: 5px 0;">
+                        "They said they'd call..."
+                    </p>
+                    <p style="font-size: 12px; color: #7f8c8d; margin: 5px 0;">
+                        "Maybe tomorrow"
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Exit door section -->
+        <div class="exit-door">
+            <div class="exit-sign">🔒 EXIT DOOR - LOCKED</div>
+            <div class="exit-message">No exit until they return</div>
+            <div style="font-size: 14px; margin-top: 10px; opacity: 0.8;">
+                (Management apologizes for the inconvenience)
+            </div>
+        </div>
+        
+        <!-- Final message -->
+        <div class="final-message">
+            YOUR WAIT TIME IS: FOREVER
+        </div>
+    </div>
+</body>
+</html>

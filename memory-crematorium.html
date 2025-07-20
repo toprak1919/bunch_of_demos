@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Crematorium - Final Services for Your Past</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Old+Standard+TT:ital@0;1&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a0a;
+            color: #d4d4d4;
+            font-family: 'Old Standard TT', serif;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="%23000"/><path d="M0 0L50 50L0 100M50 0L100 50L50 100" stroke="%23111" stroke-width="0.5" fill="none"/></svg>');
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);
+            border-bottom: 2px solid #333;
+        }
+        
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 3em;
+            font-weight: 600;
+            color: #8b7355;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+        }
+        
+        .tagline {
+            font-style: italic;
+            color: #666;
+            font-size: 1.2em;
+            letter-spacing: 2px;
+        }
+        
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .service-section {
+            background: #141414;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+        }
+        
+        .section-title {
+            font-family: 'Cinzel', serif;
+            font-size: 2em;
+            color: #8b7355;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+        
+        .upload-area {
+            border: 2px dashed #444;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #0f0f0f;
+        }
+        
+        .upload-area:hover {
+            border-color: #8b7355;
+            background: #1a1a1a;
+        }
+        
+        .upload-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+            color: #666;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .memory-item {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .memory-item.burning {
+            animation: shake 0.3s infinite;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+        }
+        
+        .memory-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .memory-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 2px solid #333;
+        }
+        
+        .memory-details {
+            flex: 1;
+        }
+        
+        .memory-text {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        
+        .burn-timer {
+            color: #ff6b6b;
+            font-size: 0.9em;
+            font-style: italic;
+        }
+        
+        .cremation-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .option-card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(139, 115, 85, 0.3);
+            border-color: #8b7355;
+        }
+        
+        .option-card.selected {
+            border-color: #8b7355;
+            background: #1f1a16;
+        }
+        
+        .urn-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        
+        .option-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.3em;
+            color: #8b7355;
+            margin-bottom: 5px;
+        }
+        
+        .option-description {
+            color: #888;
+            font-size: 0.9em;
+        }
+        
+        .cremate-button {
+            background: linear-gradient(135deg, #8b1a1a 0%, #cd5c5c 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-family: 'Cinzel', serif;
+            font-size: 1.2em;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 30px;
+            width: 100%;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .cremate-button:hover {
+            background: linear-gradient(135deg, #a52a2a 0%, #dc143c 100%);
+            transform: scale(1.02);
+        }
+        
+        .certificate {
+            background: #f4f1e8;
+            color: #333;
+            padding: 40px;
+            border: 3px solid #8b7355;
+            border-radius: 10px;
+            margin-top: 30px;
+            text-align: center;
+            position: relative;
+            display: none;
+        }
+        
+        .certificate::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 1px solid #8b7355;
+            border-radius: 5px;
+            pointer-events: none;
+        }
+        
+        .certificate-title {
+            font-family: 'Cinzel', serif;
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        
+        .certificate-content {
+            font-size: 1.2em;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+        
+        .witness-line {
+            border-top: 1px solid #333;
+            margin-top: 40px;
+            padding-top: 10px;
+            font-style: italic;
+        }
+        
+        .fire-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            display: none;
+        }
+        
+        .flame {
+            position: absolute;
+            width: 40px;
+            height: 60px;
+            background: linear-gradient(to top, #ff6b6b, #ffa500, #ffff00);
+            border-radius: 0 50% 50% 50%;
+            transform: rotate(-45deg);
+            animation: flicker 0.5s infinite;
+            filter: blur(2px);
+        }
+        
+        @keyframes flicker {
+            0%, 100% { transform: rotate(-45deg) scale(1); opacity: 1; }
+            50% { transform: rotate(-45deg) scale(1.1); opacity: 0.8; }
+        }
+        
+        .ash-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #666;
+            border-radius: 50%;
+            animation: float-away 3s ease-out forwards;
+        }
+        
+        @keyframes float-away {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--x), -200px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .columbarium {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .urn-slot {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px;
+            position: relative;
+            min-height: 120px;
+        }
+        
+        .urn-slot.occupied {
+            background: #1f1a16;
+            border-color: #8b7355;
+        }
+        
+        .memorial-plaque {
+            font-size: 0.9em;
+            color: #8b7355;
+            margin-top: 10px;
+        }
+        
+        .warning-section {
+            background: rgba(139, 26, 26, 0.2);
+            border: 1px solid #8b1a1a;
+            border-radius: 5px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .warning-title {
+            color: #ff6b6b;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        
+        .smoke-text {
+            position: fixed;
+            font-family: 'Cinzel', serif;
+            font-size: 3em;
+            color: rgba(255, 255, 255, 0.1);
+            pointer-events: none;
+            animation: smoke-rise 5s ease-out forwards;
+        }
+        
+        @keyframes smoke-rise {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-300px) scale(2);
+                opacity: 0;
+            }
+        }
+        
+        .eulogy-section {
+            background: #0f0f0f;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+            font-style: italic;
+            text-align: center;
+            color: #888;
+        }
+        
+        .scatter-options {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .scatter-button {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #8b7355;
+        }
+        
+        .scatter-button:hover {
+            background: #1f1a16;
+            border-color: #8b7355;
+        }
+        
+        audio {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Memory Crematorium</h1>
+        <p class="tagline">Cremate memories and scatter their ashes</p>
+    </div>
+    
+    <div class="main-container">
+        <div class="service-section">
+            <h2 class="section-title">Upload Memories for Cremation</h2>
+            <div class="upload-area" onclick="document.getElementById('memoryUpload').click()">
+                <div class="upload-icon">⚱️</div>
+                <p>Click to upload memories (photos/text)</p>
+                <p style="color: #666; font-size: 0.9em; margin-top: 10px">Each memory will be given its final rites</p>
+            </div>
+            <input type="file" id="memoryUpload" accept="image/*" multiple>
+            
+            <div id="memoryList" style="margin-top: 20px;"></div>
+        </div>
+        
+        <div class="service-section">
+            <h2 class="section-title">Cremation Options</h2>
+            <div class="cremation-options">
+                <div class="option-card" data-burn="quick">
+                    <div class="urn-icon">🔥</div>
+                    <div class="option-title">Quick Burn</div>
+                    <div class="option-description">Swift mercy - 30 seconds to ash</div>
+                </div>
+                <div class="option-card" data-burn="slow">
+                    <div class="urn-icon">🕯️</div>
+                    <div class="option-title">Slow Painful Burn</div>
+                    <div class="option-description">Watch them suffer - 2 minutes of agony</div>
+                </div>
+                <div class="option-card" data-burn="bulk">
+                    <div class="urn-icon">💔</div>
+                    <div class="option-title">Burn Entire Relationship</div>
+                    <div class="option-description">30% discount on bulk cremation</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="service-section">
+            <h2 class="section-title">Select Urn</h2>
+            <div class="cremation-options">
+                <div class="option-card urn-option" data-urn="plastic">
+                    <div class="urn-icon">🗑️</div>
+                    <div class="option-title">Cheap Plastic</div>
+                    <div class="option-description">They weren't worth much anyway</div>
+                </div>
+                <div class="option-card urn-option" data-urn="standard">
+                    <div class="urn-icon">⚱️</div>
+                    <div class="option-title">Standard Bronze</div>
+                    <div class="option-description">Adequate containment for regret</div>
+                </div>
+                <div class="option-card urn-option" data-urn="ornate">
+                    <div class="urn-icon">🏺</div>
+                    <div class="option-title">Ornate Suffering</div>
+                    <div class="option-description">Beautiful vessel for painful memories</div>
+                </div>
+            </div>
+        </div>
+        
+        <button class="cremate-button" onclick="startCremation()">Begin Cremation Ceremony</button>
+        
+        <div class="certificate" id="certificate">
+            <h3 class="certificate-title">Certificate of Cremation</h3>
+            <div class="certificate-content">
+                <p>This certifies that the memories of</p>
+                <p style="font-size: 1.5em; margin: 20px 0; font-family: 'Cinzel', serif;" id="memoryName">[Memory Name]</p>
+                <p>have been reduced to ashes on this day</p>
+                <p style="font-size: 1.2em; margin-top: 20px;" id="cremationDate">[Date]</p>
+            </div>
+            <div class="witness-line">
+                <p>"I watched it all burn"</p>
+                <p style="margin-top: 10px;">_________________________</p>
+                <p style="font-size: 0.9em; color: #666;">Witness Signature</p>
+            </div>
+        </div>
+        
+        <div class="service-section">
+            <h2 class="section-title">Columbarium - Wall of Memories</h2>
+            <div class="columbarium" id="columbarium"></div>
+        </div>
+        
+        <div class="service-section">
+            <h2 class="section-title">Scattering Options</h2>
+            <div class="scatter-options">
+                <button class="scatter-button" onclick="scatterAshes('sea')">🌊 Sea of Tears</button>
+                <button class="scatter-button" onclick="scatterAshes('wind')">💨 Wind of Change</button>
+                <button class="scatter-button" onclick="scatterAshes('garden')">🥀 Garden of Regret</button>
+            </div>
+        </div>
+        
+        <div class="eulogy-section">
+            <p id="eulogyText">"Here lies the time we were happy. May it rest in pieces."</p>
+        </div>
+        
+        <div class="warning-section">
+            <div class="warning-title">⚠️ Warning</div>
+            <p>Some memories refuse to burn completely. Fragments may resurface when least expected.</p>
+        </div>
+        
+        <div class="service-section">
+            <h2 class="section-title">Aftercare Services</h2>
+            <p style="text-align: center; color: #888; margin-top: 20px;">
+                "Learning to live with the ashes"<br>
+                <span style="font-size: 0.9em;">No memorial service available - no one wants to remember</span>
+            </p>
+        </div>
+    </div>
+    
+    <audio id="fireSound">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSl+zPLaizsGG2W57OScTgwOUarm7LJcGAU2kNbzzn0vBSF1xe/glEMKEmqx6OWlUBULSaPj8bljHAU7k9j1znkqBChsy/PajDEGHmO26+OeTQ0OVKzm7qtXFAVGod/ws2IeBDiS2PLL"
+        type="audio/wav">
+    </audio>
+
+    <script>
+        let memories = [];
+        let selectedBurnType = 'quick';
+        let selectedUrnType = 'standard';
+        let crematedCount = 0;
+        
+        document.getElementById('memoryUpload').addEventListener('change', function(e) {
+            const files = e.target.files;
+            for (let file of files) {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        addMemory({
+                            type: 'image',
+                            content: event.target.result,
+                            name: file.name,
+                            date: new Date().toLocaleDateString()
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+        
+        function addMemory(memory) {
+            memories.push(memory);
+            updateMemoryList();
+        }
+        
+        function updateMemoryList() {
+            const list = document.getElementById('memoryList');
+            list.innerHTML = memories.map((memory, index) => `
+                <div class="memory-item" id="memory-${index}">
+                    <div class="memory-content">
+                        ${memory.type === 'image' ? 
+                            `<img src="${memory.content}" class="memory-image" alt="${memory.name}">` :
+                            `<div class="memory-text">${memory.content}</div>`
+                        }
+                        <div class="memory-details">
+                            <div class="memory-text">${memory.name}</div>
+                            <div class="burn-timer">Time to ash: ${getBurnTime()} seconds</div>
+                        </div>
+                    </div>
+                    <div class="fire-animation" id="fire-${index}"></div>
+                </div>
+            `).join('');
+        }
+        
+        function getBurnTime() {
+            switch(selectedBurnType) {
+                case 'quick': return 30;
+                case 'slow': return 120;
+                case 'bulk': return 45;
+                default: return 47;
+            }
+        }
+        
+        document.querySelectorAll('.option-card[data-burn]').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.option-card[data-burn]').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedBurnType = this.dataset.burn;
+                updateMemoryList();
+            });
+        });
+        
+        document.querySelectorAll('.urn-option').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.urn-option').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedUrnType = this.dataset.urn;
+            });
+        });
+        
+        function startCremation() {
+            if (memories.length === 0) {
+                alert('No memories uploaded for cremation');
+                return;
+            }
+            
+            memories.forEach((memory, index) => {
+                setTimeout(() => {
+                    cremateMemory(index, memory);
+                }, index * 2000);
+            });
+        }
+        
+        function cremateMemory(index, memory) {
+            const memoryElement = document.getElementById(`memory-${index}`);
+            const fireElement = document.getElementById(`fire-${index}`);
+            
+            memoryElement.classList.add('burning');
+            fireElement.style.display = 'block';
+            
+            // Create fire effect
+            for (let i = 0; i < 10; i++) {
+                const flame = document.createElement('div');
+                flame.className = 'flame';
+                flame.style.left = Math.random() * 100 + '%';
+                flame.style.top = Math.random() * 100 + '%';
+                flame.style.animationDelay = Math.random() * 0.5 + 's';
+                fireElement.appendChild(flame);
+            }
+            
+            // Play burning sound (simulated)
+            const audio = document.getElementById('fireSound');
+            audio.play().catch(() => {});
+            
+            // Create smoke text with memory name
+            const smokeText = document.createElement('div');
+            smokeText.className = 'smoke-text';
+            smokeText.textContent = memory.name.split('.')[0];
+            smokeText.style.left = memoryElement.offsetLeft + 'px';
+            smokeText.style.top = memoryElement.offsetTop + 'px';
+            document.body.appendChild(smokeText);
+            
+            // Turn to ash after burn time
+            setTimeout(() => {
+                memoryElement.style.transition = 'opacity 2s';
+                memoryElement.style.opacity = '0.3';
+                
+                // Create ash particles
+                for (let i = 0; i < 30; i++) {
+                    const ash = document.createElement('div');
+                    ash.className = 'ash-particle';
+                    ash.style.left = Math.random() * 100 + '%';
+                    ash.style.top = Math.random() * 100 + '%';
+                    ash.style.setProperty('--x', (Math.random() - 0.5) * 200 + 'px');
+                    memoryElement.appendChild(ash);
+                }
+                
+                // Show certificate
+                showCertificate(memory);
+                
+                // Add to columbarium
+                addToColumbarium(memory);
+                
+                crematedCount++;
+                
+                // Generate eulogy
+                generateEulogy();
+                
+            }, getBurnTime() * 100);
+        }
+        
+        function showCertificate(memory) {
+            const certificate = document.getElementById('certificate');
+            const memoryName = document.getElementById('memoryName');
+            const cremationDate = document.getElementById('cremationDate');
+            
+            memoryName.textContent = memory.name;
+            cremationDate.textContent = new Date().toLocaleString();
+            
+            certificate.style.display = 'block';
+            certificate.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function addToColumbarium(memory) {
+            const columbarium = document.getElementById('columbarium');
+            const urnSlot = document.createElement('div');
+            urnSlot.className = 'urn-slot occupied';
+            urnSlot.innerHTML = `
+                <div style="font-size: 2em;">⚱️</div>
+                <div class="memorial-plaque">
+                    ${memory.name}<br>
+                    <span style="font-size: 0.8em; color: #666;">
+                        Born: ${memory.date}<br>
+                        Died: Today
+                    </span>
+                </div>
+            `;
+            columbarium.appendChild(urnSlot);
+        }
+        
+        function generateEulogy() {
+            const eulogies = [
+                "Here lies the time we were happy. May it rest in pieces.",
+                "Beloved memory, cruelly taken by the flames of time.",
+                "Gone but not forgotten. Actually, that's the whole point.",
+                "In loving memory of what could have been.",
+                "Ashes to ashes, tears to tears.",
+                "May these memories find peace in oblivion.",
+                "Here burns what once brought joy.",
+                "Reduced to ash, as all things must be."
+            ];
+            
+            const eulogyText = document.getElementById('eulogyText');
+            eulogyText.textContent = eulogies[Math.floor(Math.random() * eulogies.length)];
+        }
+        
+        function scatterAshes(location) {
+            const messages = {
+                'sea': 'Ashes scattered in the Sea of Tears, carried away by waves of sorrow.',
+                'wind': 'Ashes released to the Wind of Change, never to return.',
+                'garden': 'Ashes spread in the Garden of Regret, where nothing grows.'
+            };
+            
+            alert(messages[location]);
+            
+            // Clear columbarium after scattering
+            setTimeout(() => {
+                document.getElementById('columbarium').innerHTML = '';
+                memories = [];
+                updateMemoryList();
+            }, 2000);
+        }
+        
+        // Add floating ash particles to background
+        setInterval(() => {
+            if (crematedCount > 0 && Math.random() > 0.7) {
+                const ash = document.createElement('div');
+                ash.className = 'ash-particle';
+                ash.style.position = 'fixed';
+                ash.style.left = Math.random() * window.innerWidth + 'px';
+                ash.style.bottom = '0';
+                ash.style.setProperty('--x', (Math.random() - 0.5) * 300 + 'px');
+                document.body.appendChild(ash);
+                setTimeout(() => ash.remove(), 3000);
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

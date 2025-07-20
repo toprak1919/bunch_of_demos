@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love Language Obituary Writer</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Crimson+Text:wght@400;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #1a1a1a;
+            color: #d4d4d4;
+            font-family: 'Crimson Text', serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background-image: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 10px,
+                    rgba(255,255,255,.01) 10px,
+                    rgba(255,255,255,.01) 20px
+                );
+        }
+        
+        .obituary-container {
+            max-width: 800px;
+            width: 100%;
+            background-color: #f5f5dc;
+            color: #000;
+            padding: 40px;
+            border: 8px solid #000;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .obituary-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 100px,
+                    rgba(0,0,0,0.03) 100px,
+                    rgba(0,0,0,0.03) 101px
+                );
+            pointer-events: none;
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #000;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            font-size: 48px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+        
+        .header .subtitle {
+            font-size: 24px;
+            font-style: italic;
+            font-weight: 400;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        input[type="text"],
+        input[type="date"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #000;
+            background-color: rgba(255,255,255,0.8);
+            font-family: 'Crimson Text', serif;
+            font-size: 16px;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .love-language-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #000;
+            background-color: rgba(0,0,0,0.05);
+        }
+        
+        .love-language-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-decoration: underline;
+        }
+        
+        .generate-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #000;
+            color: #f5f5dc;
+            border: none;
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 30px;
+        }
+        
+        .generate-btn:hover {
+            background-color: #333;
+            transform: scale(1.02);
+        }
+        
+        .obituary-output {
+            display: none;
+            margin-top: 50px;
+            padding: 40px;
+            border: 8px double #000;
+            background-color: #fff;
+            position: relative;
+        }
+        
+        .obituary-output::before,
+        .obituary-output::after {
+            content: '✝';
+            position: absolute;
+            font-size: 30px;
+        }
+        
+        .obituary-output::before {
+            top: 10px;
+            left: 10px;
+        }
+        
+        .obituary-output::after {
+            bottom: 10px;
+            right: 10px;
+        }
+        
+        .obit-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .obit-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            font-weight: 900;
+            margin-bottom: 10px;
+        }
+        
+        .obit-dates {
+            font-size: 20px;
+            font-style: italic;
+        }
+        
+        .obit-section {
+            margin-bottom: 25px;
+            line-height: 1.8;
+        }
+        
+        .obit-section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .love-language-obit {
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 4px solid #000;
+            background-color: rgba(0,0,0,0.05);
+        }
+        
+        .love-language-obit h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        
+        .memorial-details {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 3px solid #000;
+        }
+        
+        .fade-photo {
+            width: 200px;
+            height: 200px;
+            margin: 30px auto;
+            background-color: #ddd;
+            border: 4px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+            opacity: 0.5;
+        }
+        
+        .guestbook {
+            margin-top: 30px;
+            padding: 20px;
+            border: 2px dashed #000;
+            text-align: center;
+            font-style: italic;
+        }
+        
+        .publication-fee {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="obituary-container">
+        <div class="header">
+            <h1>Love Language Obituary Writer</h1>
+            <p class="subtitle">Write the Death Notice for How You Loved Each Other</p>
+        </div>
+        
+        <form id="obituaryForm" class="form-section">
+            <div class="form-group">
+                <label for="relationshipName">Relationship Names (e.g., "John & Mary")</label>
+                <input type="text" id="relationshipName" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="firstILoveYou">Date of Birth (First "I Love You")</label>
+                <input type="date" id="firstILoveYou" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="lastConversation">Date of Death (Last Meaningful Conversation)</label>
+                <input type="date" id="lastConversation" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="favoriteMemory">Favorite Memory (That Now Hurts to Remember)</label>
+                <textarea id="favoriteMemory" required></textarea>
+            </div>
+            
+            <div class="love-language-section">
+                <h3 class="love-language-title">Words of Affirmation</h3>
+                <div class="form-group">
+                    <label for="wordsLastHeard">Last Words of Love Spoken</label>
+                    <input type="text" id="wordsLastHeard" placeholder="e.g., 'I'm proud of you' - 6 months ago">
+                </div>
+                <div class="form-group">
+                    <label for="wordsNeeded">Words That Were Never Said</label>
+                    <textarea id="wordsNeeded" placeholder="e.g., You're beautiful, I appreciate you, Thank you"></textarea>
+                </div>
+            </div>
+            
+            <div class="love-language-section">
+                <h3 class="love-language-title">Physical Touch</h3>
+                <div class="form-group">
+                    <label for="lastTouch">Last Meaningful Touch</label>
+                    <input type="text" id="lastTouch" placeholder="e.g., A brief hug, 3 weeks ago">
+                </div>
+                <div class="form-group">
+                    <label for="touchMissed">Touch That Disappeared</label>
+                    <textarea id="touchMissed" placeholder="e.g., Morning kisses, hand holding, back rubs"></textarea>
+                </div>
+            </div>
+            
+            <div class="love-language-section">
+                <h3 class="love-language-title">Quality Time</h3>
+                <div class="form-group">
+                    <label for="lastQualityTime">Last Time Spent Together (Without Phones)</label>
+                    <input type="text" id="lastQualityTime" placeholder="e.g., Can't remember">
+                </div>
+                <div class="form-group">
+                    <label for="timeLost">Activities That Died</label>
+                    <textarea id="timeLost" placeholder="e.g., Sunday morning coffee, evening walks, date nights"></textarea>
+                </div>
+            </div>
+            
+            <div class="love-language-section">
+                <h3 class="love-language-title">Acts of Service</h3>
+                <div class="form-group">
+                    <label for="lastAct">Last Act of Love</label>
+                    <input type="text" id="lastAct" placeholder="e.g., Made dinner, 2 months ago">
+                </div>
+                <div class="form-group">
+                    <label for="actsAbandoned">Services That Ceased</label>
+                    <textarea id="actsAbandoned" placeholder="e.g., Morning coffee, packed lunches, surprise cleanings"></textarea>
+                </div>
+            </div>
+            
+            <div class="love-language-section">
+                <h3 class="love-language-title">Receiving Gifts</h3>
+                <div class="form-group">
+                    <label for="lastGift">Last Thoughtful Gift</label>
+                    <input type="text" id="lastGift" placeholder="e.g., Birthday card, felt obligatory">
+                </div>
+                <div class="form-group">
+                    <label for="giftsForget">"Just Because" Gifts That Stopped</label>
+                    <textarea id="giftsForget" placeholder="e.g., Favorite flowers, surprise treats, handwritten notes"></textarea>
+                </div>
+            </div>
+            
+            <button type="submit" class="generate-btn">Generate Obituary</button>
+        </form>
+        
+        <div id="obituaryOutput" class="obituary-output">
+            <!-- Generated obituary will appear here -->
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('obituaryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            generateObituary();
+        });
+        
+        function generateObituary() {
+            const relationshipName = document.getElementById('relationshipName').value;
+            const firstILoveYou = new Date(document.getElementById('firstILoveYou').value);
+            const lastConversation = new Date(document.getElementById('lastConversation').value);
+            const favoriteMemory = document.getElementById('favoriteMemory').value;
+            
+            const wordsLastHeard = document.getElementById('wordsLastHeard').value;
+            const wordsNeeded = document.getElementById('wordsNeeded').value;
+            const lastTouch = document.getElementById('lastTouch').value;
+            const touchMissed = document.getElementById('touchMissed').value;
+            const lastQualityTime = document.getElementById('lastQualityTime').value;
+            const timeLost = document.getElementById('timeLost').value;
+            const lastAct = document.getElementById('lastAct').value;
+            const actsAbandoned = document.getElementById('actsAbandoned').value;
+            const lastGift = document.getElementById('lastGift').value;
+            const giftsForget = document.getElementById('giftsForget').value;
+            
+            const relationshipDuration = Math.floor((lastConversation - firstILoveYou) / (1000 * 60 * 60 * 24));
+            const years = Math.floor(relationshipDuration / 365);
+            const months = Math.floor((relationshipDuration % 365) / 30);
+            
+            const obituaryHTML = `
+                <div class="obit-header">
+                    <h2 class="obit-title">In Loving Memory of How We Communicated</h2>
+                    <p class="obit-dates">${formatDate(firstILoveYou)} - ${formatDate(lastConversation)}</p>
+                    <p class="obit-dates">Aged ${years} years and ${months} months</p>
+                </div>
+                
+                <div class="obit-section">
+                    <p>It is with profound emptiness that we announce the death of the love language between ${relationshipName}, 
+                    which passed away quietly after a prolonged battle with chronic communication failure.</p>
+                </div>
+                
+                <div class="obit-section">
+                    <h3 class="obit-section-title">Survived By</h3>
+                    <p>Deafening silence, countless misunderstandings, words left unspoken, and the ghost of what once was.</p>
+                </div>
+                
+                <div class="obit-section">
+                    <h3 class="obit-section-title">Preceded in Death By</h3>
+                    <p>Trust (died suddenly), Intimacy (faded slowly), Understanding (lost without warning), 
+                    and Hope (held on until the very end).</p>
+                </div>
+                
+                <div class="obit-section">
+                    <h3 class="obit-section-title">Life Story of Each Love Language</h3>
+                    
+                    <div class="love-language-obit">
+                        <h4>Words of Affirmation - Died of Starvation</h4>
+                        <p>Last nourishment received: "${wordsLastHeard || 'Cannot recall'}"</p>
+                        <p>Starved for: ${wordsNeeded || 'Any words at all'}</p>
+                        <p>Official cause of death: Verbal malnutrition and emotional anemia</p>
+                    </div>
+                    
+                    <div class="love-language-obit">
+                        <h4>Physical Touch - Withered From Neglect</h4>
+                        <p>Final contact: ${lastTouch || 'Lost to memory'}</p>
+                        <p>Died waiting for: ${touchMissed || 'Any gentle touch'}</p>
+                        <p>Manner of death: Touch deprivation syndrome</p>
+                    </div>
+                    
+                    <div class="love-language-obit">
+                        <h4>Quality Time - Expired Due to Absence</h4>
+                        <p>Last seen alive: ${lastQualityTime || 'Unknown'}</p>
+                        <p>Activities that perished: ${timeLost || 'All shared moments'}</p>
+                        <p>Time of death: When "later" became "never"</p>
+                    </div>
+                    
+                    <div class="love-language-obit">
+                        <h4>Acts of Service - Ceased All Operations</h4>
+                        <p>Final act recorded: ${lastAct || 'No recent activity'}</p>
+                        <p>Services terminated: ${actsAbandoned || 'All caring gestures'}</p>
+                        <p>Shutdown reason: Complete system failure</p>
+                    </div>
+                    
+                    <div class="love-language-obit">
+                        <h4>Receiving Gifts - Returned to Sender</h4>
+                        <p>Last delivery: ${lastGift || 'Return to sender'}</p>
+                        <p>Packages lost in transit: ${giftsForget || 'All thoughtful surprises'}</p>
+                        <p>Final status: Permanently undeliverable</p>
+                    </div>
+                </div>
+                
+                <div class="obit-section">
+                    <h3 class="obit-section-title">Favorite Memory</h3>
+                    <p><em>"${favoriteMemory}"</em></p>
+                    <p style="text-align: center; margin-top: 10px;">- Now too painful to revisit -</p>
+                </div>
+                
+                <div class="fade-photo">
+                    <p>Last Happy Photo Together<br>
+                    <small>(Image fading from memory)</small></p>
+                </div>
+                
+                <div class="memorial-details">
+                    <h3 class="obit-section-title">Memorial Service</h3>
+                    <p>No service planned - no one would attend.</p>
+                    <p style="margin-top: 15px;"><strong>In lieu of flowers:</strong> Send nothing, like they did.</p>
+                </div>
+                
+                <div class="guestbook">
+                    <h3 class="obit-section-title">Guestbook</h3>
+                    <p>No condolences received.<br>
+                    0 people signed the register.<br>
+                    Comments have been disabled.</p>
+                </div>
+                
+                <div class="obit-section" style="text-align: center; margin-top: 40px;">
+                    <p style="font-size: 24px; font-family: 'Playfair Display', serif; font-weight: 700;">
+                        "Here lies a love that forgot how to speak"
+                    </p>
+                </div>
+                
+                <div class="publication-fee">
+                    <p>Publication Fee: Everything you had to give</p>
+                    <p style="font-size: 14px; margin-top: 10px;">Plus your heart, soul, and remaining hope</p>
+                </div>
+            `;
+            
+            document.getElementById('obituaryOutput').innerHTML = obituaryHTML;
+            document.getElementById('obituaryOutput').style.display = 'block';
+            document.getElementById('obituaryOutput').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function formatDate(date) {
+            const months = ['January', 'February', 'March', 'April', 'May', 'June',
+                          'July', 'August', 'September', 'October', 'November', 'December'];
+            return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+        }
+    </script>
+</body>
+</html>

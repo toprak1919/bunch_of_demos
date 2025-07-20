@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soul Contract Termination Notice</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=UnifrakturMaguntia&display=swap');
+        
+        body {
+            margin: 0;
+            padding: 40px;
+            background: #0a0a0a;
+            color: #d4af37;
+            font-family: 'Crimson Text', serif;
+            line-height: 1.8;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(139, 0, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139, 0, 0, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        .document {
+            max-width: 800px;
+            margin: 0 auto;
+            background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
+            border: 3px double #8b0000;
+            padding: 60px;
+            box-shadow: 
+                0 0 50px rgba(139, 0, 0, 0.5),
+                inset 0 0 100px rgba(0, 0, 0, 0.8);
+            position: relative;
+        }
+        
+        .document::before,
+        .document::after {
+            content: '☩';
+            position: absolute;
+            font-size: 30px;
+            color: #8b0000;
+            opacity: 0.3;
+        }
+        
+        .document::before {
+            top: 20px;
+            left: 20px;
+        }
+        
+        .document::after {
+            bottom: 20px;
+            right: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            border-bottom: 3px double #8b0000;
+            padding-bottom: 30px;
+        }
+        
+        h1 {
+            font-family: 'UnifrakturMaguntia', cursive;
+            font-size: 48px;
+            margin: 0 0 10px 0;
+            color: #8b0000;
+            text-shadow: 
+                0 0 10px rgba(139, 0, 0, 0.8),
+                0 0 20px rgba(139, 0, 0, 0.5);
+            letter-spacing: 3px;
+        }
+        
+        .subtitle {
+            font-family: 'Cinzel', serif;
+            font-size: 16px;
+            letter-spacing: 5px;
+            color: #666;
+            margin-top: 10px;
+        }
+        
+        .case-number {
+            font-family: monospace;
+            color: #666;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        
+        .section {
+            margin: 30px 0;
+            padding: 20px 0;
+            border-bottom: 1px dotted #444;
+        }
+        
+        .section:last-child {
+            border-bottom: none;
+        }
+        
+        .section-title {
+            font-family: 'Cinzel', serif;
+            font-weight: 600;
+            font-size: 18px;
+            color: #d4af37;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .parties {
+            background: rgba(139, 0, 0, 0.05);
+            padding: 25px;
+            border-left: 3px solid #8b0000;
+            margin: 20px 0;
+        }
+        
+        .party {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+        
+        .party-title {
+            font-weight: 600;
+            color: #8b0000;
+        }
+        
+        .clause {
+            margin: 15px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+        
+        .clause::before {
+            content: '§';
+            position: absolute;
+            left: 0;
+            color: #8b0000;
+            font-size: 20px;
+        }
+        
+        .breach-list {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+        
+        .breach-list li {
+            padding: 10px 0 10px 40px;
+            position: relative;
+            color: #999;
+            font-style: italic;
+        }
+        
+        .breach-list li::before {
+            content: '✗';
+            position: absolute;
+            left: 15px;
+            color: #8b0000;
+            font-size: 18px;
+        }
+        
+        .asset-division {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+        }
+        
+        .asset-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px dotted #333;
+        }
+        
+        .asset-name {
+            font-weight: 600;
+            color: #d4af37;
+        }
+        
+        .asset-status {
+            color: #8b0000;
+            font-style: italic;
+        }
+        
+        .karmic-debt {
+            background: linear-gradient(135deg, rgba(139, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.5) 100%);
+            padding: 30px;
+            margin: 30px 0;
+            border: 2px solid #8b0000;
+            text-align: center;
+        }
+        
+        .debt-amount {
+            font-family: 'Cinzel', serif;
+            font-size: 24px;
+            color: #8b0000;
+            margin: 10px 0;
+            text-shadow: 0 0 10px rgba(139, 0, 0, 0.5);
+        }
+        
+        .signatures {
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 3px double #8b0000;
+        }
+        
+        .signature-block {
+            margin: 30px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        
+        .signature-line {
+            width: 300px;
+            border-bottom: 1px solid #666;
+            margin-bottom: 5px;
+        }
+        
+        .signature-name {
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .witness-signature {
+            text-align: center;
+            margin: 40px 0;
+            font-family: 'UnifrakturMaguntia', cursive;
+            font-size: 36px;
+            color: #8b0000;
+            opacity: 0.7;
+        }
+        
+        .seal {
+            text-align: center;
+            margin: 40px 0;
+            position: relative;
+        }
+        
+        .seal-circle {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+            border: 3px double #8b0000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle, rgba(139, 0, 0, 0.2) 0%, transparent 70%);
+            box-shadow: 0 0 30px rgba(139, 0, 0, 0.5);
+        }
+        
+        .seal-text {
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
+            text-align: center;
+            line-height: 1.2;
+            color: #8b0000;
+        }
+        
+        .final-stamp {
+            text-align: center;
+            margin-top: 60px;
+            padding: 30px;
+            background: #000;
+            border: 5px double #8b0000;
+            position: relative;
+            transform: rotate(-2deg);
+        }
+        
+        .stamp-text {
+            font-family: 'Cinzel', serif;
+            font-size: 28px;
+            font-weight: 600;
+            color: #8b0000;
+            letter-spacing: 5px;
+            text-shadow: 
+                2px 2px 0 #000,
+                -2px -2px 0 #000,
+                2px -2px 0 #000,
+                -2px 2px 0 #000;
+        }
+        
+        .effective-date {
+            text-align: center;
+            margin: 30px 0;
+            font-size: 20px;
+            color: #d4af37;
+            font-style: italic;
+        }
+        
+        .no-appeal {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin: 20px 0;
+        }
+        
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .document {
+            animation: flicker 5s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="document">
+        <div class="header">
+            <h1>NOTICE OF SOUL CONTRACT TERMINATION</h1>
+            <div class="subtitle">DECREE OF ETERNAL SEVERANCE</div>
+            <div class="case-number">Case No. SOUL-∞-VOID-2024</div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Parties to this Termination</div>
+            <div class="parties">
+                <div class="party">
+                    <span class="party-title">THE LOVER</span> (hereafter referred to as "The Abandoned")
+                </div>
+                <div class="party">
+                    <span class="party-title">THE BELOVED</span> (hereafter referred to as "The Escapee")
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Contract Details</div>
+            <div class="clause">
+                This termination refers to the Eternal Bond Agreement dated <strong>[FIRST "I LOVE YOU"]</strong>, 
+                witnessed by the stars and sealed with promises that have now turned to ash.
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Breach Clauses</div>
+            <div class="clause">
+                The following contract violations have been documented and verified:
+                <ul class="breach-list">
+                    <li>Failure to maintain promised "forever and always"</li>
+                    <li>Abandonment of shared dreams without notice</li>
+                    <li>Willful destruction of trust infrastructure</li>
+                    <li>Chronic underdelivery of affection quotas</li>
+                    <li>Unauthorized redirection of love to third parties</li>
+                    <li>Negligent infliction of emotional devastation</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Termination Reasons</div>
+            <div class="clause">
+                Primary Cause: <strong>FAILURE TO MAINTAIN MINIMUM LOVE LEVELS</strong><br>
+                Secondary Causes: Irreparable breach of heart contract, soul abandonment, 
+                and willful emotional negligence resulting in total system failure.
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Asset Division</div>
+            <div class="asset-division">
+                <div class="asset-item">
+                    <span class="asset-name">Dreams:</span>
+                    <span class="asset-status">DESTROYED</span>
+                </div>
+                <div class="asset-item">
+                    <span class="asset-name">Memories:</span>
+                    <span class="asset-status">CONTESTED</span>
+                </div>
+                <div class="asset-item">
+                    <span class="asset-name">Future:</span>
+                    <span class="asset-status">VOID</span>
+                </div>
+                <div class="asset-item">
+                    <span class="asset-name">Shared Songs:</span>
+                    <span class="asset-status">AWARDED TO SILENCE</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Penalty Clauses</div>
+            <div class="clause">
+                The Escapee shall be subject to: <strong>ETERNAL LONELINESS</strong> for breach of heart contract. 
+                No statute of limitations shall apply to this penalty.
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Karmic Debt</div>
+            <div class="karmic-debt">
+                <div class="debt-amount">OWED BY THE ESCAPEE:</div>
+                <div>10,000 TEARS</div>
+                <div>1,000 SLEEPLESS NIGHTS</div>
+                <div>∞ MOMENTS OF REGRET</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Severance Terms</div>
+            <div class="clause">
+                All soul ties shall be cut with spiritual scissors blessed by the tears of the abandoned. 
+                The severing shall be complete, irrevocable, and extend through all dimensions of existence.
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Non-Compete Clause</div>
+            <div class="clause">
+                The Abandoned may not love another for an undefined period as determined by the 
+                healing of their shattered heart. No timeline for recovery is guaranteed or implied.
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Liquidated Damages</div>
+            <div class="clause">
+                One (1) whole heart, irreparably broken, valued at: <strong>PRICELESS (NOW WORTHLESS)</strong>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Force Majeure</div>
+            <div class="clause">
+                No act of god, fate, or universe can reverse this termination. 
+                Not even true love's kiss, should such a thing still exist.
+            </div>
+        </div>
+        
+        <div class="effective-date">
+            EFFECTIVE: IMMEDIATELY AND FOR ALL ETERNITY
+        </div>
+        
+        <div class="no-appeal">
+            NO APPEALS PERMITTED - DECISION IS FINAL
+        </div>
+        
+        <div class="signatures">
+            <div class="signature-block">
+                <div>
+                    <div class="signature-line"></div>
+                    <div class="signature-name">The Abandoned (signed in tears)</div>
+                </div>
+                <div>
+                    <div class="signature-line"></div>
+                    <div class="signature-name">The Escapee (signature foregone)</div>
+                </div>
+            </div>
+            
+            <div class="witness-signature">
+                Universe
+                <div style="font-size: 14px; font-family: 'Crimson Text', serif; font-style: italic; color: #666;">
+                    (witnessed but did not intervene)
+                </div>
+            </div>
+        </div>
+        
+        <div class="seal">
+            <div class="seal-circle">
+                <div class="seal-text">
+                    SEALED<br>WITH<br>TEARS<br>&<br>FATE
+                </div>
+            </div>
+            <div style="margin-top: 20px; color: #666; font-style: italic;">
+                Notarized by the cosmos and countersigned by destiny
+            </div>
+        </div>
+        
+        <div class="final-stamp">
+            <div class="stamp-text">VOID WHERE PROHIBITED BY HOPE</div>
+        </div>
+    </div>
+</body>
+</html>
